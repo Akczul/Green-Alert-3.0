@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { getReportes } from '../../src/controllers/reporte.controller.js';
+import { getReportes } from '../helpers/reportes-controllers.js';
+import { createMysqlReportesReader } from '../../src/modules/reportes-lectura/adapters/outbound/mysql-reportes-reader.js';
 import { ReporteModel } from '../../src/models/reporte.model.js';
 
 const createResponse = () => ({
@@ -87,7 +88,7 @@ test('getReportes total no depende de la cantidad devuelta en la pagina', async 
 });
 
 test('ReporteModel.countAll usa COUNT con filtros compartidos', () => {
-  const source = ReporteModel.countAll.toString();
+  const source = createMysqlReportesReader({ pool: {} }).countAll.toString();
 
   assert.match(source, /COUNT\(\*\) AS total/);
   assert.match(source, /buildReportesFilter/);

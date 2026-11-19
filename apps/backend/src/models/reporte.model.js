@@ -1,9 +1,13 @@
+import { createMysqlReportesReader } from '../modules/reportes-lectura/adapters/outbound/mysql-reportes-reader.js';
+import { normalizeReporteIA, normalizeReporteEstado } from '../modules/reportes-lectura/domain/reportes.js';
+export { normalizeReporteIA, normalizeReporteEstado };
 import { createMysqlReporteReader } from '../modules/zonas-riesgo/adapters/outbound/mysql-reporte-reader.js';
 import pool from '../config/database.js';
 import { tableExists } from '../config/schema-compat.js';
 import { CATEGORIAS_FALLBACK } from './categoria-riesgo.model.js';
 import { randomUUID } from 'crypto';
 
+const reportesReadAdapter = createMysqlReportesReader({ pool });
 const reporteAnaliticaReader = createMysqlReporteReader({ pool });
 
 export const ESTADO_INICIAL_REPORTE = 'pendiente';
@@ -19,9 +23,6 @@ export const ESTADOS_REPORTE_LABELS = [
   'resuelto',
   'rechazado',
 ];
-export const normalizeReporteEstado = (estado) => (
-  typeof estado === 'string' ? estado.trim().toLowerCase().replace(/\s+/g, '_') : ''
-);
 export const NIVELES_SEVERIDAD_PERMITIDOS = [
   'bajo',
   'medio',
@@ -29,144 +30,13 @@ export const NIVELES_SEVERIDAD_PERMITIDOS = [
   'critico',
 ];
 
-const buildReportesFilter = ({
-  estado,
-  tipo_contaminacion,
-  nivel_severidad,
-  municipio,
-} = {}) => {
-  const conditions = ['r.deleted_at IS NULL'];
-  const params = [];
-
-  if (estado) {
-    conditions.push('r.estado = ?');
-    params.push(normalizeReporteEstado(estado));
-  }
-  if (tipo_contaminacion) {
-    conditions.push('r.tipo_contaminacion = ?');
-    params.push(tipo_contaminacion);
-  }
-  if (nivel_severidad) {
-    conditions.push('r.nivel_severidad = ?');
-    params.push(nivel_severidad);
-  }
-  if (municipio) {
-    conditions.push('r.municipio = ?');
-    params.push(municipio);
-  }
-
-  return {
-    where: conditions.join(' AND '),
-    params,
-  };
-};
-
-const ESTADO_ATENCION_RESPONSABLE_SQL = `
-              (
-                SELECT CASE
-                  WHEN SUM(CASE WHEN re.estado_atencion = 'en_atencion' THEN 1 ELSE 0 END) > 0 THEN 'en_atencion'
-                  WHEN SUM(CASE WHEN re.estado_atencion = 'atendido' THEN 1 ELSE 0 END) > 0 THEN 'atendido'
-                  WHEN SUM(CASE WHEN re.estado_atencion = 'cerrado' THEN 1 ELSE 0 END) > 0 THEN 'cerrado'
-                  ELSE NULL
-                END
-                FROM reporte_entidades re
-                WHERE re.id_reporte = r.id_reporte
-              ) AS estado_atencion_responsable`;
-
-export const normalizeReporteIA = (reporte) => {
-  if (!reporte) return reporte;
-
-  let etiquetas = [];
-  if (Array.isArray(reporte.ia_etiquetas)) {
-    etiquetas = reporte.ia_etiquetas;
-  } else if (typeof reporte.ia_etiquetas === 'string' && reporte.ia_etiquetas.trim()) {
-    try {
-      const parsed = JSON.parse(reporte.ia_etiquetas);
-      etiquetas = Array.isArray(parsed) ? parsed : [];
-    } catch {
-      etiquetas = [];
-    }
-  }
-  const confianza = Number(reporte.ia_confianza);
-
-  return {
-    ...reporte,
-    ia_etiquetas: etiquetas,
-    ia_confianza: reporte.ia_confianza === null || reporte.ia_confianza === undefined
-      ? null
-      : (Number.isFinite(confianza) ? confianza : null),
-    confianza_evidencia: reporte.confianza_evidencia === null || reporte.confianza_evidencia === undefined
-      ? null
-      : Number(reporte.confianza_evidencia),
-    ia_procesado: reporte.ia_procesado === true ||
-      reporte.ia_procesado === 'true' ||
-      Boolean(Number(reporte.ia_procesado)),
-  };
-};
-
 export const ReporteModel = {
   
     // Lista reportes con filtros opcionales y paginación
    
-  findAll: async ({
-    estado,
-    tipo_contaminacion,
-    nivel_severidad,
-    municipio,
-    limit = 20,
-    offset = 0,
-  } = {}) => {
-    const { where, params } = buildReportesFilter({
-      estado,
-      tipo_contaminacion,
-      nivel_severidad,
-      municipio,
-    });
-    const safeLimit  = Math.max(1, Math.min(100, parseInt(limit,  10) || 20));
-    const safeOffset = Math.max(0,               parseInt(offset, 10) || 0);
+  findAll: async (arg) => reportesReadAdapter.findAll(arg),
 
-    const [rows] = await pool.execute(
-      `SELECT r.id_reporte, r.uuid, r.id_usuario,
-              r.tipo_contaminacion, r.subcategoria, r.estado, r.nivel_severidad,
-              r.titulo, r.descripcion,
-              r.latitud, r.longitud, r.direccion, r.municipio, r.departamento,
-              ${ESTADO_ATENCION_RESPONSABLE_SQL},
-              r.ia_etiquetas, r.ia_confianza, r.ia_procesado, r.confianza_evidencia,
-              r.votos_relevancia, r.vistas,
-              r.created_at, r.updated_at,
-              u.nombre AS autor_nombre, u.apellido AS autor_apellido, u.rol AS autor_rol
-       FROM reportes r
-       LEFT JOIN usuarios u ON u.id_usuario = r.id_usuario
-       WHERE ${where}
-       ORDER BY r.created_at DESC
-       LIMIT ${safeLimit} OFFSET ${safeOffset}`,
-      params
-    );
-    return rows.map(normalizeReporteIA);
-  },
-
-  countAll: async ({
-    estado,
-    tipo_contaminacion,
-    nivel_severidad,
-    municipio,
-  } = {}) => {
-    const { where, params } = buildReportesFilter({
-      estado,
-      tipo_contaminacion,
-      nivel_severidad,
-      municipio,
-    });
-
-    const [[row]] = await pool.execute(
-      `SELECT COUNT(*) AS total
-       FROM reportes r
-       WHERE ${where}`,
-      params
-    );
-
-    return Number(row?.total) || 0;
-  },
+  countAll: async (arg) => reportesReadAdapter.countAll(arg),
 
   // Exporta reportes con filtros opcionales (para CSV/JSON)
   findForExport: async ({
@@ -230,54 +100,12 @@ export const ReporteModel = {
   
     // Busca un reporte por id_reporte 
    
-  findById: async (id_reporte) => {
-    const [rows] = await pool.execute(
-      `SELECT r.id_reporte, r.uuid, r.id_usuario,
-              r.tipo_contaminacion, r.subcategoria, r.estado, r.nivel_severidad,
-              r.titulo, r.descripcion,
-              r.latitud, r.longitud, r.direccion, r.municipio, r.departamento,
-              ${ESTADO_ATENCION_RESPONSABLE_SQL},
-              r.ia_etiquetas, r.ia_confianza, r.ia_procesado, r.confianza_evidencia,
-              r.votos_relevancia, r.vistas,
-              r.comentario_moderacion,
-              r.created_at, r.updated_at
-       FROM reportes r
-       WHERE r.id_reporte = ? AND r.deleted_at IS NULL
-       LIMIT 1`,
-      [id_reporte]
-    );
-    return normalizeReporteIA(rows[0] ?? null);
-  },
+  findById: async (arg) => reportesReadAdapter.findById(arg),
 
   
     //Busca los reportes creados por un usuario específico
    
-  findByUsuario: async (id_usuario, { limit = 20, offset = 0, estado = null, nivel_severidad = null } = {}) => {
-    const safeLimit  = Math.max(1, Math.min(100, parseInt(limit,  10) || 20));
-    const safeOffset = Math.max(0,               parseInt(offset, 10) || 0);
-    const conditions = ['r.id_usuario = ?', 'r.deleted_at IS NULL'];
-    const params = [id_usuario];
-    if (estado)           { conditions.push('r.estado = ?');           params.push(estado); }
-    if (nivel_severidad)  { conditions.push('r.nivel_severidad = ?');  params.push(nivel_severidad); }
-    const where = conditions.join(' AND ');
-    const [rows] = await pool.execute(
-      `SELECT r.id_reporte, r.uuid, r.tipo_contaminacion, r.subcategoria, r.estado, r.nivel_severidad,
-              r.titulo, r.descripcion, r.municipio, r.departamento,
-              ${ESTADO_ATENCION_RESPONSABLE_SQL},
-              r.ia_etiquetas, r.ia_confianza, r.ia_procesado, r.confianza_evidencia,
-              r.votos_relevancia, r.vistas,
-              r.created_at, r.updated_at,
-              (SELECT e.url_archivo FROM evidencias e
-               WHERE e.id_reporte = r.id_reporte AND e.tipo_archivo = 'imagen'
-               ORDER BY e.orden ASC, e.created_at ASC LIMIT 1) AS primera_imagen
-       FROM reportes r
-       WHERE ${where}
-       ORDER BY r.created_at DESC
-       LIMIT ${safeLimit} OFFSET ${safeOffset}`,
-      params
-    );
-    return rows.map(normalizeReporteIA);
-  },
+  findByUsuario: async (...args) => reportesReadAdapter.findByUsuario(...args),
 
   
     // Crea un nuevo reporte, genera punto_geo automáticamente a partir de lat/lon
@@ -436,17 +264,7 @@ export const ReporteModel = {
   },
 
   // Cuenta total de reportes de un usuario específico
-  countByUsuario: async (id_usuario, { estado = null, nivel_severidad = null } = {}) => {
-    const conditions = ['id_usuario = ?', 'deleted_at IS NULL'];
-    const params = [id_usuario];
-    if (estado)           { conditions.push('estado = ?');           params.push(estado); }
-    if (nivel_severidad)  { conditions.push('nivel_severidad = ?');  params.push(nivel_severidad); }
-    const [[row]] = await pool.execute(
-      `SELECT COUNT(*) AS total FROM reportes WHERE ${conditions.join(' AND ')}`,
-      params
-    );
-    return row?.total ?? 0;
-  },
+  countByUsuario: async (...args) => reportesReadAdapter.countByUsuario(...args),
 
   // Estadísticas globales para Dashboard y Home
   getStats: async () => {
@@ -604,28 +422,7 @@ export const ReporteModel = {
   // Compatibilidad con consumidores heredados; el SQL vive en el adaptador.
   findParaPrediccion: async (params) => reporteAnaliticaReader.findParaPrediccion(params),
 
-  findTrending: async ({ limit = 12 } = {}) => {
-    const safeLimit = Math.max(1, Math.min(50, parseInt(limit, 10) || 12));
-    const [rows] = await pool.execute(
-      `SELECT r.id_reporte, r.uuid, r.id_usuario,
-              r.tipo_contaminacion, r.subcategoria, r.estado, r.nivel_severidad,
-              r.titulo, r.descripcion,
-              r.latitud, r.longitud, r.direccion, r.municipio, r.departamento,
-              r.ia_etiquetas, r.ia_confianza, r.ia_procesado, r.confianza_evidencia,
-              r.votos_relevancia, r.vistas,
-              r.created_at, r.updated_at,
-              (r.votos_relevancia * 3 + r.vistas + GREATEST(0, 30 - TIMESTAMPDIFF(DAY, r.created_at, NOW()))) AS trending_score
-       FROM reportes r
-       WHERE r.deleted_at IS NULL
-       ORDER BY trending_score DESC, r.created_at DESC
-       LIMIT ${safeLimit}`
-    );
-
-    return rows.map((row) => ({
-      ...row,
-      trending_score: Number(row.trending_score) || 0,
-    }));
-  },
+  findTrending: async (arg) => reportesReadAdapter.findTrending(arg),
 
   getStatsIA: async ({ dias = 30 } = {}) => {
     const safeDias = Math.max(1, Math.min(365, parseInt(dias, 10) || 30));

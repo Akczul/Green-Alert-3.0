@@ -72,6 +72,12 @@ try {
     }, auth.token, 201);
     const detail = await api('GET', `/reportes/${reporte.id_reporte}`, null, auth.token);
     assert.equal(detail.reporte.titulo, 'Reporte Docker sintético');
+    const list = await api('GET', '/reportes?tipo_contaminacion=agua&limit=1', null, auth.token);
+    assert.equal(list.reportes[0].id_reporte, reporte.id_reporte);
+    const own = await api('GET', '/reportes/mis-reportes', null, auth.token);
+    assert.equal(own.reportes[0].id_reporte, reporte.id_reporte);
+    const trending = await api('GET', '/reportes/trending?limit=1');
+    assert.equal(trending.reportes[0].id_reporte, reporte.id_reporte);
     pilotReport = reporte;
   });
   await check('Piloto hexagonal: consulta geográfica y alertas por Nginx con Node 24', async () => {

@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import { optionalAuth } from '../../middlewares/auth.middleware.js';
 import { LikeModel } from '../../src/models/like.model.js';
 import { ReporteModel } from '../../src/models/reporte.model.js';
+import pool from '../../src/config/database.js';
 
 process.env.API_PREFIX = '';
 process.env.JWT_SECRET = 'optional-auth-test-secret';
@@ -100,8 +101,10 @@ test('GET /reportes responde anonimo y enriquece liked_by_me con token valido', 
     { id_reporte: 10, titulo: 'Reporte 10' },
     { id_reporte: 11, titulo: 'Reporte 11' },
   ];
-  t.mock.method(ReporteModel, 'findAll', async () => reportes);
-  t.mock.method(ReporteModel, 'countAll', async () => 2);
+  t.mock.method(pool, 'execute', async (sql) => {
+    if (sql.includes('COUNT(*) AS total')) return [[{ total: 2 }]];
+    return [reportes];
+  });
   t.mock.method(LikeModel, 'likedSet', async (_ids, idUsuario) => (
     Number(idUsuario) === 21 ? new Set([10]) : new Set()
   ));

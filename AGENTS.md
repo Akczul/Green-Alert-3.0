@@ -5,7 +5,7 @@
 - Este repositorio consolida Green-Alert/Backend y Green-Alert/Frontend. Los SHA de origen están en `docs/procedencia.md`; ambos historiales son ancestros de `main`.
 - Backend: JavaScript ESM, Express 4, `mysql2/promise`, SQL explícito. Rutas en `apps/backend/routes`, middleware en `middlewares`, controladores/modelos/servicios en `src`.
 - Frontend: React 18 JSX, Vite 5, React Router 6, Tailwind 3, Axios, Leaflet, Firebase. Mantener las pantallas y los componentes originales.
-- No hay NestJS, gateway distribuido ni microservicios. Solo la consulta de zonas tiene un piloto hexagonal real; el resto sigue por capas. Ver `docs/piloto-hexagonal-zonas-riesgo.md` y la propuesta restante en `docs/arquitectura-objetivo.md`.
+- No hay NestJS, gateway distribuido ni microservicios. Consulta de zonas y las cuatro lecturas de reportes tienen módulos hexagonales; el resto sigue por capas. Ver `docs/piloto-hexagonal-zonas-riesgo.md`, `docs/hexagonal-reportes-lectura.md` y la propuesta restante en `docs/arquitectura-objetivo.md`.
 - Instalaciones independientes por aplicación. No introducir workspaces, hoisting ni otro gestor sin justificar cómo se preservan los lockfiles y contratos.
 
 ## Contratos y convenciones
@@ -31,6 +31,7 @@ npm run test:smoke         # HTTP/proxy real; sin persistencia
 npm run test:mysql         # mysqld nativo separado, datos sintéticos y MySQL real
 npm run test:mysql:docker  # MySQL 8.4.11 temporal y la misma suite de integración
 npm run test:stack         # Compose real aislado + override; retira solo sus recursos
+npm run test:reportes:lectura # 33 contratos originales contra Express/MySQL Docker aislado
 npm run infra:config       # validar Compose sin exponer variables
 npm run docs:inventory     # regenerar endpoints/dependencias/nombres de variables
 ```
@@ -59,4 +60,6 @@ Node de referencia: 24. Ver `docs/verificacion.md` antes de afirmar qué entorno
 - El piloto se ensambla en `src/bootstrap/zonas-riesgo.js`. Dominio/aplicación reciben reader, reloj y caché por fábrica; no importar modelos, pool, Express, entorno o adaptadores desde esas capas.
 - `prediccion.service.js` y `ReporteModel.findParaPrediccion` son puentes para consumidores heredados. Conservar una sola consulta SQL en el adaptador y una sola caché productiva compartida con alertas.
 - Los ocho fixtures de `tests/fixtures/zonas-riesgo/contrato.json` provienen de a79b6ba antes del refactor. No regenerarlos desde el código nuevo para ocultar regresiones; un cambio de contrato exige revisión explícita.
-- Esta fase termina en consulta de zonas. No extraer alertas u otros módulos como efecto secundario de mantenimiento del piloto.
+- La lectura de reportes se ensambla en `src/bootstrap/reportes-lectura.js`; casos y dominio solo dependen de puertos/funciones internos. Los puentes del modelo y adaptadores heredados conservan consumidores y efectos de vistas.
+- Los 33 fixtures de reportes provienen de `6e6f5d1` antes del refactor. No regenerarlos desde el código nuevo para ocultar regresiones.
+- Esta fase termina en listado, propios, detalle y tendencias de reportes. No extraer escrituras, moderación, asignaciones, evidencias, alertas u otros módulos sin nueva tarea.

@@ -1,3 +1,4 @@
+export { getReportes, getMisReportes, getReporteById, getTrendingReportes } from '../bootstrap/reportes-lectura.js';
 import {
   ESTADO_INICIAL_REPORTE,
   ESTADOS_REPORTE_LABELS,
@@ -26,8 +27,6 @@ import { errorResponse, successResponse } from '../utils/response.js';
 import { crearNotificacion } from './notificacion.controller.js';
 import { validateUploadedFilesContent } from '../../middlewares/upload.middleware.js';
 
-const ANONYMOUS_VIEW_THROTTLE_MS = 5 * 60 * 1000;
-const anonymousViewThrottle = new Map();
 
 const parseCoordinate = (value, { field, min, max }) => {
   if (value === undefined || value === null || value === '') {
@@ -311,48 +310,6 @@ const parseAcceptedIaPayload = ({ ia_etiquetas, ia_confianza, ia_procesado }) =>
   };
 };
 
-const getAnonymousViewerKey = (req, idReporte) => {
-  const ip = req.ip || req.socket?.remoteAddress || 'unknown-ip';
-  const userAgent = req.get?.('user-agent') || req.headers?.['user-agent'] || 'unknown-agent';
-  return `${idReporte}:${ip}:${userAgent}`;
-};
-
-const registerReporteView = async (req, idReporte) => {
-  if (req.query?.skip_view === 'true') return false;
-
-  if (req.user?.sub) {
-    return ReporteModel.registrarVistaUsuario(idReporte, req.user.sub);
-  }
-
-  const now = Date.now();
-  const key = getAnonymousViewerKey(req, idReporte);
-  const lastSeenAt = anonymousViewThrottle.get(key) || 0;
-
-  if (now - lastSeenAt < ANONYMOUS_VIEW_THROTTLE_MS) {
-    return false;
-  }
-
-  anonymousViewThrottle.set(key, now);
-  await ReporteModel.incrementarVistas(idReporte);
-  return true;
-};
-
-const enrichLikedByMe = async (reportes, idUsuario) => {
-  const items = Array.isArray(reportes) ? reportes : [reportes].filter(Boolean);
-  if (!idUsuario || items.length === 0) return reportes;
-
-  const likedSet = await LikeModel.likedSet(
-    items.map((reporte) => reporte.id_reporte),
-    idUsuario
-  );
-  const enriched = items.map((reporte) => ({
-    ...reporte,
-    liked_by_me: likedSet.has(Number(reporte.id_reporte)),
-  }));
-
-  return Array.isArray(reportes) ? enriched : enriched[0];
-};
-
 export const createReporte = async (req, res, next) => {
   try {
     const {
@@ -509,59 +466,6 @@ export const createReporte = async (req, res, next) => {
   }
 };
 
-export const getReportes = async (req, res, next) => {
-  try {
-    const { estado, tipo_contaminacion, nivel_severidad, municipio, limit = 20, offset = 0 } = req.query;
-
-    if (req.user?.rol === 'entidad') {
-      const idEntidad = await getEntidadActivaIdFromUser(req.user);
-      if (!idEntidad) {
-        return errorResponse(res, 'Usuario entidad sin entidad asignada.', 403);
-      }
-
-      const data = await ReporteEntidadModel.findByEntidad(idEntidad, {
-        categoria: tipo_contaminacion,
-        severidad: nivel_severidad,
-        limit,
-        offset,
-      });
-
-      return successResponse(res, {
-        reportes: data.reportes,
-        total: data.total,
-        limit: data.limit,
-        offset: data.offset,
-      });
-    }
-
-    const filters = {
-      estado, tipo_contaminacion, nivel_severidad, municipio,
-      limit: Number(limit),
-      offset: Number(offset),
-    };
-    const countFilters = {
-      estado,
-      tipo_contaminacion,
-      nivel_severidad,
-      municipio,
-    };
-    const [reportes, total] = await Promise.all([
-      ReporteModel.findAll(filters),
-      ReporteModel.countAll(countFilters),
-    ]);
-    const enrichedReportes = await enrichLikedByMe(reportes, req.user?.sub);
-
-    return successResponse(res, {
-      reportes: enrichedReportes,
-      total,
-      limit: Math.max(1, Math.min(100, parseInt(limit, 10) || 20)),
-      offset: Math.max(0, parseInt(offset, 10) || 0),
-    });
-  } catch (error) {
-    return next(error);
-  }
-};
-
 export const exportReportes = async (req, res, next) => {
   try {
     const {
@@ -697,39 +601,6 @@ export const exportReportes = async (req, res, next) => {
   }
 };
 
-export const getMisReportes = async (req, res, next) => {
-  try {
-    const id_usuario = req.user?.sub;
-
-    if (!id_usuario) {
-      return errorResponse(res, 'No autorizado.', 401);
-    }
-
-    const { limit = 20, offset = 0, estado, nivel_severidad } = req.query;
-
-    const filters = {
-      limit: Number(limit),
-      offset: Number(offset),
-      estado: estado?.trim() || null,
-      nivel_severidad: nivel_severidad?.trim() || null,
-    };
-
-    const [reportes, total] = await Promise.all([
-      ReporteModel.findByUsuario(id_usuario, filters),
-      ReporteModel.countByUsuario(id_usuario, { estado: filters.estado, nivel_severidad: filters.nivel_severidad }),
-    ]);
-
-    return successResponse(
-      res,
-      { reportes, total },
-      'Reportes del usuario obtenidos correctamente.',
-      200
-    );
-  } catch (error) {
-    return next(error);
-  }
-};
-
 export const getStats = async (req, res, next) => {
   try {
     const stats = await ReporteModel.getStats();
@@ -832,20 +703,6 @@ export const getAlertasPredictivas = async (req, res, next) => {
       res,
       { alertas, total: alertas.length },
       'Alertas predictivas obtenidas correctamente.'
-    );
-  } catch (error) {
-    return next(error);
-  }
-};
-
-export const getTrendingReportes = async (req, res, next) => {
-  try {
-    const reportes = await ReporteModel.findTrending({ limit: req.query?.limit });
-    const enrichedReportes = await enrichLikedByMe(reportes, req.user?.sub);
-    return successResponse(
-      res,
-      { reportes: enrichedReportes, total: reportes.length },
-      'Reportes en tendencia obtenidos correctamente.'
     );
   } catch (error) {
     return next(error);
@@ -1181,43 +1038,6 @@ export const deleteReporte = async (req, res, next) => {
     await ReporteModel.remove(id);
     invalidatePrediccionCache();
     return successResponse(res, null, 'Reporte eliminado.');
-  } catch (error) {
-    return next(error);
-  }
-};
-
-export const getReporteById = async (req, res, next) => {
-  try {
-    const id = Number(req.params.id);
-    if (req.user?.rol === 'entidad') {
-      const idEntidad = await getEntidadActivaIdFromUser(req.user);
-      if (!idEntidad) {
-        return errorResponse(res, 'Usuario entidad sin entidad asignada.', 403);
-      }
-
-      const asignado = await ReporteEntidadModel.findOneByReporteAndEntidad(id, idEntidad);
-      if (!asignado) {
-        return errorResponse(res, 'No tienes permiso para ver este reporte.', 403);
-      }
-    }
-
-    const reporte = await ReporteModel.findById(id);
-    if (!reporte) return errorResponse(res, 'Reporte no encontrado.', 404);
-    await registerReporteView(req, id);
-    const enrichedReporte = await enrichLikedByMe(reporte, req.user?.sub);
-
-    // Fetch related data in parallel
-    const [evidencias, usuario] = await Promise.all([
-      EvidenciaModel.findByReporte(id),
-      UsuarioModel.findById(reporte.id_usuario),
-    ]);
-
-    // Strip sensitive user fields
-    const autor = usuario
-      ? { nombre: usuario.nombre, apellido: usuario.apellido, rol: usuario.rol, avatar_url: usuario.avatar_url ?? null }
-      : null;
-
-    return successResponse(res, { reporte: enrichedReporte, evidencias, autor });
   } catch (error) {
     return next(error);
   }

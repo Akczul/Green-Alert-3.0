@@ -10,8 +10,8 @@ import {
   getReporteById,
   getReportes,
   getTrendingReportes,
-  toggleLikeReporte,
-} from '../../src/controllers/reporte.controller.js';
+} from '../helpers/reportes-controllers.js';
+import { toggleLikeReporte } from '../../src/controllers/reporte.controller.js';
 
 const createResponse = () => ({
   statusCode: null,

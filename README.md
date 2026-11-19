@@ -1,6 +1,6 @@
 # GreenAlert
 
-Monorepositorio de la plataforma ambiental existente. Conserva la SPA **React 18 + Vite 5** y la API **Express 4 + MySQL**. La consulta de zonas de riesgo tiene un [piloto hexagonal implementado](docs/piloto-hexagonal-zonas-riesgo.md); el resto del backend continúa por capas. No usa NestJS ni microservicios. Las nuevas bases de datos y ML siguen pendientes de decisión.
+Monorepositorio de la plataforma ambiental existente. Conserva la SPA **React 18 + Vite 5** y la API **Express 4 + MySQL**. La consulta de zonas de riesgo tiene un [piloto hexagonal implementado](docs/piloto-hexagonal-zonas-riesgo.md), extendido a [cuatro lecturas de reportes](docs/hexagonal-reportes-lectura.md); los demás módulos y escrituras continúan por capas. No usa NestJS ni microservicios. Las nuevas bases de datos y ML siguen pendientes de decisión.
 
 ```text
 GreenAlert/                 # carpeta de trabajo actual: GreenAlert3.0
@@ -70,7 +70,7 @@ npm run test:smoke
 npm run infra:config
 ```
 
-El backend no necesita compilación: `build:backend` comprueba la sintaxis de sus 125 archivos JS. El frontend genera `apps/frontend/dist`. `npm start` inicia la API desde su directorio, conservando la resolución de `.env` y `uploads`. La prueba smoke utiliza HTTP real con puertos efímeros, comprueba SPA/proxy/validación/autenticación y espera 503 al usar una base deliberadamente inaccesible; **no es una prueba de persistencia**.
+El backend no necesita compilación: `build:backend` comprueba la sintaxis de sus archivos JS. El frontend genera `apps/frontend/dist`. `npm start` inicia la API desde su directorio, conservando la resolución de `.env` y `uploads`. La prueba smoke utiliza HTTP real con puertos efímeros, comprueba SPA/proxy/validación/autenticación y espera 503 al usar una base deliberadamente inaccesible; **no es una prueba de persistencia**.
 
 Las suites legacy, SMTP e integración remota se conservan y no se ejecutan automáticamente: pueden requerir credenciales, modificar datos o enviar correos. Las nuevas comprobaciones aisladas se ejecutan con `npm run test:mysql` (binarios nativos), `npm run test:mysql:docker` y `npm run test:stack` (stack Docker completo). [Resultados y límites](docs/validacion-mysql.md).
 
@@ -106,4 +106,4 @@ Las variables Vite se incorporan al construir la imagen. Para Google/Firebase en
 - [Validación posterior de MySQL y stack completo](docs/validacion-mysql.md).
 - [Piloto hexagonal de zonas: estructura, puertos, archivos y pruebas](docs/piloto-hexagonal-zonas-riesgo.md).
 
-El piloto de consulta de zonas está completado y verificado: **278 pruebas**, **57 comprobaciones MySQL Docker** y **8 del stack completo**. Conserva el contrato anterior, la geografía y la invalidación de caché. La entrega se detiene aquí; la migración de los demás módulos requiere revisar los resultados y una nueva tarea.
+La consulta de zonas y las [lecturas hexagonales de reportes](docs/hexagonal-reportes-lectura.md) están verificadas: **315 pruebas**, **33 contratos HTTP/MySQL equivalentes al código anterior**, **57 comprobaciones MySQL Docker** y **8 del stack completo**. Ejecutar `npm run test:reportes:lectura` con Docker iniciado para comparar los reportes con sus capturas previas. Se conservan contratos, geografía y caché; relaciones y vistas mantienen adaptadores heredados. La entrega se detiene en las lecturas; las escrituras y los demás módulos requieren revisar los resultados y una nueva tarea.

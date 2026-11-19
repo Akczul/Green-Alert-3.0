@@ -1,6 +1,6 @@
 # Plan de migración por fases
 
-Estado actualizado después del [piloto de consulta de zonas](piloto-hexagonal-zonas-riesgo.md). Se completaron consolidación, [validación SQL/stack](validacion-mysql.md) y la primera extracción hexagonal. Mantener siempre rutas, estados, multipart, JSON, roles, pantallas y funcionalidades. Las demás migraciones no se inician automáticamente.
+Estado actualizado después del [piloto de consulta de zonas](piloto-hexagonal-zonas-riesgo.md) y de la [Fase 4 autorizada: lectura de reportes](hexagonal-reportes-lectura.md). Se completaron consolidación, [validación SQL/stack](validacion-mysql.md) y ambas extracciones acotadas. Mantener siempre rutas, estados, multipart, JSON, roles, pantallas y funcionalidades. Las demás migraciones no se inician automáticamente. La numeración de la tarea actual no implica que se hayan completado las fases generales intermedias.
 
 | Etapa | Estado |
 | --- | --- |
@@ -9,7 +9,8 @@ Estado actualizado después del [piloto de consulta de zonas](piloto-hexagonal-z
 | Fase 1: requisitos del piloto | Esquema validado, catálogo ampliado, contrato y ocho fixtures previos, reloj controlado y lecturas de caché verificados; benchmark de carga y proveedores quedan diferidos |
 | Fase 2: consulta de zonas | Completada: dominio, caso, puertos, reader MySQL, caché, adaptador HTTP y composición |
 | Alertas como caso independiente | Pendiente; conserva lógica heredada y reutiliza el caso de zonas |
-| Fases 3–7 | No iniciadas; requieren revisión y nueva tarea |
+| Fase 4 de la tarea: lecturas de reportes | Completada: listado, propios, detalle y tendencias; 33 contratos equivalentes y 315 pruebas |
+| Fases generales 3–7, incluidas escrituras | No iniciadas; requieren revisión y nueva tarea |
 
 ## Fase 0 — Consolidar y medir la base
 
@@ -40,7 +41,13 @@ Criterios acreditados: ocho fixtures antes/después equivalentes; algoritmo, cla
 
 Reversión: volver a conectar el servicio original en bootstrap; ninguna migración de base requerida. Si cambia el JSON, dividir el cambio y volver al contrato existente antes de continuar.
 
-## Fase 3 — Instituciones, alertas y notificaciones
+## Fase 4 de la tarea — Lecturas de reportes completadas
+
+Contrato previo contra `6e6f5d1`, 33 capturas MySQL/HTTP sintéticas y comparación profunda antes/después. Dominio puro, cuatro operaciones de aplicación, tres puertos, reader MySQL, adaptadores heredados de relaciones/vistas, entrada Express y bootstrap explícito. Los métodos del modelo y exports del controlador quedan como puentes compatibles. No cambia ningún endpoint, middleware, frontend, esquema ni escritura.
+
+Verificación: 315 pruebas backend/frontend, 33 contratos reales, 57 comprobaciones MySQL Docker, 8 del stack, build/lint/smoke correctos. Detalles, archivos, peculiaridades preservadas y límites en [hexagonal-reportes-lectura.md](hexagonal-reportes-lectura.md). Pendiente: retirar puentes cuando se autoricen sus consumidores; migrar relaciones y escrituras en tareas propias. La fase se detiene aquí.
+
+## Fase 3 del plan general — Instituciones, alertas y notificaciones (pendiente)
 
 1. Extraer reglas puras de resolución de entidades y prioridad de `asignacion-entidades.service`.
 2. Inyectar repositorios de entidades/asignaciones y gateways de alertas, notificación y tiempo real.
@@ -50,7 +57,7 @@ Reversión: volver a conectar el servicio original en bootstrap; ninguna migraci
 
 Salida: tests de reglas sin SQL/Express, contratos SQL de asignación, pruebas negativas entre entidades y prueba de entrega/persistencia sin duplicados. Reversión por ensamblaje, sin borrar tablas ni campos.
 
-## Fase 4 — Escrituras de reportes y evidencias
+## Fase 4 del plan general — Escrituras de reportes y evidencias (pendiente)
 
 Definir invariantes, políticas de moderación y autorización. Crear `CrearReporte`, `ActualizarReporte`, `ModerarReporte` y gestión de evidencia como operaciones separadas. Encapsular almacenamiento, análisis y score. Introducir UnitOfWork SQL solo para las operaciones que deban ser atómicas dentro de MySQL.
 

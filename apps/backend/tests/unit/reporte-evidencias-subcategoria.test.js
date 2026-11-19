@@ -34,10 +34,11 @@ test('reportes soporta subcategoria en esquema, migracion, creacion y consultas'
   const migration = readProjectFile('migrations/014_create_entidades_and_reporte_entidades.sql');
   const controller = readProjectFile('src/controllers/reporte.controller.js');
   const model = readProjectFile('src/models/reporte.model.js');
+  const reader = readProjectFile('src/modules/reportes-lectura/adapters/outbound/mysql-reportes-reader.js');
 
   assert.match(schema, /subcategoria VARCHAR\(100\) NULL/);
   assert.match(migration, /CREATE TABLE IF NOT EXISTS reporte_entidades/);
   assert.match(controller, /subcategoria:\s+subcategoria\?\.trim\(\) \|\| null/);
-  assert.match(model, /r\.tipo_contaminacion, r\.subcategoria, r\.estado/);
+  assert.match(reader, /r\.tipo_contaminacion, r\.subcategoria, r\.estado/);
   assert.match(model, /tipo_contaminacion, subcategoria, estado, nivel_severidad/);
 });

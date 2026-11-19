@@ -2,7 +2,7 @@
 
 Este documento registra la auditoría inicial. Consultar la [validación posterior de MySQL y Docker](validacion-mysql.md) para las correcciones de catálogo, geometría y migraciones, y las pruebas reales ya ejecutadas.
 
-La [consulta de zonas de riesgo](piloto-hexagonal-zonas-riesgo.md) ya se extrajo mediante dominio/aplicación/puertos/adaptadores. El diagnóstico por capas que sigue permanece como referencia histórica y describe todavía los demás módulos; no se migró el backend completo.
+La [consulta de zonas de riesgo](piloto-hexagonal-zonas-riesgo.md) y las [cuatro lecturas de reportes](hexagonal-reportes-lectura.md) ya se extrajeron mediante dominio/aplicación/puertos/adaptadores. El diagnóstico por capas que sigue permanece como referencia histórica y describe todavía los demás módulos y escrituras; no se migró el backend completo.
 
 Fecha de revisión: **18 de noviembre de 2026**, America/Bogota. Evidencia: código de las ramas `main` indicadas en [procedencia](procedencia.md), manifests, lockfiles, configuración e inventarios de este monorepositorio. No se inspeccionó una base productiva ni una instalación desplegada.
 

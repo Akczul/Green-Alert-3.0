@@ -1,0 +1,4546 @@
+{
+  "reference": "6e6f5d1",
+  "now": 1795003200000,
+  "cases": [
+    {
+      "name": "list-anonymous",
+      "url": "/reportes",
+      "subject": null,
+      "status": 200,
+      "body": {
+        "status": "success",
+        "message": "ok",
+        "data": {
+          "reportes": [
+            {
+              "id_reporte": 13,
+              "uuid": "10000000-0000-4000-8000-000000000013",
+              "id_usuario": 5,
+              "tipo_contaminacion": "residuos",
+              "subcategoria": null,
+              "estado": "rechazado",
+              "nivel_severidad": "critico",
+              "titulo": "Reporte 13",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Pasto",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": null,
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 0,
+              "vistas": 0,
+              "created_at": "2026-11-13T11:00:00.000Z",
+              "updated_at": "2026-11-13T11:00:00.000Z",
+              "autor_nombre": "Persona 5",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            },
+            {
+              "id_reporte": 12,
+              "uuid": "10000000-0000-4000-8000-000000000012",
+              "id_usuario": 5,
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "resuelto",
+              "nivel_severidad": "bajo",
+              "titulo": "Reporte 12",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": null,
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 1,
+              "vistas": 10,
+              "created_at": "2026-11-12T11:00:00.000Z",
+              "updated_at": "2026-11-12T11:00:00.000Z",
+              "autor_nombre": "Persona 5",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            },
+            {
+              "id_reporte": 11,
+              "uuid": "10000000-0000-4000-8000-000000000011",
+              "id_usuario": 1,
+              "tipo_contaminacion": "aire",
+              "subcategoria": null,
+              "estado": "pendiente",
+              "nivel_severidad": "medio",
+              "titulo": "Reporte 11",
+              "descripcion": "Contenido sintético",
+              "latitud": null,
+              "longitud": null,
+              "direccion": null,
+              "municipio": "Pasto",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": null,
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 2,
+              "vistas": 1,
+              "created_at": "2026-11-11T11:00:00.000Z",
+              "updated_at": "2026-11-11T11:00:00.000Z",
+              "autor_nombre": "Persona 1",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            },
+            {
+              "id_reporte": 10,
+              "uuid": "10000000-0000-4000-8000-000000000010",
+              "id_usuario": 1,
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "en_proceso",
+              "nivel_severidad": "alto",
+              "titulo": "Reporte 10",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": "en_atencion",
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 5,
+              "vistas": 2,
+              "created_at": "2026-11-10T11:00:00.000Z",
+              "updated_at": "2026-11-10T11:00:00.000Z",
+              "autor_nombre": "Persona 1",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            }
+          ],
+          "total": 4,
+          "limit": 20,
+          "offset": 0
+        }
+      },
+      "trace": [
+        {
+          "port": "reportes",
+          "method": "findAll",
+          "args": [
+            {
+              "limit": 20,
+              "offset": 0
+            }
+          ],
+          "result": [
+            {
+              "id_reporte": 13,
+              "uuid": "10000000-0000-4000-8000-000000000013",
+              "id_usuario": 5,
+              "tipo_contaminacion": "residuos",
+              "subcategoria": null,
+              "estado": "rechazado",
+              "nivel_severidad": "critico",
+              "titulo": "Reporte 13",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Pasto",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": null,
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 0,
+              "vistas": 0,
+              "created_at": "2026-11-13T11:00:00.000Z",
+              "updated_at": "2026-11-13T11:00:00.000Z",
+              "autor_nombre": "Persona 5",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            },
+            {
+              "id_reporte": 12,
+              "uuid": "10000000-0000-4000-8000-000000000012",
+              "id_usuario": 5,
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "resuelto",
+              "nivel_severidad": "bajo",
+              "titulo": "Reporte 12",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": null,
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 1,
+              "vistas": 10,
+              "created_at": "2026-11-12T11:00:00.000Z",
+              "updated_at": "2026-11-12T11:00:00.000Z",
+              "autor_nombre": "Persona 5",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            },
+            {
+              "id_reporte": 11,
+              "uuid": "10000000-0000-4000-8000-000000000011",
+              "id_usuario": 1,
+              "tipo_contaminacion": "aire",
+              "subcategoria": null,
+              "estado": "pendiente",
+              "nivel_severidad": "medio",
+              "titulo": "Reporte 11",
+              "descripcion": "Contenido sintético",
+              "latitud": null,
+              "longitud": null,
+              "direccion": null,
+              "municipio": "Pasto",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": null,
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 2,
+              "vistas": 1,
+              "created_at": "2026-11-11T11:00:00.000Z",
+              "updated_at": "2026-11-11T11:00:00.000Z",
+              "autor_nombre": "Persona 1",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            },
+            {
+              "id_reporte": 10,
+              "uuid": "10000000-0000-4000-8000-000000000010",
+              "id_usuario": 1,
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "en_proceso",
+              "nivel_severidad": "alto",
+              "titulo": "Reporte 10",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": "en_atencion",
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 5,
+              "vistas": 2,
+              "created_at": "2026-11-10T11:00:00.000Z",
+              "updated_at": "2026-11-10T11:00:00.000Z",
+              "autor_nombre": "Persona 1",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            }
+          ]
+        },
+        {
+          "port": "reportes",
+          "method": "countAll",
+          "args": [
+            {}
+          ],
+          "result": 4
+        }
+      ],
+      "persistedViews": 2
+    },
+    {
+      "name": "list-citizen",
+      "url": "/reportes",
+      "subject": "citizen",
+      "status": 200,
+      "body": {
+        "status": "success",
+        "message": "ok",
+        "data": {
+          "reportes": [
+            {
+              "id_reporte": 13,
+              "uuid": "10000000-0000-4000-8000-000000000013",
+              "id_usuario": 5,
+              "tipo_contaminacion": "residuos",
+              "subcategoria": null,
+              "estado": "rechazado",
+              "nivel_severidad": "critico",
+              "titulo": "Reporte 13",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Pasto",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": null,
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 0,
+              "vistas": 0,
+              "created_at": "2026-11-13T11:00:00.000Z",
+              "updated_at": "2026-11-13T11:00:00.000Z",
+              "autor_nombre": "Persona 5",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano",
+              "liked_by_me": false
+            },
+            {
+              "id_reporte": 12,
+              "uuid": "10000000-0000-4000-8000-000000000012",
+              "id_usuario": 5,
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "resuelto",
+              "nivel_severidad": "bajo",
+              "titulo": "Reporte 12",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": null,
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 1,
+              "vistas": 10,
+              "created_at": "2026-11-12T11:00:00.000Z",
+              "updated_at": "2026-11-12T11:00:00.000Z",
+              "autor_nombre": "Persona 5",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano",
+              "liked_by_me": true
+            },
+            {
+              "id_reporte": 11,
+              "uuid": "10000000-0000-4000-8000-000000000011",
+              "id_usuario": 1,
+              "tipo_contaminacion": "aire",
+              "subcategoria": null,
+              "estado": "pendiente",
+              "nivel_severidad": "medio",
+              "titulo": "Reporte 11",
+              "descripcion": "Contenido sintético",
+              "latitud": null,
+              "longitud": null,
+              "direccion": null,
+              "municipio": "Pasto",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": null,
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 2,
+              "vistas": 1,
+              "created_at": "2026-11-11T11:00:00.000Z",
+              "updated_at": "2026-11-11T11:00:00.000Z",
+              "autor_nombre": "Persona 1",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano",
+              "liked_by_me": false
+            },
+            {
+              "id_reporte": 10,
+              "uuid": "10000000-0000-4000-8000-000000000010",
+              "id_usuario": 1,
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "en_proceso",
+              "nivel_severidad": "alto",
+              "titulo": "Reporte 10",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": "en_atencion",
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 5,
+              "vistas": 2,
+              "created_at": "2026-11-10T11:00:00.000Z",
+              "updated_at": "2026-11-10T11:00:00.000Z",
+              "autor_nombre": "Persona 1",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano",
+              "liked_by_me": true
+            }
+          ],
+          "total": 4,
+          "limit": 20,
+          "offset": 0
+        }
+      },
+      "trace": [
+        {
+          "port": "reportes",
+          "method": "findAll",
+          "args": [
+            {
+              "limit": 20,
+              "offset": 0
+            }
+          ],
+          "result": [
+            {
+              "id_reporte": 13,
+              "uuid": "10000000-0000-4000-8000-000000000013",
+              "id_usuario": 5,
+              "tipo_contaminacion": "residuos",
+              "subcategoria": null,
+              "estado": "rechazado",
+              "nivel_severidad": "critico",
+              "titulo": "Reporte 13",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Pasto",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": null,
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 0,
+              "vistas": 0,
+              "created_at": "2026-11-13T11:00:00.000Z",
+              "updated_at": "2026-11-13T11:00:00.000Z",
+              "autor_nombre": "Persona 5",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            },
+            {
+              "id_reporte": 12,
+              "uuid": "10000000-0000-4000-8000-000000000012",
+              "id_usuario": 5,
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "resuelto",
+              "nivel_severidad": "bajo",
+              "titulo": "Reporte 12",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": null,
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 1,
+              "vistas": 10,
+              "created_at": "2026-11-12T11:00:00.000Z",
+              "updated_at": "2026-11-12T11:00:00.000Z",
+              "autor_nombre": "Persona 5",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            },
+            {
+              "id_reporte": 11,
+              "uuid": "10000000-0000-4000-8000-000000000011",
+              "id_usuario": 1,
+              "tipo_contaminacion": "aire",
+              "subcategoria": null,
+              "estado": "pendiente",
+              "nivel_severidad": "medio",
+              "titulo": "Reporte 11",
+              "descripcion": "Contenido sintético",
+              "latitud": null,
+              "longitud": null,
+              "direccion": null,
+              "municipio": "Pasto",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": null,
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 2,
+              "vistas": 1,
+              "created_at": "2026-11-11T11:00:00.000Z",
+              "updated_at": "2026-11-11T11:00:00.000Z",
+              "autor_nombre": "Persona 1",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            },
+            {
+              "id_reporte": 10,
+              "uuid": "10000000-0000-4000-8000-000000000010",
+              "id_usuario": 1,
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "en_proceso",
+              "nivel_severidad": "alto",
+              "titulo": "Reporte 10",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": "en_atencion",
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 5,
+              "vistas": 2,
+              "created_at": "2026-11-10T11:00:00.000Z",
+              "updated_at": "2026-11-10T11:00:00.000Z",
+              "autor_nombre": "Persona 1",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            }
+          ]
+        },
+        {
+          "port": "reportes",
+          "method": "countAll",
+          "args": [
+            {}
+          ],
+          "result": 4
+        },
+        {
+          "port": "relations",
+          "method": "likedSet",
+          "args": [
+            [
+              13,
+              12,
+              11,
+              10
+            ],
+            1
+          ],
+          "result": {
+            "__set": [
+              10,
+              12
+            ]
+          }
+        }
+      ],
+      "persistedViews": 2
+    },
+    {
+      "name": "list-invalid-jwt",
+      "url": "/reportes",
+      "subject": "invalid",
+      "status": 200,
+      "body": {
+        "status": "success",
+        "message": "ok",
+        "data": {
+          "reportes": [
+            {
+              "id_reporte": 13,
+              "uuid": "10000000-0000-4000-8000-000000000013",
+              "id_usuario": 5,
+              "tipo_contaminacion": "residuos",
+              "subcategoria": null,
+              "estado": "rechazado",
+              "nivel_severidad": "critico",
+              "titulo": "Reporte 13",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Pasto",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": null,
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 0,
+              "vistas": 0,
+              "created_at": "2026-11-13T11:00:00.000Z",
+              "updated_at": "2026-11-13T11:00:00.000Z",
+              "autor_nombre": "Persona 5",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            },
+            {
+              "id_reporte": 12,
+              "uuid": "10000000-0000-4000-8000-000000000012",
+              "id_usuario": 5,
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "resuelto",
+              "nivel_severidad": "bajo",
+              "titulo": "Reporte 12",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": null,
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 1,
+              "vistas": 10,
+              "created_at": "2026-11-12T11:00:00.000Z",
+              "updated_at": "2026-11-12T11:00:00.000Z",
+              "autor_nombre": "Persona 5",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            },
+            {
+              "id_reporte": 11,
+              "uuid": "10000000-0000-4000-8000-000000000011",
+              "id_usuario": 1,
+              "tipo_contaminacion": "aire",
+              "subcategoria": null,
+              "estado": "pendiente",
+              "nivel_severidad": "medio",
+              "titulo": "Reporte 11",
+              "descripcion": "Contenido sintético",
+              "latitud": null,
+              "longitud": null,
+              "direccion": null,
+              "municipio": "Pasto",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": null,
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 2,
+              "vistas": 1,
+              "created_at": "2026-11-11T11:00:00.000Z",
+              "updated_at": "2026-11-11T11:00:00.000Z",
+              "autor_nombre": "Persona 1",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            },
+            {
+              "id_reporte": 10,
+              "uuid": "10000000-0000-4000-8000-000000000010",
+              "id_usuario": 1,
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "en_proceso",
+              "nivel_severidad": "alto",
+              "titulo": "Reporte 10",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": "en_atencion",
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 5,
+              "vistas": 2,
+              "created_at": "2026-11-10T11:00:00.000Z",
+              "updated_at": "2026-11-10T11:00:00.000Z",
+              "autor_nombre": "Persona 1",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            }
+          ],
+          "total": 4,
+          "limit": 20,
+          "offset": 0
+        }
+      },
+      "trace": [
+        {
+          "port": "reportes",
+          "method": "findAll",
+          "args": [
+            {
+              "limit": 20,
+              "offset": 0
+            }
+          ],
+          "result": [
+            {
+              "id_reporte": 13,
+              "uuid": "10000000-0000-4000-8000-000000000013",
+              "id_usuario": 5,
+              "tipo_contaminacion": "residuos",
+              "subcategoria": null,
+              "estado": "rechazado",
+              "nivel_severidad": "critico",
+              "titulo": "Reporte 13",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Pasto",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": null,
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 0,
+              "vistas": 0,
+              "created_at": "2026-11-13T11:00:00.000Z",
+              "updated_at": "2026-11-13T11:00:00.000Z",
+              "autor_nombre": "Persona 5",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            },
+            {
+              "id_reporte": 12,
+              "uuid": "10000000-0000-4000-8000-000000000012",
+              "id_usuario": 5,
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "resuelto",
+              "nivel_severidad": "bajo",
+              "titulo": "Reporte 12",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": null,
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 1,
+              "vistas": 10,
+              "created_at": "2026-11-12T11:00:00.000Z",
+              "updated_at": "2026-11-12T11:00:00.000Z",
+              "autor_nombre": "Persona 5",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            },
+            {
+              "id_reporte": 11,
+              "uuid": "10000000-0000-4000-8000-000000000011",
+              "id_usuario": 1,
+              "tipo_contaminacion": "aire",
+              "subcategoria": null,
+              "estado": "pendiente",
+              "nivel_severidad": "medio",
+              "titulo": "Reporte 11",
+              "descripcion": "Contenido sintético",
+              "latitud": null,
+              "longitud": null,
+              "direccion": null,
+              "municipio": "Pasto",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": null,
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 2,
+              "vistas": 1,
+              "created_at": "2026-11-11T11:00:00.000Z",
+              "updated_at": "2026-11-11T11:00:00.000Z",
+              "autor_nombre": "Persona 1",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            },
+            {
+              "id_reporte": 10,
+              "uuid": "10000000-0000-4000-8000-000000000010",
+              "id_usuario": 1,
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "en_proceso",
+              "nivel_severidad": "alto",
+              "titulo": "Reporte 10",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": "en_atencion",
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 5,
+              "vistas": 2,
+              "created_at": "2026-11-10T11:00:00.000Z",
+              "updated_at": "2026-11-10T11:00:00.000Z",
+              "autor_nombre": "Persona 1",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            }
+          ]
+        },
+        {
+          "port": "reportes",
+          "method": "countAll",
+          "args": [
+            {}
+          ],
+          "result": 4
+        }
+      ],
+      "persistedViews": 2
+    },
+    {
+      "name": "list-filter",
+      "url": "/reportes?estado=en%20proceso&tipo_contaminacion=agua&municipio=Mocoa&nivel_severidad=alto",
+      "subject": "admin",
+      "status": 200,
+      "body": {
+        "status": "success",
+        "message": "ok",
+        "data": {
+          "reportes": [
+            {
+              "id_reporte": 10,
+              "uuid": "10000000-0000-4000-8000-000000000010",
+              "id_usuario": 1,
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "en_proceso",
+              "nivel_severidad": "alto",
+              "titulo": "Reporte 10",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": "en_atencion",
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 5,
+              "vistas": 2,
+              "created_at": "2026-11-10T11:00:00.000Z",
+              "updated_at": "2026-11-10T11:00:00.000Z",
+              "autor_nombre": "Persona 1",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano",
+              "liked_by_me": false
+            }
+          ],
+          "total": 1,
+          "limit": 20,
+          "offset": 0
+        }
+      },
+      "trace": [
+        {
+          "port": "reportes",
+          "method": "findAll",
+          "args": [
+            {
+              "estado": "en proceso",
+              "tipo_contaminacion": "agua",
+              "nivel_severidad": "alto",
+              "municipio": "Mocoa",
+              "limit": 20,
+              "offset": 0
+            }
+          ],
+          "result": [
+            {
+              "id_reporte": 10,
+              "uuid": "10000000-0000-4000-8000-000000000010",
+              "id_usuario": 1,
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "en_proceso",
+              "nivel_severidad": "alto",
+              "titulo": "Reporte 10",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": "en_atencion",
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 5,
+              "vistas": 2,
+              "created_at": "2026-11-10T11:00:00.000Z",
+              "updated_at": "2026-11-10T11:00:00.000Z",
+              "autor_nombre": "Persona 1",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            }
+          ]
+        },
+        {
+          "port": "reportes",
+          "method": "countAll",
+          "args": [
+            {
+              "estado": "en proceso",
+              "tipo_contaminacion": "agua",
+              "nivel_severidad": "alto",
+              "municipio": "Mocoa"
+            }
+          ],
+          "result": 1
+        },
+        {
+          "port": "relations",
+          "method": "likedSet",
+          "args": [
+            [
+              10
+            ],
+            2
+          ],
+          "result": {
+            "__set": []
+          }
+        }
+      ],
+      "persistedViews": 2
+    },
+    {
+      "name": "list-page",
+      "url": "/reportes?limit=1&offset=1",
+      "subject": null,
+      "status": 200,
+      "body": {
+        "status": "success",
+        "message": "ok",
+        "data": {
+          "reportes": [
+            {
+              "id_reporte": 12,
+              "uuid": "10000000-0000-4000-8000-000000000012",
+              "id_usuario": 5,
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "resuelto",
+              "nivel_severidad": "bajo",
+              "titulo": "Reporte 12",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": null,
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 1,
+              "vistas": 10,
+              "created_at": "2026-11-12T11:00:00.000Z",
+              "updated_at": "2026-11-12T11:00:00.000Z",
+              "autor_nombre": "Persona 5",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            }
+          ],
+          "total": 4,
+          "limit": 1,
+          "offset": 1
+        }
+      },
+      "trace": [
+        {
+          "port": "reportes",
+          "method": "findAll",
+          "args": [
+            {
+              "limit": 1,
+              "offset": 1
+            }
+          ],
+          "result": [
+            {
+              "id_reporte": 12,
+              "uuid": "10000000-0000-4000-8000-000000000012",
+              "id_usuario": 5,
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "resuelto",
+              "nivel_severidad": "bajo",
+              "titulo": "Reporte 12",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": null,
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 1,
+              "vistas": 10,
+              "created_at": "2026-11-12T11:00:00.000Z",
+              "updated_at": "2026-11-12T11:00:00.000Z",
+              "autor_nombre": "Persona 5",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            }
+          ]
+        },
+        {
+          "port": "reportes",
+          "method": "countAll",
+          "args": [
+            {}
+          ],
+          "result": 4
+        }
+      ],
+      "persistedViews": 2
+    },
+    {
+      "name": "list-empty-page",
+      "url": "/reportes?limit=1&offset=99",
+      "subject": null,
+      "status": 200,
+      "body": {
+        "status": "success",
+        "message": "ok",
+        "data": {
+          "reportes": [],
+          "total": 4,
+          "limit": 1,
+          "offset": 99
+        }
+      },
+      "trace": [
+        {
+          "port": "reportes",
+          "method": "findAll",
+          "args": [
+            {
+              "limit": 1,
+              "offset": 99
+            }
+          ],
+          "result": []
+        },
+        {
+          "port": "reportes",
+          "method": "countAll",
+          "args": [
+            {}
+          ],
+          "result": 4
+        }
+      ],
+      "persistedViews": 2
+    },
+    {
+      "name": "list-q-ignored",
+      "url": "/reportes?q=no-coincide",
+      "subject": null,
+      "status": 200,
+      "body": {
+        "status": "success",
+        "message": "ok",
+        "data": {
+          "reportes": [
+            {
+              "id_reporte": 13,
+              "uuid": "10000000-0000-4000-8000-000000000013",
+              "id_usuario": 5,
+              "tipo_contaminacion": "residuos",
+              "subcategoria": null,
+              "estado": "rechazado",
+              "nivel_severidad": "critico",
+              "titulo": "Reporte 13",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Pasto",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": null,
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 0,
+              "vistas": 0,
+              "created_at": "2026-11-13T11:00:00.000Z",
+              "updated_at": "2026-11-13T11:00:00.000Z",
+              "autor_nombre": "Persona 5",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            },
+            {
+              "id_reporte": 12,
+              "uuid": "10000000-0000-4000-8000-000000000012",
+              "id_usuario": 5,
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "resuelto",
+              "nivel_severidad": "bajo",
+              "titulo": "Reporte 12",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": null,
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 1,
+              "vistas": 10,
+              "created_at": "2026-11-12T11:00:00.000Z",
+              "updated_at": "2026-11-12T11:00:00.000Z",
+              "autor_nombre": "Persona 5",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            },
+            {
+              "id_reporte": 11,
+              "uuid": "10000000-0000-4000-8000-000000000011",
+              "id_usuario": 1,
+              "tipo_contaminacion": "aire",
+              "subcategoria": null,
+              "estado": "pendiente",
+              "nivel_severidad": "medio",
+              "titulo": "Reporte 11",
+              "descripcion": "Contenido sintético",
+              "latitud": null,
+              "longitud": null,
+              "direccion": null,
+              "municipio": "Pasto",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": null,
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 2,
+              "vistas": 1,
+              "created_at": "2026-11-11T11:00:00.000Z",
+              "updated_at": "2026-11-11T11:00:00.000Z",
+              "autor_nombre": "Persona 1",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            },
+            {
+              "id_reporte": 10,
+              "uuid": "10000000-0000-4000-8000-000000000010",
+              "id_usuario": 1,
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "en_proceso",
+              "nivel_severidad": "alto",
+              "titulo": "Reporte 10",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": "en_atencion",
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 5,
+              "vistas": 2,
+              "created_at": "2026-11-10T11:00:00.000Z",
+              "updated_at": "2026-11-10T11:00:00.000Z",
+              "autor_nombre": "Persona 1",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            }
+          ],
+          "total": 4,
+          "limit": 20,
+          "offset": 0
+        }
+      },
+      "trace": [
+        {
+          "port": "reportes",
+          "method": "findAll",
+          "args": [
+            {
+              "limit": 20,
+              "offset": 0
+            }
+          ],
+          "result": [
+            {
+              "id_reporte": 13,
+              "uuid": "10000000-0000-4000-8000-000000000013",
+              "id_usuario": 5,
+              "tipo_contaminacion": "residuos",
+              "subcategoria": null,
+              "estado": "rechazado",
+              "nivel_severidad": "critico",
+              "titulo": "Reporte 13",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Pasto",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": null,
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 0,
+              "vistas": 0,
+              "created_at": "2026-11-13T11:00:00.000Z",
+              "updated_at": "2026-11-13T11:00:00.000Z",
+              "autor_nombre": "Persona 5",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            },
+            {
+              "id_reporte": 12,
+              "uuid": "10000000-0000-4000-8000-000000000012",
+              "id_usuario": 5,
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "resuelto",
+              "nivel_severidad": "bajo",
+              "titulo": "Reporte 12",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": null,
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 1,
+              "vistas": 10,
+              "created_at": "2026-11-12T11:00:00.000Z",
+              "updated_at": "2026-11-12T11:00:00.000Z",
+              "autor_nombre": "Persona 5",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            },
+            {
+              "id_reporte": 11,
+              "uuid": "10000000-0000-4000-8000-000000000011",
+              "id_usuario": 1,
+              "tipo_contaminacion": "aire",
+              "subcategoria": null,
+              "estado": "pendiente",
+              "nivel_severidad": "medio",
+              "titulo": "Reporte 11",
+              "descripcion": "Contenido sintético",
+              "latitud": null,
+              "longitud": null,
+              "direccion": null,
+              "municipio": "Pasto",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": null,
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 2,
+              "vistas": 1,
+              "created_at": "2026-11-11T11:00:00.000Z",
+              "updated_at": "2026-11-11T11:00:00.000Z",
+              "autor_nombre": "Persona 1",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            },
+            {
+              "id_reporte": 10,
+              "uuid": "10000000-0000-4000-8000-000000000010",
+              "id_usuario": 1,
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "en_proceso",
+              "nivel_severidad": "alto",
+              "titulo": "Reporte 10",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": "en_atencion",
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 5,
+              "vistas": 2,
+              "created_at": "2026-11-10T11:00:00.000Z",
+              "updated_at": "2026-11-10T11:00:00.000Z",
+              "autor_nombre": "Persona 1",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            }
+          ]
+        },
+        {
+          "port": "reportes",
+          "method": "countAll",
+          "args": [
+            {}
+          ],
+          "result": 4
+        }
+      ],
+      "persistedViews": 2
+    },
+    {
+      "name": "list-scientific-limit",
+      "url": "/reportes?limit=1e2",
+      "subject": null,
+      "status": 200,
+      "body": {
+        "status": "success",
+        "message": "ok",
+        "data": {
+          "reportes": [
+            {
+              "id_reporte": 13,
+              "uuid": "10000000-0000-4000-8000-000000000013",
+              "id_usuario": 5,
+              "tipo_contaminacion": "residuos",
+              "subcategoria": null,
+              "estado": "rechazado",
+              "nivel_severidad": "critico",
+              "titulo": "Reporte 13",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Pasto",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": null,
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 0,
+              "vistas": 0,
+              "created_at": "2026-11-13T11:00:00.000Z",
+              "updated_at": "2026-11-13T11:00:00.000Z",
+              "autor_nombre": "Persona 5",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            },
+            {
+              "id_reporte": 12,
+              "uuid": "10000000-0000-4000-8000-000000000012",
+              "id_usuario": 5,
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "resuelto",
+              "nivel_severidad": "bajo",
+              "titulo": "Reporte 12",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": null,
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 1,
+              "vistas": 10,
+              "created_at": "2026-11-12T11:00:00.000Z",
+              "updated_at": "2026-11-12T11:00:00.000Z",
+              "autor_nombre": "Persona 5",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            },
+            {
+              "id_reporte": 11,
+              "uuid": "10000000-0000-4000-8000-000000000011",
+              "id_usuario": 1,
+              "tipo_contaminacion": "aire",
+              "subcategoria": null,
+              "estado": "pendiente",
+              "nivel_severidad": "medio",
+              "titulo": "Reporte 11",
+              "descripcion": "Contenido sintético",
+              "latitud": null,
+              "longitud": null,
+              "direccion": null,
+              "municipio": "Pasto",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": null,
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 2,
+              "vistas": 1,
+              "created_at": "2026-11-11T11:00:00.000Z",
+              "updated_at": "2026-11-11T11:00:00.000Z",
+              "autor_nombre": "Persona 1",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            },
+            {
+              "id_reporte": 10,
+              "uuid": "10000000-0000-4000-8000-000000000010",
+              "id_usuario": 1,
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "en_proceso",
+              "nivel_severidad": "alto",
+              "titulo": "Reporte 10",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": "en_atencion",
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 5,
+              "vistas": 2,
+              "created_at": "2026-11-10T11:00:00.000Z",
+              "updated_at": "2026-11-10T11:00:00.000Z",
+              "autor_nombre": "Persona 1",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            }
+          ],
+          "total": 4,
+          "limit": 1,
+          "offset": 0
+        }
+      },
+      "trace": [
+        {
+          "port": "reportes",
+          "method": "findAll",
+          "args": [
+            {
+              "limit": 100,
+              "offset": 0
+            }
+          ],
+          "result": [
+            {
+              "id_reporte": 13,
+              "uuid": "10000000-0000-4000-8000-000000000013",
+              "id_usuario": 5,
+              "tipo_contaminacion": "residuos",
+              "subcategoria": null,
+              "estado": "rechazado",
+              "nivel_severidad": "critico",
+              "titulo": "Reporte 13",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Pasto",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": null,
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 0,
+              "vistas": 0,
+              "created_at": "2026-11-13T11:00:00.000Z",
+              "updated_at": "2026-11-13T11:00:00.000Z",
+              "autor_nombre": "Persona 5",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            },
+            {
+              "id_reporte": 12,
+              "uuid": "10000000-0000-4000-8000-000000000012",
+              "id_usuario": 5,
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "resuelto",
+              "nivel_severidad": "bajo",
+              "titulo": "Reporte 12",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": null,
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 1,
+              "vistas": 10,
+              "created_at": "2026-11-12T11:00:00.000Z",
+              "updated_at": "2026-11-12T11:00:00.000Z",
+              "autor_nombre": "Persona 5",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            },
+            {
+              "id_reporte": 11,
+              "uuid": "10000000-0000-4000-8000-000000000011",
+              "id_usuario": 1,
+              "tipo_contaminacion": "aire",
+              "subcategoria": null,
+              "estado": "pendiente",
+              "nivel_severidad": "medio",
+              "titulo": "Reporte 11",
+              "descripcion": "Contenido sintético",
+              "latitud": null,
+              "longitud": null,
+              "direccion": null,
+              "municipio": "Pasto",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": null,
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 2,
+              "vistas": 1,
+              "created_at": "2026-11-11T11:00:00.000Z",
+              "updated_at": "2026-11-11T11:00:00.000Z",
+              "autor_nombre": "Persona 1",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            },
+            {
+              "id_reporte": 10,
+              "uuid": "10000000-0000-4000-8000-000000000010",
+              "id_usuario": 1,
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "en_proceso",
+              "nivel_severidad": "alto",
+              "titulo": "Reporte 10",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": "en_atencion",
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 5,
+              "vistas": 2,
+              "created_at": "2026-11-10T11:00:00.000Z",
+              "updated_at": "2026-11-10T11:00:00.000Z",
+              "autor_nombre": "Persona 1",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            }
+          ]
+        },
+        {
+          "port": "reportes",
+          "method": "countAll",
+          "args": [
+            {}
+          ],
+          "result": 4
+        }
+      ],
+      "persistedViews": 2
+    },
+    {
+      "name": "list-zero",
+      "url": "/reportes?limit=0&offset=-4",
+      "subject": null,
+      "status": 200,
+      "body": {
+        "status": "success",
+        "message": "ok",
+        "data": {
+          "reportes": [
+            {
+              "id_reporte": 13,
+              "uuid": "10000000-0000-4000-8000-000000000013",
+              "id_usuario": 5,
+              "tipo_contaminacion": "residuos",
+              "subcategoria": null,
+              "estado": "rechazado",
+              "nivel_severidad": "critico",
+              "titulo": "Reporte 13",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Pasto",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": null,
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 0,
+              "vistas": 0,
+              "created_at": "2026-11-13T11:00:00.000Z",
+              "updated_at": "2026-11-13T11:00:00.000Z",
+              "autor_nombre": "Persona 5",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            },
+            {
+              "id_reporte": 12,
+              "uuid": "10000000-0000-4000-8000-000000000012",
+              "id_usuario": 5,
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "resuelto",
+              "nivel_severidad": "bajo",
+              "titulo": "Reporte 12",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": null,
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 1,
+              "vistas": 10,
+              "created_at": "2026-11-12T11:00:00.000Z",
+              "updated_at": "2026-11-12T11:00:00.000Z",
+              "autor_nombre": "Persona 5",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            },
+            {
+              "id_reporte": 11,
+              "uuid": "10000000-0000-4000-8000-000000000011",
+              "id_usuario": 1,
+              "tipo_contaminacion": "aire",
+              "subcategoria": null,
+              "estado": "pendiente",
+              "nivel_severidad": "medio",
+              "titulo": "Reporte 11",
+              "descripcion": "Contenido sintético",
+              "latitud": null,
+              "longitud": null,
+              "direccion": null,
+              "municipio": "Pasto",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": null,
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 2,
+              "vistas": 1,
+              "created_at": "2026-11-11T11:00:00.000Z",
+              "updated_at": "2026-11-11T11:00:00.000Z",
+              "autor_nombre": "Persona 1",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            },
+            {
+              "id_reporte": 10,
+              "uuid": "10000000-0000-4000-8000-000000000010",
+              "id_usuario": 1,
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "en_proceso",
+              "nivel_severidad": "alto",
+              "titulo": "Reporte 10",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": "en_atencion",
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 5,
+              "vistas": 2,
+              "created_at": "2026-11-10T11:00:00.000Z",
+              "updated_at": "2026-11-10T11:00:00.000Z",
+              "autor_nombre": "Persona 1",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            }
+          ],
+          "total": 4,
+          "limit": 20,
+          "offset": 0
+        }
+      },
+      "trace": [
+        {
+          "port": "reportes",
+          "method": "findAll",
+          "args": [
+            {
+              "limit": 0,
+              "offset": -4
+            }
+          ],
+          "result": [
+            {
+              "id_reporte": 13,
+              "uuid": "10000000-0000-4000-8000-000000000013",
+              "id_usuario": 5,
+              "tipo_contaminacion": "residuos",
+              "subcategoria": null,
+              "estado": "rechazado",
+              "nivel_severidad": "critico",
+              "titulo": "Reporte 13",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Pasto",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": null,
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 0,
+              "vistas": 0,
+              "created_at": "2026-11-13T11:00:00.000Z",
+              "updated_at": "2026-11-13T11:00:00.000Z",
+              "autor_nombre": "Persona 5",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            },
+            {
+              "id_reporte": 12,
+              "uuid": "10000000-0000-4000-8000-000000000012",
+              "id_usuario": 5,
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "resuelto",
+              "nivel_severidad": "bajo",
+              "titulo": "Reporte 12",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": null,
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 1,
+              "vistas": 10,
+              "created_at": "2026-11-12T11:00:00.000Z",
+              "updated_at": "2026-11-12T11:00:00.000Z",
+              "autor_nombre": "Persona 5",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            },
+            {
+              "id_reporte": 11,
+              "uuid": "10000000-0000-4000-8000-000000000011",
+              "id_usuario": 1,
+              "tipo_contaminacion": "aire",
+              "subcategoria": null,
+              "estado": "pendiente",
+              "nivel_severidad": "medio",
+              "titulo": "Reporte 11",
+              "descripcion": "Contenido sintético",
+              "latitud": null,
+              "longitud": null,
+              "direccion": null,
+              "municipio": "Pasto",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": null,
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 2,
+              "vistas": 1,
+              "created_at": "2026-11-11T11:00:00.000Z",
+              "updated_at": "2026-11-11T11:00:00.000Z",
+              "autor_nombre": "Persona 1",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            },
+            {
+              "id_reporte": 10,
+              "uuid": "10000000-0000-4000-8000-000000000010",
+              "id_usuario": 1,
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "en_proceso",
+              "nivel_severidad": "alto",
+              "titulo": "Reporte 10",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": "en_atencion",
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 5,
+              "vistas": 2,
+              "created_at": "2026-11-10T11:00:00.000Z",
+              "updated_at": "2026-11-10T11:00:00.000Z",
+              "autor_nombre": "Persona 1",
+              "autor_apellido": "Sintetica",
+              "autor_rol": "ciudadano"
+            }
+          ]
+        },
+        {
+          "port": "reportes",
+          "method": "countAll",
+          "args": [
+            {}
+          ],
+          "result": 4
+        }
+      ],
+      "persistedViews": 2
+    },
+    {
+      "name": "list-entity",
+      "url": "/reportes?estado=pendiente&municipio=NoCoincide",
+      "subject": "entity",
+      "status": 200,
+      "body": {
+        "status": "success",
+        "message": "ok",
+        "data": {
+          "reportes": [
+            {
+              "id_reporte": 12,
+              "uuid": "10000000-0000-4000-8000-000000000012",
+              "titulo": "Reporte 12",
+              "descripcion": "Contenido sintético",
+              "categoria": "agua",
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "severidad": "bajo",
+              "nivel_severidad": "bajo",
+              "estado": "resuelto",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "created_at": "2026-11-12T11:00:00.000Z",
+              "updated_at": "2026-11-12T11:00:00.000Z",
+              "asignacion": {
+                "id_reporte_entidad": 3,
+                "tipo_asignacion": "principal",
+                "prioridad": "critica",
+                "estado_atencion": "pendiente",
+                "comentario": null,
+                "asignado_at": "2026-11-11T09:00:00.000Z",
+                "actualizado_at": null
+              },
+              "entidad": {
+                "id_entidad": 1,
+                "codigo": "bomberos",
+                "nombre": "Bomberos"
+              }
+            },
+            {
+              "id_reporte": 10,
+              "uuid": "10000000-0000-4000-8000-000000000010",
+              "titulo": "Reporte 10",
+              "descripcion": "Contenido sintético",
+              "categoria": "agua",
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "severidad": "alto",
+              "nivel_severidad": "alto",
+              "estado": "en_proceso",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "created_at": "2026-11-10T11:00:00.000Z",
+              "updated_at": "2026-11-10T11:00:00.000Z",
+              "asignacion": {
+                "id_reporte_entidad": 1,
+                "tipo_asignacion": "principal",
+                "prioridad": "alta",
+                "estado_atencion": "en_atencion",
+                "comentario": null,
+                "asignado_at": "2026-11-12T10:00:00.000Z",
+                "actualizado_at": null
+              },
+              "entidad": {
+                "id_entidad": 1,
+                "codigo": "bomberos",
+                "nombre": "Bomberos"
+              }
+            }
+          ],
+          "total": 2,
+          "limit": 20,
+          "offset": 0
+        }
+      },
+      "trace": [
+        {
+          "port": "relations",
+          "method": "findActiveAllowedByIdOrCodigo",
+          "args": [
+            {
+              "id_entidad": 1
+            }
+          ],
+          "result": {
+            "id_entidad": 1,
+            "nombre": "Bomberos",
+            "codigo": "bomberos",
+            "descripcion": "Entidad encargada de la atencion de incendios, quemas activas, emergencias, explosiones, derrames peligrosos y materiales inflamables.",
+            "activo": 1,
+            "created_at": "2026-11-19T03:05:21.000Z",
+            "updated_at": null
+          }
+        },
+        {
+          "port": "relations",
+          "method": "findByEntidad",
+          "args": [
+            1,
+            {
+              "limit": 20,
+              "offset": 0
+            }
+          ],
+          "result": {
+            "reportes": [
+              {
+                "id_reporte": 12,
+                "uuid": "10000000-0000-4000-8000-000000000012",
+                "titulo": "Reporte 12",
+                "descripcion": "Contenido sintético",
+                "categoria": "agua",
+                "tipo_contaminacion": "agua",
+                "subcategoria": null,
+                "severidad": "bajo",
+                "nivel_severidad": "bajo",
+                "estado": "resuelto",
+                "latitud": "1.15000000",
+                "longitud": "-120.25000000",
+                "direccion": null,
+                "municipio": "Mocoa",
+                "departamento": "Putumayo",
+                "created_at": "2026-11-12T11:00:00.000Z",
+                "updated_at": "2026-11-12T11:00:00.000Z",
+                "asignacion": {
+                  "id_reporte_entidad": 3,
+                  "tipo_asignacion": "principal",
+                  "prioridad": "critica",
+                  "estado_atencion": "pendiente",
+                  "comentario": null,
+                  "asignado_at": "2026-11-11T09:00:00.000Z",
+                  "actualizado_at": null
+                },
+                "entidad": {
+                  "id_entidad": 1,
+                  "codigo": "bomberos",
+                  "nombre": "Bomberos"
+                }
+              },
+              {
+                "id_reporte": 10,
+                "uuid": "10000000-0000-4000-8000-000000000010",
+                "titulo": "Reporte 10",
+                "descripcion": "Contenido sintético",
+                "categoria": "agua",
+                "tipo_contaminacion": "agua",
+                "subcategoria": null,
+                "severidad": "alto",
+                "nivel_severidad": "alto",
+                "estado": "en_proceso",
+                "latitud": "1.15000000",
+                "longitud": "-120.25000000",
+                "direccion": null,
+                "municipio": "Mocoa",
+                "departamento": "Putumayo",
+                "created_at": "2026-11-10T11:00:00.000Z",
+                "updated_at": "2026-11-10T11:00:00.000Z",
+                "asignacion": {
+                  "id_reporte_entidad": 1,
+                  "tipo_asignacion": "principal",
+                  "prioridad": "alta",
+                  "estado_atencion": "en_atencion",
+                  "comentario": null,
+                  "asignado_at": "2026-11-12T10:00:00.000Z",
+                  "actualizado_at": null
+                },
+                "entidad": {
+                  "id_entidad": 1,
+                  "codigo": "bomberos",
+                  "nombre": "Bomberos"
+                }
+              }
+            ],
+            "total": 2,
+            "limit": 20,
+            "offset": 0
+          }
+        }
+      ],
+      "persistedViews": 2
+    },
+    {
+      "name": "list-entity-filter",
+      "url": "/reportes?tipo_contaminacion=agua&nivel_severidad=alto&limit=0",
+      "subject": "entity",
+      "status": 200,
+      "body": {
+        "status": "success",
+        "message": "ok",
+        "data": {
+          "reportes": [
+            {
+              "id_reporte": 10,
+              "uuid": "10000000-0000-4000-8000-000000000010",
+              "titulo": "Reporte 10",
+              "descripcion": "Contenido sintético",
+              "categoria": "agua",
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "severidad": "alto",
+              "nivel_severidad": "alto",
+              "estado": "en_proceso",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "created_at": "2026-11-10T11:00:00.000Z",
+              "updated_at": "2026-11-10T11:00:00.000Z",
+              "asignacion": {
+                "id_reporte_entidad": 1,
+                "tipo_asignacion": "principal",
+                "prioridad": "alta",
+                "estado_atencion": "en_atencion",
+                "comentario": null,
+                "asignado_at": "2026-11-12T10:00:00.000Z",
+                "actualizado_at": null
+              },
+              "entidad": {
+                "id_entidad": 1,
+                "codigo": "bomberos",
+                "nombre": "Bomberos"
+              }
+            }
+          ],
+          "total": 1,
+          "limit": 1,
+          "offset": 0
+        }
+      },
+      "trace": [
+        {
+          "port": "relations",
+          "method": "findActiveAllowedByIdOrCodigo",
+          "args": [
+            {
+              "id_entidad": 1
+            }
+          ],
+          "result": {
+            "id_entidad": 1,
+            "nombre": "Bomberos",
+            "codigo": "bomberos",
+            "descripcion": "Entidad encargada de la atencion de incendios, quemas activas, emergencias, explosiones, derrames peligrosos y materiales inflamables.",
+            "activo": 1,
+            "created_at": "2026-11-19T03:05:21.000Z",
+            "updated_at": null
+          }
+        },
+        {
+          "port": "relations",
+          "method": "findByEntidad",
+          "args": [
+            1,
+            {
+              "categoria": "agua",
+              "severidad": "alto",
+              "limit": "0",
+              "offset": 0
+            }
+          ],
+          "result": {
+            "reportes": [
+              {
+                "id_reporte": 10,
+                "uuid": "10000000-0000-4000-8000-000000000010",
+                "titulo": "Reporte 10",
+                "descripcion": "Contenido sintético",
+                "categoria": "agua",
+                "tipo_contaminacion": "agua",
+                "subcategoria": null,
+                "severidad": "alto",
+                "nivel_severidad": "alto",
+                "estado": "en_proceso",
+                "latitud": "1.15000000",
+                "longitud": "-120.25000000",
+                "direccion": null,
+                "municipio": "Mocoa",
+                "departamento": "Putumayo",
+                "created_at": "2026-11-10T11:00:00.000Z",
+                "updated_at": "2026-11-10T11:00:00.000Z",
+                "asignacion": {
+                  "id_reporte_entidad": 1,
+                  "tipo_asignacion": "principal",
+                  "prioridad": "alta",
+                  "estado_atencion": "en_atencion",
+                  "comentario": null,
+                  "asignado_at": "2026-11-12T10:00:00.000Z",
+                  "actualizado_at": null
+                },
+                "entidad": {
+                  "id_entidad": 1,
+                  "codigo": "bomberos",
+                  "nombre": "Bomberos"
+                }
+              }
+            ],
+            "total": 1,
+            "limit": 1,
+            "offset": 0
+          }
+        }
+      ],
+      "persistedViews": 2
+    },
+    {
+      "name": "list-entity-missing",
+      "url": "/reportes",
+      "subject": "entity_missing",
+      "status": 403,
+      "body": {
+        "status": "error",
+        "message": "Usuario entidad sin entidad asignada."
+      },
+      "trace": [],
+      "persistedViews": 2
+    },
+    {
+      "name": "list-entity-outside",
+      "url": "/reportes",
+      "subject": "entity_outside",
+      "status": 403,
+      "body": {
+        "status": "error",
+        "message": "Usuario entidad sin entidad asignada."
+      },
+      "trace": [
+        {
+          "port": "relations",
+          "method": "findActiveAllowedByIdOrCodigo",
+          "args": [
+            {
+              "id_entidad": 9999
+            }
+          ],
+          "result": null
+        }
+      ],
+      "persistedViews": 2
+    },
+    {
+      "name": "own",
+      "url": "/reportes/mis-reportes",
+      "subject": "citizen",
+      "status": 200,
+      "body": {
+        "status": "success",
+        "message": "Reportes del usuario obtenidos correctamente.",
+        "data": {
+          "reportes": [
+            {
+              "id_reporte": 11,
+              "uuid": "10000000-0000-4000-8000-000000000011",
+              "tipo_contaminacion": "aire",
+              "subcategoria": null,
+              "estado": "pendiente",
+              "nivel_severidad": "medio",
+              "titulo": "Reporte 11",
+              "descripcion": "Contenido sintético",
+              "municipio": "Pasto",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": null,
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 2,
+              "vistas": 1,
+              "created_at": "2026-11-11T11:00:00.000Z",
+              "updated_at": "2026-11-11T11:00:00.000Z",
+              "primera_imagen": null
+            },
+            {
+              "id_reporte": 10,
+              "uuid": "10000000-0000-4000-8000-000000000010",
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "en_proceso",
+              "nivel_severidad": "alto",
+              "titulo": "Reporte 10",
+              "descripcion": "Contenido sintético",
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": "en_atencion",
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 5,
+              "vistas": 2,
+              "created_at": "2026-11-10T11:00:00.000Z",
+              "updated_at": "2026-11-10T11:00:00.000Z",
+              "primera_imagen": "/uploads/imagen-1.png"
+            }
+          ],
+          "total": 2
+        }
+      },
+      "trace": [
+        {
+          "port": "reportes",
+          "method": "findByUsuario",
+          "args": [
+            1,
+            {
+              "limit": 20,
+              "offset": 0,
+              "estado": null,
+              "nivel_severidad": null
+            }
+          ],
+          "result": [
+            {
+              "id_reporte": 11,
+              "uuid": "10000000-0000-4000-8000-000000000011",
+              "tipo_contaminacion": "aire",
+              "subcategoria": null,
+              "estado": "pendiente",
+              "nivel_severidad": "medio",
+              "titulo": "Reporte 11",
+              "descripcion": "Contenido sintético",
+              "municipio": "Pasto",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": null,
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 2,
+              "vistas": 1,
+              "created_at": "2026-11-11T11:00:00.000Z",
+              "updated_at": "2026-11-11T11:00:00.000Z",
+              "primera_imagen": null
+            },
+            {
+              "id_reporte": 10,
+              "uuid": "10000000-0000-4000-8000-000000000010",
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "en_proceso",
+              "nivel_severidad": "alto",
+              "titulo": "Reporte 10",
+              "descripcion": "Contenido sintético",
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": "en_atencion",
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 5,
+              "vistas": 2,
+              "created_at": "2026-11-10T11:00:00.000Z",
+              "updated_at": "2026-11-10T11:00:00.000Z",
+              "primera_imagen": "/uploads/imagen-1.png"
+            }
+          ]
+        },
+        {
+          "port": "reportes",
+          "method": "countByUsuario",
+          "args": [
+            1,
+            {
+              "estado": null,
+              "nivel_severidad": null
+            }
+          ],
+          "result": 2
+        }
+      ],
+      "persistedViews": 2
+    },
+    {
+      "name": "own-filter",
+      "url": "/reportes/mis-reportes?estado=%20pendiente%20&nivel_severidad=%20medio%20&limit=1",
+      "subject": "citizen",
+      "status": 200,
+      "body": {
+        "status": "success",
+        "message": "Reportes del usuario obtenidos correctamente.",
+        "data": {
+          "reportes": [
+            {
+              "id_reporte": 11,
+              "uuid": "10000000-0000-4000-8000-000000000011",
+              "tipo_contaminacion": "aire",
+              "subcategoria": null,
+              "estado": "pendiente",
+              "nivel_severidad": "medio",
+              "titulo": "Reporte 11",
+              "descripcion": "Contenido sintético",
+              "municipio": "Pasto",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": null,
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 2,
+              "vistas": 1,
+              "created_at": "2026-11-11T11:00:00.000Z",
+              "updated_at": "2026-11-11T11:00:00.000Z",
+              "primera_imagen": null
+            }
+          ],
+          "total": 1
+        }
+      },
+      "trace": [
+        {
+          "port": "reportes",
+          "method": "findByUsuario",
+          "args": [
+            1,
+            {
+              "limit": 1,
+              "offset": 0,
+              "estado": "pendiente",
+              "nivel_severidad": "medio"
+            }
+          ],
+          "result": [
+            {
+              "id_reporte": 11,
+              "uuid": "10000000-0000-4000-8000-000000000011",
+              "tipo_contaminacion": "aire",
+              "subcategoria": null,
+              "estado": "pendiente",
+              "nivel_severidad": "medio",
+              "titulo": "Reporte 11",
+              "descripcion": "Contenido sintético",
+              "municipio": "Pasto",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": null,
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 2,
+              "vistas": 1,
+              "created_at": "2026-11-11T11:00:00.000Z",
+              "updated_at": "2026-11-11T11:00:00.000Z",
+              "primera_imagen": null
+            }
+          ]
+        },
+        {
+          "port": "reportes",
+          "method": "countByUsuario",
+          "args": [
+            1,
+            {
+              "estado": "pendiente",
+              "nivel_severidad": "medio"
+            }
+          ],
+          "result": 1
+        }
+      ],
+      "persistedViews": 2
+    },
+    {
+      "name": "own-no-normalize",
+      "url": "/reportes/mis-reportes?estado=en%20proceso",
+      "subject": "citizen",
+      "status": 200,
+      "body": {
+        "status": "success",
+        "message": "Reportes del usuario obtenidos correctamente.",
+        "data": {
+          "reportes": [],
+          "total": 0
+        }
+      },
+      "trace": [
+        {
+          "port": "reportes",
+          "method": "findByUsuario",
+          "args": [
+            1,
+            {
+              "limit": 20,
+              "offset": 0,
+              "estado": "en proceso",
+              "nivel_severidad": null
+            }
+          ],
+          "result": []
+        },
+        {
+          "port": "reportes",
+          "method": "countByUsuario",
+          "args": [
+            1,
+            {
+              "estado": "en proceso",
+              "nivel_severidad": null
+            }
+          ],
+          "result": 0
+        }
+      ],
+      "persistedViews": 2
+    },
+    {
+      "name": "own-offset",
+      "url": "/reportes/mis-reportes?limit=1&offset=1",
+      "subject": "citizen",
+      "status": 200,
+      "body": {
+        "status": "success",
+        "message": "Reportes del usuario obtenidos correctamente.",
+        "data": {
+          "reportes": [
+            {
+              "id_reporte": 10,
+              "uuid": "10000000-0000-4000-8000-000000000010",
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "en_proceso",
+              "nivel_severidad": "alto",
+              "titulo": "Reporte 10",
+              "descripcion": "Contenido sintético",
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": "en_atencion",
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 5,
+              "vistas": 2,
+              "created_at": "2026-11-10T11:00:00.000Z",
+              "updated_at": "2026-11-10T11:00:00.000Z",
+              "primera_imagen": "/uploads/imagen-1.png"
+            }
+          ],
+          "total": 2
+        }
+      },
+      "trace": [
+        {
+          "port": "reportes",
+          "method": "findByUsuario",
+          "args": [
+            1,
+            {
+              "limit": 1,
+              "offset": 1,
+              "estado": null,
+              "nivel_severidad": null
+            }
+          ],
+          "result": [
+            {
+              "id_reporte": 10,
+              "uuid": "10000000-0000-4000-8000-000000000010",
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "en_proceso",
+              "nivel_severidad": "alto",
+              "titulo": "Reporte 10",
+              "descripcion": "Contenido sintético",
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "estado_atencion_responsable": "en_atencion",
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": 75.5,
+              "ia_procesado": true,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 5,
+              "vistas": 2,
+              "created_at": "2026-11-10T11:00:00.000Z",
+              "updated_at": "2026-11-10T11:00:00.000Z",
+              "primera_imagen": "/uploads/imagen-1.png"
+            }
+          ]
+        },
+        {
+          "port": "reportes",
+          "method": "countByUsuario",
+          "args": [
+            1,
+            {
+              "estado": null,
+              "nivel_severidad": null
+            }
+          ],
+          "result": 2
+        }
+      ],
+      "persistedViews": 2
+    },
+    {
+      "name": "own-anonymous",
+      "url": "/reportes/mis-reportes",
+      "subject": null,
+      "status": 401,
+      "body": {
+        "status": "error",
+        "message": "acceso denegado. token no proporcionado."
+      },
+      "trace": [],
+      "persistedViews": 2
+    },
+    {
+      "name": "own-invalid",
+      "url": "/reportes/mis-reportes",
+      "subject": "invalid",
+      "status": 403,
+      "body": {
+        "status": "error",
+        "message": "token inválido o expirado."
+      },
+      "trace": [],
+      "persistedViews": 2
+    },
+    {
+      "name": "trending-anonymous",
+      "url": "/reportes/trending?limit=2",
+      "subject": null,
+      "status": 200,
+      "body": {
+        "status": "success",
+        "message": "Reportes en tendencia obtenidos correctamente.",
+        "data": {
+          "reportes": [
+            {
+              "id_reporte": 10,
+              "uuid": "10000000-0000-4000-8000-000000000010",
+              "id_usuario": 1,
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "en_proceso",
+              "nivel_severidad": "alto",
+              "titulo": "Reporte 10",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": "75.50",
+              "ia_procesado": 1,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 5,
+              "vistas": 2,
+              "created_at": "2026-11-10T11:00:00.000Z",
+              "updated_at": "2026-11-10T11:00:00.000Z",
+              "trending_score": 39
+            },
+            {
+              "id_reporte": 12,
+              "uuid": "10000000-0000-4000-8000-000000000012",
+              "id_usuario": 5,
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "resuelto",
+              "nivel_severidad": "bajo",
+              "titulo": "Reporte 12",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": "75.50",
+              "ia_procesado": 1,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 1,
+              "vistas": 10,
+              "created_at": "2026-11-12T11:00:00.000Z",
+              "updated_at": "2026-11-12T11:00:00.000Z",
+              "trending_score": 37
+            }
+          ],
+          "total": 2
+        }
+      },
+      "trace": [
+        {
+          "port": "reportes",
+          "method": "findTrending",
+          "args": [
+            {
+              "limit": "2"
+            }
+          ],
+          "result": [
+            {
+              "id_reporte": 10,
+              "uuid": "10000000-0000-4000-8000-000000000010",
+              "id_usuario": 1,
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "en_proceso",
+              "nivel_severidad": "alto",
+              "titulo": "Reporte 10",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": "75.50",
+              "ia_procesado": 1,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 5,
+              "vistas": 2,
+              "created_at": "2026-11-10T11:00:00.000Z",
+              "updated_at": "2026-11-10T11:00:00.000Z",
+              "trending_score": 39
+            },
+            {
+              "id_reporte": 12,
+              "uuid": "10000000-0000-4000-8000-000000000012",
+              "id_usuario": 5,
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "resuelto",
+              "nivel_severidad": "bajo",
+              "titulo": "Reporte 12",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": "75.50",
+              "ia_procesado": 1,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 1,
+              "vistas": 10,
+              "created_at": "2026-11-12T11:00:00.000Z",
+              "updated_at": "2026-11-12T11:00:00.000Z",
+              "trending_score": 37
+            }
+          ]
+        }
+      ],
+      "persistedViews": 2
+    },
+    {
+      "name": "trending-citizen",
+      "url": "/reportes/trending?limit=3",
+      "subject": "citizen",
+      "status": 200,
+      "body": {
+        "status": "success",
+        "message": "Reportes en tendencia obtenidos correctamente.",
+        "data": {
+          "reportes": [
+            {
+              "id_reporte": 10,
+              "uuid": "10000000-0000-4000-8000-000000000010",
+              "id_usuario": 1,
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "en_proceso",
+              "nivel_severidad": "alto",
+              "titulo": "Reporte 10",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": "75.50",
+              "ia_procesado": 1,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 5,
+              "vistas": 2,
+              "created_at": "2026-11-10T11:00:00.000Z",
+              "updated_at": "2026-11-10T11:00:00.000Z",
+              "trending_score": 39,
+              "liked_by_me": true
+            },
+            {
+              "id_reporte": 12,
+              "uuid": "10000000-0000-4000-8000-000000000012",
+              "id_usuario": 5,
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "resuelto",
+              "nivel_severidad": "bajo",
+              "titulo": "Reporte 12",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": "75.50",
+              "ia_procesado": 1,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 1,
+              "vistas": 10,
+              "created_at": "2026-11-12T11:00:00.000Z",
+              "updated_at": "2026-11-12T11:00:00.000Z",
+              "trending_score": 37,
+              "liked_by_me": true
+            },
+            {
+              "id_reporte": 11,
+              "uuid": "10000000-0000-4000-8000-000000000011",
+              "id_usuario": 1,
+              "tipo_contaminacion": "aire",
+              "subcategoria": null,
+              "estado": "pendiente",
+              "nivel_severidad": "medio",
+              "titulo": "Reporte 11",
+              "descripcion": "Contenido sintético",
+              "latitud": null,
+              "longitud": null,
+              "direccion": null,
+              "municipio": "Pasto",
+              "departamento": "Putumayo",
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": "75.50",
+              "ia_procesado": 1,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 2,
+              "vistas": 1,
+              "created_at": "2026-11-11T11:00:00.000Z",
+              "updated_at": "2026-11-11T11:00:00.000Z",
+              "trending_score": 30,
+              "liked_by_me": false
+            }
+          ],
+          "total": 3
+        }
+      },
+      "trace": [
+        {
+          "port": "reportes",
+          "method": "findTrending",
+          "args": [
+            {
+              "limit": "3"
+            }
+          ],
+          "result": [
+            {
+              "id_reporte": 10,
+              "uuid": "10000000-0000-4000-8000-000000000010",
+              "id_usuario": 1,
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "en_proceso",
+              "nivel_severidad": "alto",
+              "titulo": "Reporte 10",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": "75.50",
+              "ia_procesado": 1,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 5,
+              "vistas": 2,
+              "created_at": "2026-11-10T11:00:00.000Z",
+              "updated_at": "2026-11-10T11:00:00.000Z",
+              "trending_score": 39
+            },
+            {
+              "id_reporte": 12,
+              "uuid": "10000000-0000-4000-8000-000000000012",
+              "id_usuario": 5,
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "resuelto",
+              "nivel_severidad": "bajo",
+              "titulo": "Reporte 12",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": "75.50",
+              "ia_procesado": 1,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 1,
+              "vistas": 10,
+              "created_at": "2026-11-12T11:00:00.000Z",
+              "updated_at": "2026-11-12T11:00:00.000Z",
+              "trending_score": 37
+            },
+            {
+              "id_reporte": 11,
+              "uuid": "10000000-0000-4000-8000-000000000011",
+              "id_usuario": 1,
+              "tipo_contaminacion": "aire",
+              "subcategoria": null,
+              "estado": "pendiente",
+              "nivel_severidad": "medio",
+              "titulo": "Reporte 11",
+              "descripcion": "Contenido sintético",
+              "latitud": null,
+              "longitud": null,
+              "direccion": null,
+              "municipio": "Pasto",
+              "departamento": "Putumayo",
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": "75.50",
+              "ia_procesado": 1,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 2,
+              "vistas": 1,
+              "created_at": "2026-11-11T11:00:00.000Z",
+              "updated_at": "2026-11-11T11:00:00.000Z",
+              "trending_score": 30
+            }
+          ]
+        },
+        {
+          "port": "relations",
+          "method": "likedSet",
+          "args": [
+            [
+              10,
+              12,
+              11
+            ],
+            1
+          ],
+          "result": {
+            "__set": [
+              10,
+              12
+            ]
+          }
+        }
+      ],
+      "persistedViews": 2
+    },
+    {
+      "name": "trending-entity",
+      "url": "/reportes/trending?tipo_contaminacion=aire&limit=3",
+      "subject": "entity",
+      "status": 200,
+      "body": {
+        "status": "success",
+        "message": "Reportes en tendencia obtenidos correctamente.",
+        "data": {
+          "reportes": [
+            {
+              "id_reporte": 10,
+              "uuid": "10000000-0000-4000-8000-000000000010",
+              "id_usuario": 1,
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "en_proceso",
+              "nivel_severidad": "alto",
+              "titulo": "Reporte 10",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": "75.50",
+              "ia_procesado": 1,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 5,
+              "vistas": 2,
+              "created_at": "2026-11-10T11:00:00.000Z",
+              "updated_at": "2026-11-10T11:00:00.000Z",
+              "trending_score": 39,
+              "liked_by_me": false
+            },
+            {
+              "id_reporte": 12,
+              "uuid": "10000000-0000-4000-8000-000000000012",
+              "id_usuario": 5,
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "resuelto",
+              "nivel_severidad": "bajo",
+              "titulo": "Reporte 12",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": "75.50",
+              "ia_procesado": 1,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 1,
+              "vistas": 10,
+              "created_at": "2026-11-12T11:00:00.000Z",
+              "updated_at": "2026-11-12T11:00:00.000Z",
+              "trending_score": 37,
+              "liked_by_me": false
+            },
+            {
+              "id_reporte": 11,
+              "uuid": "10000000-0000-4000-8000-000000000011",
+              "id_usuario": 1,
+              "tipo_contaminacion": "aire",
+              "subcategoria": null,
+              "estado": "pendiente",
+              "nivel_severidad": "medio",
+              "titulo": "Reporte 11",
+              "descripcion": "Contenido sintético",
+              "latitud": null,
+              "longitud": null,
+              "direccion": null,
+              "municipio": "Pasto",
+              "departamento": "Putumayo",
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": "75.50",
+              "ia_procesado": 1,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 2,
+              "vistas": 1,
+              "created_at": "2026-11-11T11:00:00.000Z",
+              "updated_at": "2026-11-11T11:00:00.000Z",
+              "trending_score": 30,
+              "liked_by_me": false
+            }
+          ],
+          "total": 3
+        }
+      },
+      "trace": [
+        {
+          "port": "reportes",
+          "method": "findTrending",
+          "args": [
+            {
+              "limit": "3"
+            }
+          ],
+          "result": [
+            {
+              "id_reporte": 10,
+              "uuid": "10000000-0000-4000-8000-000000000010",
+              "id_usuario": 1,
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "en_proceso",
+              "nivel_severidad": "alto",
+              "titulo": "Reporte 10",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": "75.50",
+              "ia_procesado": 1,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 5,
+              "vistas": 2,
+              "created_at": "2026-11-10T11:00:00.000Z",
+              "updated_at": "2026-11-10T11:00:00.000Z",
+              "trending_score": 39
+            },
+            {
+              "id_reporte": 12,
+              "uuid": "10000000-0000-4000-8000-000000000012",
+              "id_usuario": 5,
+              "tipo_contaminacion": "agua",
+              "subcategoria": null,
+              "estado": "resuelto",
+              "nivel_severidad": "bajo",
+              "titulo": "Reporte 12",
+              "descripcion": "Contenido sintético",
+              "latitud": "1.15000000",
+              "longitud": "-120.25000000",
+              "direccion": null,
+              "municipio": "Mocoa",
+              "departamento": "Putumayo",
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": "75.50",
+              "ia_procesado": 1,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 1,
+              "vistas": 10,
+              "created_at": "2026-11-12T11:00:00.000Z",
+              "updated_at": "2026-11-12T11:00:00.000Z",
+              "trending_score": 37
+            },
+            {
+              "id_reporte": 11,
+              "uuid": "10000000-0000-4000-8000-000000000011",
+              "id_usuario": 1,
+              "tipo_contaminacion": "aire",
+              "subcategoria": null,
+              "estado": "pendiente",
+              "nivel_severidad": "medio",
+              "titulo": "Reporte 11",
+              "descripcion": "Contenido sintético",
+              "latitud": null,
+              "longitud": null,
+              "direccion": null,
+              "municipio": "Pasto",
+              "departamento": "Putumayo",
+              "ia_etiquetas": [
+                "agua",
+                "prueba"
+              ],
+              "ia_confianza": "75.50",
+              "ia_procesado": 1,
+              "confianza_evidencia": 64,
+              "votos_relevancia": 2,
+              "vistas": 1,
+              "created_at": "2026-11-11T11:00:00.000Z",
+              "updated_at": "2026-11-11T11:00:00.000Z",
+              "trending_score": 30
+            }
+          ]
+        },
+        {
+          "port": "relations",
+          "method": "likedSet",
+          "args": [
+            [
+              10,
+              12,
+              11
+            ],
+            4
+          ],
+          "result": {
+            "__set": []
+          }
+        }
+      ],
+      "persistedViews": 2
+    },
+    {
+      "name": "detail-skip",
+      "url": "/reportes/10?skip_view=true",
+      "subject": "citizen",
+      "status": 200,
+      "body": {
+        "status": "success",
+        "message": "ok",
+        "data": {
+          "reporte": {
+            "id_reporte": 10,
+            "uuid": "10000000-0000-4000-8000-000000000010",
+            "id_usuario": 1,
+            "tipo_contaminacion": "agua",
+            "subcategoria": null,
+            "estado": "en_proceso",
+            "nivel_severidad": "alto",
+            "titulo": "Reporte 10",
+            "descripcion": "Contenido sintético",
+            "latitud": "1.15000000",
+            "longitud": "-120.25000000",
+            "direccion": null,
+            "municipio": "Mocoa",
+            "departamento": "Putumayo",
+            "estado_atencion_responsable": "en_atencion",
+            "ia_etiquetas": [
+              "agua",
+              "prueba"
+            ],
+            "ia_confianza": 75.5,
+            "ia_procesado": true,
+            "confianza_evidencia": 64,
+            "votos_relevancia": 5,
+            "vistas": 2,
+            "comentario_moderacion": null,
+            "created_at": "2026-11-10T11:00:00.000Z",
+            "updated_at": "2026-11-10T11:00:00.000Z",
+            "liked_by_me": true
+          },
+          "evidencias": [
+            {
+              "id_evidencia": 2,
+              "uuid": "20000000-0000-4000-8000-000000000002",
+              "id_usuario": 1,
+              "tipo_archivo": "imagen",
+              "url_archivo": "/uploads/imagen-2.png",
+              "nombre_original": null,
+              "mime_type": null,
+              "tamano_bytes": null,
+              "hash_sha256": null,
+              "storage_provider": "cloudinary",
+              "cloudinary_public_id": null,
+              "cloudinary_asset_id": null,
+              "cloudinary_resource_type": null,
+              "cloudinary_metadata": null,
+              "verificado": 0,
+              "orden": 1,
+              "created_at": "2026-11-15T12:00:00.000Z"
+            }
+          ],
+          "autor": {
+            "nombre": "Persona 1",
+            "apellido": "Sintetica",
+            "rol": "ciudadano",
+            "avatar_url": null
+          }
+        }
+      },
+      "trace": [
+        {
+          "port": "reportes",
+          "method": "findById",
+          "args": [
+            10
+          ],
+          "result": {
+            "id_reporte": 10,
+            "uuid": "10000000-0000-4000-8000-000000000010",
+            "id_usuario": 1,
+            "tipo_contaminacion": "agua",
+            "subcategoria": null,
+            "estado": "en_proceso",
+            "nivel_severidad": "alto",
+            "titulo": "Reporte 10",
+            "descripcion": "Contenido sintético",
+            "latitud": "1.15000000",
+            "longitud": "-120.25000000",
+            "direccion": null,
+            "municipio": "Mocoa",
+            "departamento": "Putumayo",
+            "estado_atencion_responsable": "en_atencion",
+            "ia_etiquetas": [
+              "agua",
+              "prueba"
+            ],
+            "ia_confianza": 75.5,
+            "ia_procesado": true,
+            "confianza_evidencia": 64,
+            "votos_relevancia": 5,
+            "vistas": 2,
+            "comentario_moderacion": null,
+            "created_at": "2026-11-10T11:00:00.000Z",
+            "updated_at": "2026-11-10T11:00:00.000Z"
+          }
+        },
+        {
+          "port": "relations",
+          "method": "likedSet",
+          "args": [
+            [
+              10
+            ],
+            1
+          ],
+          "result": {
+            "__set": [
+              10
+            ]
+          }
+        },
+        {
+          "port": "relations",
+          "method": "findByReporte",
+          "args": [
+            10
+          ],
+          "result": [
+            {
+              "id_evidencia": 2,
+              "uuid": "20000000-0000-4000-8000-000000000002",
+              "id_usuario": 1,
+              "tipo_archivo": "imagen",
+              "url_archivo": "/uploads/imagen-2.png",
+              "nombre_original": null,
+              "mime_type": null,
+              "tamano_bytes": null,
+              "hash_sha256": null,
+              "storage_provider": "cloudinary",
+              "cloudinary_public_id": null,
+              "cloudinary_asset_id": null,
+              "cloudinary_resource_type": null,
+              "cloudinary_metadata": null,
+              "verificado": 0,
+              "orden": 1,
+              "created_at": "2026-11-15T12:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "port": "relations",
+          "method": "findById",
+          "args": [
+            1
+          ],
+          "result": {
+            "id_usuario": 1,
+            "uuid": "00000000-0000-4000-8000-000000000001",
+            "nombre": "Persona 1",
+            "apellido": "Sintetica",
+            "email": "persona1@example.test",
+            "rol": "ciudadano",
+            "activo": 1,
+            "email_verificado": 0,
+            "avatar_url": null,
+            "telefono": null,
+            "created_at": "2026-11-19T03:05:21.000Z",
+            "updated_at": "2026-11-19T03:05:21.000Z",
+            "id_entidad": null,
+            "notification_preferences": null,
+            "google_id": null,
+            "facebook_id": null,
+            "ultimo_acceso": null
+          }
+        }
+      ],
+      "persistedViews": 2
+    },
+    {
+      "name": "detail-entity-assigned",
+      "url": "/reportes/10?skip_view=true",
+      "subject": "entity",
+      "status": 200,
+      "body": {
+        "status": "success",
+        "message": "ok",
+        "data": {
+          "reporte": {
+            "id_reporte": 10,
+            "uuid": "10000000-0000-4000-8000-000000000010",
+            "id_usuario": 1,
+            "tipo_contaminacion": "agua",
+            "subcategoria": null,
+            "estado": "en_proceso",
+            "nivel_severidad": "alto",
+            "titulo": "Reporte 10",
+            "descripcion": "Contenido sintético",
+            "latitud": "1.15000000",
+            "longitud": "-120.25000000",
+            "direccion": null,
+            "municipio": "Mocoa",
+            "departamento": "Putumayo",
+            "estado_atencion_responsable": "en_atencion",
+            "ia_etiquetas": [
+              "agua",
+              "prueba"
+            ],
+            "ia_confianza": 75.5,
+            "ia_procesado": true,
+            "confianza_evidencia": 64,
+            "votos_relevancia": 5,
+            "vistas": 2,
+            "comentario_moderacion": null,
+            "created_at": "2026-11-10T11:00:00.000Z",
+            "updated_at": "2026-11-10T11:00:00.000Z",
+            "liked_by_me": false
+          },
+          "evidencias": [
+            {
+              "id_evidencia": 2,
+              "uuid": "20000000-0000-4000-8000-000000000002",
+              "id_usuario": 1,
+              "tipo_archivo": "imagen",
+              "url_archivo": "/uploads/imagen-2.png",
+              "nombre_original": null,
+              "mime_type": null,
+              "tamano_bytes": null,
+              "hash_sha256": null,
+              "storage_provider": "cloudinary",
+              "cloudinary_public_id": null,
+              "cloudinary_asset_id": null,
+              "cloudinary_resource_type": null,
+              "cloudinary_metadata": null,
+              "verificado": 0,
+              "orden": 1,
+              "created_at": "2026-11-15T12:00:00.000Z"
+            }
+          ],
+          "autor": {
+            "nombre": "Persona 1",
+            "apellido": "Sintetica",
+            "rol": "ciudadano",
+            "avatar_url": null
+          }
+        }
+      },
+      "trace": [
+        {
+          "port": "relations",
+          "method": "findActiveAllowedByIdOrCodigo",
+          "args": [
+            {
+              "id_entidad": 1
+            }
+          ],
+          "result": {
+            "id_entidad": 1,
+            "nombre": "Bomberos",
+            "codigo": "bomberos",
+            "descripcion": "Entidad encargada de la atencion de incendios, quemas activas, emergencias, explosiones, derrames peligrosos y materiales inflamables.",
+            "activo": 1,
+            "created_at": "2026-11-19T03:05:21.000Z",
+            "updated_at": null
+          }
+        },
+        {
+          "port": "relations",
+          "method": "findOneByReporteAndEntidad",
+          "args": [
+            10,
+            1
+          ],
+          "result": {
+            "id_reporte_entidad": 1,
+            "id_reporte": 10,
+            "id_entidad": 1,
+            "tipo_asignacion": "principal",
+            "prioridad": "alta",
+            "estado_atencion": "en_atencion",
+            "comentario": null,
+            "asignado_at": "2026-11-12T10:00:00.000Z",
+            "actualizado_at": null,
+            "entidad_codigo": "bomberos",
+            "entidad_nombre": "Bomberos"
+          }
+        },
+        {
+          "port": "reportes",
+          "method": "findById",
+          "args": [
+            10
+          ],
+          "result": {
+            "id_reporte": 10,
+            "uuid": "10000000-0000-4000-8000-000000000010",
+            "id_usuario": 1,
+            "tipo_contaminacion": "agua",
+            "subcategoria": null,
+            "estado": "en_proceso",
+            "nivel_severidad": "alto",
+            "titulo": "Reporte 10",
+            "descripcion": "Contenido sintético",
+            "latitud": "1.15000000",
+            "longitud": "-120.25000000",
+            "direccion": null,
+            "municipio": "Mocoa",
+            "departamento": "Putumayo",
+            "estado_atencion_responsable": "en_atencion",
+            "ia_etiquetas": [
+              "agua",
+              "prueba"
+            ],
+            "ia_confianza": 75.5,
+            "ia_procesado": true,
+            "confianza_evidencia": 64,
+            "votos_relevancia": 5,
+            "vistas": 2,
+            "comentario_moderacion": null,
+            "created_at": "2026-11-10T11:00:00.000Z",
+            "updated_at": "2026-11-10T11:00:00.000Z"
+          }
+        },
+        {
+          "port": "relations",
+          "method": "likedSet",
+          "args": [
+            [
+              10
+            ],
+            4
+          ],
+          "result": {
+            "__set": []
+          }
+        },
+        {
+          "port": "relations",
+          "method": "findByReporte",
+          "args": [
+            10
+          ],
+          "result": [
+            {
+              "id_evidencia": 2,
+              "uuid": "20000000-0000-4000-8000-000000000002",
+              "id_usuario": 1,
+              "tipo_archivo": "imagen",
+              "url_archivo": "/uploads/imagen-2.png",
+              "nombre_original": null,
+              "mime_type": null,
+              "tamano_bytes": null,
+              "hash_sha256": null,
+              "storage_provider": "cloudinary",
+              "cloudinary_public_id": null,
+              "cloudinary_asset_id": null,
+              "cloudinary_resource_type": null,
+              "cloudinary_metadata": null,
+              "verificado": 0,
+              "orden": 1,
+              "created_at": "2026-11-15T12:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "port": "relations",
+          "method": "findById",
+          "args": [
+            1
+          ],
+          "result": {
+            "id_usuario": 1,
+            "uuid": "00000000-0000-4000-8000-000000000001",
+            "nombre": "Persona 1",
+            "apellido": "Sintetica",
+            "email": "persona1@example.test",
+            "rol": "ciudadano",
+            "activo": 1,
+            "email_verificado": 0,
+            "avatar_url": null,
+            "telefono": null,
+            "created_at": "2026-11-19T03:05:21.000Z",
+            "updated_at": "2026-11-19T03:05:21.000Z",
+            "id_entidad": null,
+            "notification_preferences": null,
+            "google_id": null,
+            "facebook_id": null,
+            "ultimo_acceso": null
+          }
+        }
+      ],
+      "persistedViews": 2
+    },
+    {
+      "name": "detail-entity-forbidden",
+      "url": "/reportes/11?skip_view=true",
+      "subject": "entity",
+      "status": 403,
+      "body": {
+        "status": "error",
+        "message": "No tienes permiso para ver este reporte."
+      },
+      "trace": [
+        {
+          "port": "relations",
+          "method": "findActiveAllowedByIdOrCodigo",
+          "args": [
+            {
+              "id_entidad": 1
+            }
+          ],
+          "result": {
+            "id_entidad": 1,
+            "nombre": "Bomberos",
+            "codigo": "bomberos",
+            "descripcion": "Entidad encargada de la atencion de incendios, quemas activas, emergencias, explosiones, derrames peligrosos y materiales inflamables.",
+            "activo": 1,
+            "created_at": "2026-11-19T03:05:21.000Z",
+            "updated_at": null
+          }
+        },
+        {
+          "port": "relations",
+          "method": "findOneByReporteAndEntidad",
+          "args": [
+            11,
+            1
+          ],
+          "result": null
+        }
+      ],
+      "persistedViews": 2
+    },
+    {
+      "name": "detail-entity-absent",
+      "url": "/reportes/9999?skip_view=true",
+      "subject": "entity",
+      "status": 403,
+      "body": {
+        "status": "error",
+        "message": "No tienes permiso para ver este reporte."
+      },
+      "trace": [
+        {
+          "port": "relations",
+          "method": "findActiveAllowedByIdOrCodigo",
+          "args": [
+            {
+              "id_entidad": 1
+            }
+          ],
+          "result": {
+            "id_entidad": 1,
+            "nombre": "Bomberos",
+            "codigo": "bomberos",
+            "descripcion": "Entidad encargada de la atencion de incendios, quemas activas, emergencias, explosiones, derrames peligrosos y materiales inflamables.",
+            "activo": 1,
+            "created_at": "2026-11-19T03:05:21.000Z",
+            "updated_at": null
+          }
+        },
+        {
+          "port": "relations",
+          "method": "findOneByReporteAndEntidad",
+          "args": [
+            9999,
+            1
+          ],
+          "result": null
+        }
+      ],
+      "persistedViews": 2
+    },
+    {
+      "name": "detail-not-found",
+      "url": "/reportes/9999?skip_view=true",
+      "subject": null,
+      "status": 404,
+      "body": {
+        "status": "error",
+        "message": "Reporte no encontrado."
+      },
+      "trace": [
+        {
+          "port": "reportes",
+          "method": "findById",
+          "args": [
+            9999
+          ],
+          "result": null
+        }
+      ],
+      "persistedViews": 2
+    },
+    {
+      "name": "detail-deleted",
+      "url": "/reportes/14?skip_view=true",
+      "subject": null,
+      "status": 404,
+      "body": {
+        "status": "error",
+        "message": "Reporte no encontrado."
+      },
+      "trace": [
+        {
+          "port": "reportes",
+          "method": "findById",
+          "args": [
+            14
+          ],
+          "result": null
+        }
+      ],
+      "persistedViews": 2
+    },
+    {
+      "name": "detail-invalid-id",
+      "url": "/reportes/no-id",
+      "subject": null,
+      "status": 400,
+      "body": {
+        "status": "error",
+        "message": "id invalido. Debe ser un entero positivo."
+      },
+      "trace": [],
+      "persistedViews": 2
+    },
+    {
+      "name": "detail-anonymous-first",
+      "url": "/reportes/10",
+      "subject": null,
+      "status": 200,
+      "body": {
+        "status": "success",
+        "message": "ok",
+        "data": {
+          "reporte": {
+            "id_reporte": 10,
+            "uuid": "10000000-0000-4000-8000-000000000010",
+            "id_usuario": 1,
+            "tipo_contaminacion": "agua",
+            "subcategoria": null,
+            "estado": "en_proceso",
+            "nivel_severidad": "alto",
+            "titulo": "Reporte 10",
+            "descripcion": "Contenido sintético",
+            "latitud": "1.15000000",
+            "longitud": "-120.25000000",
+            "direccion": null,
+            "municipio": "Mocoa",
+            "departamento": "Putumayo",
+            "estado_atencion_responsable": "en_atencion",
+            "ia_etiquetas": [
+              "agua",
+              "prueba"
+            ],
+            "ia_confianza": 75.5,
+            "ia_procesado": true,
+            "confianza_evidencia": 64,
+            "votos_relevancia": 5,
+            "vistas": 2,
+            "comentario_moderacion": null,
+            "created_at": "2026-11-10T11:00:00.000Z",
+            "updated_at": "2026-11-10T11:00:00.000Z"
+          },
+          "evidencias": [
+            {
+              "id_evidencia": 2,
+              "uuid": "20000000-0000-4000-8000-000000000002",
+              "id_usuario": 1,
+              "tipo_archivo": "imagen",
+              "url_archivo": "/uploads/imagen-2.png",
+              "nombre_original": null,
+              "mime_type": null,
+              "tamano_bytes": null,
+              "hash_sha256": null,
+              "storage_provider": "cloudinary",
+              "cloudinary_public_id": null,
+              "cloudinary_asset_id": null,
+              "cloudinary_resource_type": null,
+              "cloudinary_metadata": null,
+              "verificado": 0,
+              "orden": 1,
+              "created_at": "2026-11-15T12:00:00.000Z"
+            }
+          ],
+          "autor": {
+            "nombre": "Persona 1",
+            "apellido": "Sintetica",
+            "rol": "ciudadano",
+            "avatar_url": null
+          }
+        }
+      },
+      "trace": [
+        {
+          "port": "reportes",
+          "method": "findById",
+          "args": [
+            10
+          ],
+          "result": {
+            "id_reporte": 10,
+            "uuid": "10000000-0000-4000-8000-000000000010",
+            "id_usuario": 1,
+            "tipo_contaminacion": "agua",
+            "subcategoria": null,
+            "estado": "en_proceso",
+            "nivel_severidad": "alto",
+            "titulo": "Reporte 10",
+            "descripcion": "Contenido sintético",
+            "latitud": "1.15000000",
+            "longitud": "-120.25000000",
+            "direccion": null,
+            "municipio": "Mocoa",
+            "departamento": "Putumayo",
+            "estado_atencion_responsable": "en_atencion",
+            "ia_etiquetas": [
+              "agua",
+              "prueba"
+            ],
+            "ia_confianza": 75.5,
+            "ia_procesado": true,
+            "confianza_evidencia": 64,
+            "votos_relevancia": 5,
+            "vistas": 2,
+            "comentario_moderacion": null,
+            "created_at": "2026-11-10T11:00:00.000Z",
+            "updated_at": "2026-11-10T11:00:00.000Z"
+          }
+        },
+        {
+          "port": "relations",
+          "method": "findByReporte",
+          "args": [
+            10
+          ],
+          "result": [
+            {
+              "id_evidencia": 2,
+              "uuid": "20000000-0000-4000-8000-000000000002",
+              "id_usuario": 1,
+              "tipo_archivo": "imagen",
+              "url_archivo": "/uploads/imagen-2.png",
+              "nombre_original": null,
+              "mime_type": null,
+              "tamano_bytes": null,
+              "hash_sha256": null,
+              "storage_provider": "cloudinary",
+              "cloudinary_public_id": null,
+              "cloudinary_asset_id": null,
+              "cloudinary_resource_type": null,
+              "cloudinary_metadata": null,
+              "verificado": 0,
+              "orden": 1,
+              "created_at": "2026-11-15T12:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "port": "relations",
+          "method": "findById",
+          "args": [
+            1
+          ],
+          "result": {
+            "id_usuario": 1,
+            "uuid": "00000000-0000-4000-8000-000000000001",
+            "nombre": "Persona 1",
+            "apellido": "Sintetica",
+            "email": "persona1@example.test",
+            "rol": "ciudadano",
+            "activo": 1,
+            "email_verificado": 0,
+            "avatar_url": null,
+            "telefono": null,
+            "created_at": "2026-11-19T03:05:21.000Z",
+            "updated_at": "2026-11-19T03:05:21.000Z",
+            "id_entidad": null,
+            "notification_preferences": null,
+            "google_id": null,
+            "facebook_id": null,
+            "ultimo_acceso": null
+          }
+        }
+      ],
+      "persistedViews": 3
+    },
+    {
+      "name": "detail-anonymous-repeat",
+      "url": "/reportes/10",
+      "subject": null,
+      "status": 200,
+      "body": {
+        "status": "success",
+        "message": "ok",
+        "data": {
+          "reporte": {
+            "id_reporte": 10,
+            "uuid": "10000000-0000-4000-8000-000000000010",
+            "id_usuario": 1,
+            "tipo_contaminacion": "agua",
+            "subcategoria": null,
+            "estado": "en_proceso",
+            "nivel_severidad": "alto",
+            "titulo": "Reporte 10",
+            "descripcion": "Contenido sintético",
+            "latitud": "1.15000000",
+            "longitud": "-120.25000000",
+            "direccion": null,
+            "municipio": "Mocoa",
+            "departamento": "Putumayo",
+            "estado_atencion_responsable": "en_atencion",
+            "ia_etiquetas": [
+              "agua",
+              "prueba"
+            ],
+            "ia_confianza": 75.5,
+            "ia_procesado": true,
+            "confianza_evidencia": 64,
+            "votos_relevancia": 5,
+            "vistas": 3,
+            "comentario_moderacion": null,
+            "created_at": "2026-11-10T11:00:00.000Z",
+            "updated_at": "2026-11-18T12:00:00.000Z"
+          },
+          "evidencias": [
+            {
+              "id_evidencia": 2,
+              "uuid": "20000000-0000-4000-8000-000000000002",
+              "id_usuario": 1,
+              "tipo_archivo": "imagen",
+              "url_archivo": "/uploads/imagen-2.png",
+              "nombre_original": null,
+              "mime_type": null,
+              "tamano_bytes": null,
+              "hash_sha256": null,
+              "storage_provider": "cloudinary",
+              "cloudinary_public_id": null,
+              "cloudinary_asset_id": null,
+              "cloudinary_resource_type": null,
+              "cloudinary_metadata": null,
+              "verificado": 0,
+              "orden": 1,
+              "created_at": "2026-11-15T12:00:00.000Z"
+            }
+          ],
+          "autor": {
+            "nombre": "Persona 1",
+            "apellido": "Sintetica",
+            "rol": "ciudadano",
+            "avatar_url": null
+          }
+        }
+      },
+      "trace": [
+        {
+          "port": "reportes",
+          "method": "findById",
+          "args": [
+            10
+          ],
+          "result": {
+            "id_reporte": 10,
+            "uuid": "10000000-0000-4000-8000-000000000010",
+            "id_usuario": 1,
+            "tipo_contaminacion": "agua",
+            "subcategoria": null,
+            "estado": "en_proceso",
+            "nivel_severidad": "alto",
+            "titulo": "Reporte 10",
+            "descripcion": "Contenido sintético",
+            "latitud": "1.15000000",
+            "longitud": "-120.25000000",
+            "direccion": null,
+            "municipio": "Mocoa",
+            "departamento": "Putumayo",
+            "estado_atencion_responsable": "en_atencion",
+            "ia_etiquetas": [
+              "agua",
+              "prueba"
+            ],
+            "ia_confianza": 75.5,
+            "ia_procesado": true,
+            "confianza_evidencia": 64,
+            "votos_relevancia": 5,
+            "vistas": 3,
+            "comentario_moderacion": null,
+            "created_at": "2026-11-10T11:00:00.000Z",
+            "updated_at": "2026-11-18T12:00:00.000Z"
+          }
+        },
+        {
+          "port": "relations",
+          "method": "findByReporte",
+          "args": [
+            10
+          ],
+          "result": [
+            {
+              "id_evidencia": 2,
+              "uuid": "20000000-0000-4000-8000-000000000002",
+              "id_usuario": 1,
+              "tipo_archivo": "imagen",
+              "url_archivo": "/uploads/imagen-2.png",
+              "nombre_original": null,
+              "mime_type": null,
+              "tamano_bytes": null,
+              "hash_sha256": null,
+              "storage_provider": "cloudinary",
+              "cloudinary_public_id": null,
+              "cloudinary_asset_id": null,
+              "cloudinary_resource_type": null,
+              "cloudinary_metadata": null,
+              "verificado": 0,
+              "orden": 1,
+              "created_at": "2026-11-15T12:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "port": "relations",
+          "method": "findById",
+          "args": [
+            1
+          ],
+          "result": {
+            "id_usuario": 1,
+            "uuid": "00000000-0000-4000-8000-000000000001",
+            "nombre": "Persona 1",
+            "apellido": "Sintetica",
+            "email": "persona1@example.test",
+            "rol": "ciudadano",
+            "activo": 1,
+            "email_verificado": 0,
+            "avatar_url": null,
+            "telefono": null,
+            "created_at": "2026-11-19T03:05:21.000Z",
+            "updated_at": "2026-11-19T03:05:21.000Z",
+            "id_entidad": null,
+            "notification_preferences": null,
+            "google_id": null,
+            "facebook_id": null,
+            "ultimo_acceso": null
+          }
+        }
+      ],
+      "persistedViews": 3
+    },
+    {
+      "name": "detail-citizen-first",
+      "url": "/reportes/10",
+      "subject": "citizen",
+      "status": 200,
+      "body": {
+        "status": "success",
+        "message": "ok",
+        "data": {
+          "reporte": {
+            "id_reporte": 10,
+            "uuid": "10000000-0000-4000-8000-000000000010",
+            "id_usuario": 1,
+            "tipo_contaminacion": "agua",
+            "subcategoria": null,
+            "estado": "en_proceso",
+            "nivel_severidad": "alto",
+            "titulo": "Reporte 10",
+            "descripcion": "Contenido sintético",
+            "latitud": "1.15000000",
+            "longitud": "-120.25000000",
+            "direccion": null,
+            "municipio": "Mocoa",
+            "departamento": "Putumayo",
+            "estado_atencion_responsable": "en_atencion",
+            "ia_etiquetas": [
+              "agua",
+              "prueba"
+            ],
+            "ia_confianza": 75.5,
+            "ia_procesado": true,
+            "confianza_evidencia": 64,
+            "votos_relevancia": 5,
+            "vistas": 3,
+            "comentario_moderacion": null,
+            "created_at": "2026-11-10T11:00:00.000Z",
+            "updated_at": "2026-11-18T12:00:00.000Z",
+            "liked_by_me": true
+          },
+          "evidencias": [
+            {
+              "id_evidencia": 2,
+              "uuid": "20000000-0000-4000-8000-000000000002",
+              "id_usuario": 1,
+              "tipo_archivo": "imagen",
+              "url_archivo": "/uploads/imagen-2.png",
+              "nombre_original": null,
+              "mime_type": null,
+              "tamano_bytes": null,
+              "hash_sha256": null,
+              "storage_provider": "cloudinary",
+              "cloudinary_public_id": null,
+              "cloudinary_asset_id": null,
+              "cloudinary_resource_type": null,
+              "cloudinary_metadata": null,
+              "verificado": 0,
+              "orden": 1,
+              "created_at": "2026-11-15T12:00:00.000Z"
+            }
+          ],
+          "autor": {
+            "nombre": "Persona 1",
+            "apellido": "Sintetica",
+            "rol": "ciudadano",
+            "avatar_url": null
+          }
+        }
+      },
+      "trace": [
+        {
+          "port": "reportes",
+          "method": "findById",
+          "args": [
+            10
+          ],
+          "result": {
+            "id_reporte": 10,
+            "uuid": "10000000-0000-4000-8000-000000000010",
+            "id_usuario": 1,
+            "tipo_contaminacion": "agua",
+            "subcategoria": null,
+            "estado": "en_proceso",
+            "nivel_severidad": "alto",
+            "titulo": "Reporte 10",
+            "descripcion": "Contenido sintético",
+            "latitud": "1.15000000",
+            "longitud": "-120.25000000",
+            "direccion": null,
+            "municipio": "Mocoa",
+            "departamento": "Putumayo",
+            "estado_atencion_responsable": "en_atencion",
+            "ia_etiquetas": [
+              "agua",
+              "prueba"
+            ],
+            "ia_confianza": 75.5,
+            "ia_procesado": true,
+            "confianza_evidencia": 64,
+            "votos_relevancia": 5,
+            "vistas": 3,
+            "comentario_moderacion": null,
+            "created_at": "2026-11-10T11:00:00.000Z",
+            "updated_at": "2026-11-18T12:00:00.000Z"
+          }
+        },
+        {
+          "port": "relations",
+          "method": "likedSet",
+          "args": [
+            [
+              10
+            ],
+            1
+          ],
+          "result": {
+            "__set": [
+              10
+            ]
+          }
+        },
+        {
+          "port": "relations",
+          "method": "findByReporte",
+          "args": [
+            10
+          ],
+          "result": [
+            {
+              "id_evidencia": 2,
+              "uuid": "20000000-0000-4000-8000-000000000002",
+              "id_usuario": 1,
+              "tipo_archivo": "imagen",
+              "url_archivo": "/uploads/imagen-2.png",
+              "nombre_original": null,
+              "mime_type": null,
+              "tamano_bytes": null,
+              "hash_sha256": null,
+              "storage_provider": "cloudinary",
+              "cloudinary_public_id": null,
+              "cloudinary_asset_id": null,
+              "cloudinary_resource_type": null,
+              "cloudinary_metadata": null,
+              "verificado": 0,
+              "orden": 1,
+              "created_at": "2026-11-15T12:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "port": "relations",
+          "method": "findById",
+          "args": [
+            1
+          ],
+          "result": {
+            "id_usuario": 1,
+            "uuid": "00000000-0000-4000-8000-000000000001",
+            "nombre": "Persona 1",
+            "apellido": "Sintetica",
+            "email": "persona1@example.test",
+            "rol": "ciudadano",
+            "activo": 1,
+            "email_verificado": 0,
+            "avatar_url": null,
+            "telefono": null,
+            "created_at": "2026-11-19T03:05:21.000Z",
+            "updated_at": "2026-11-19T03:05:21.000Z",
+            "id_entidad": null,
+            "notification_preferences": null,
+            "google_id": null,
+            "facebook_id": null,
+            "ultimo_acceso": null
+          }
+        }
+      ],
+      "persistedViews": 4
+    },
+    {
+      "name": "detail-citizen-repeat",
+      "url": "/reportes/10",
+      "subject": "citizen",
+      "status": 200,
+      "body": {
+        "status": "success",
+        "message": "ok",
+        "data": {
+          "reporte": {
+            "id_reporte": 10,
+            "uuid": "10000000-0000-4000-8000-000000000010",
+            "id_usuario": 1,
+            "tipo_contaminacion": "agua",
+            "subcategoria": null,
+            "estado": "en_proceso",
+            "nivel_severidad": "alto",
+            "titulo": "Reporte 10",
+            "descripcion": "Contenido sintético",
+            "latitud": "1.15000000",
+            "longitud": "-120.25000000",
+            "direccion": null,
+            "municipio": "Mocoa",
+            "departamento": "Putumayo",
+            "estado_atencion_responsable": "en_atencion",
+            "ia_etiquetas": [
+              "agua",
+              "prueba"
+            ],
+            "ia_confianza": 75.5,
+            "ia_procesado": true,
+            "confianza_evidencia": 64,
+            "votos_relevancia": 5,
+            "vistas": 4,
+            "comentario_moderacion": null,
+            "created_at": "2026-11-10T11:00:00.000Z",
+            "updated_at": "2026-11-18T12:00:00.000Z",
+            "liked_by_me": true
+          },
+          "evidencias": [
+            {
+              "id_evidencia": 2,
+              "uuid": "20000000-0000-4000-8000-000000000002",
+              "id_usuario": 1,
+              "tipo_archivo": "imagen",
+              "url_archivo": "/uploads/imagen-2.png",
+              "nombre_original": null,
+              "mime_type": null,
+              "tamano_bytes": null,
+              "hash_sha256": null,
+              "storage_provider": "cloudinary",
+              "cloudinary_public_id": null,
+              "cloudinary_asset_id": null,
+              "cloudinary_resource_type": null,
+              "cloudinary_metadata": null,
+              "verificado": 0,
+              "orden": 1,
+              "created_at": "2026-11-15T12:00:00.000Z"
+            }
+          ],
+          "autor": {
+            "nombre": "Persona 1",
+            "apellido": "Sintetica",
+            "rol": "ciudadano",
+            "avatar_url": null
+          }
+        }
+      },
+      "trace": [
+        {
+          "port": "reportes",
+          "method": "findById",
+          "args": [
+            10
+          ],
+          "result": {
+            "id_reporte": 10,
+            "uuid": "10000000-0000-4000-8000-000000000010",
+            "id_usuario": 1,
+            "tipo_contaminacion": "agua",
+            "subcategoria": null,
+            "estado": "en_proceso",
+            "nivel_severidad": "alto",
+            "titulo": "Reporte 10",
+            "descripcion": "Contenido sintético",
+            "latitud": "1.15000000",
+            "longitud": "-120.25000000",
+            "direccion": null,
+            "municipio": "Mocoa",
+            "departamento": "Putumayo",
+            "estado_atencion_responsable": "en_atencion",
+            "ia_etiquetas": [
+              "agua",
+              "prueba"
+            ],
+            "ia_confianza": 75.5,
+            "ia_procesado": true,
+            "confianza_evidencia": 64,
+            "votos_relevancia": 5,
+            "vistas": 4,
+            "comentario_moderacion": null,
+            "created_at": "2026-11-10T11:00:00.000Z",
+            "updated_at": "2026-11-18T12:00:00.000Z"
+          }
+        },
+        {
+          "port": "relations",
+          "method": "likedSet",
+          "args": [
+            [
+              10
+            ],
+            1
+          ],
+          "result": {
+            "__set": [
+              10
+            ]
+          }
+        },
+        {
+          "port": "relations",
+          "method": "findByReporte",
+          "args": [
+            10
+          ],
+          "result": [
+            {
+              "id_evidencia": 2,
+              "uuid": "20000000-0000-4000-8000-000000000002",
+              "id_usuario": 1,
+              "tipo_archivo": "imagen",
+              "url_archivo": "/uploads/imagen-2.png",
+              "nombre_original": null,
+              "mime_type": null,
+              "tamano_bytes": null,
+              "hash_sha256": null,
+              "storage_provider": "cloudinary",
+              "cloudinary_public_id": null,
+              "cloudinary_asset_id": null,
+              "cloudinary_resource_type": null,
+              "cloudinary_metadata": null,
+              "verificado": 0,
+              "orden": 1,
+              "created_at": "2026-11-15T12:00:00.000Z"
+            }
+          ]
+        },
+        {
+          "port": "relations",
+          "method": "findById",
+          "args": [
+            1
+          ],
+          "result": {
+            "id_usuario": 1,
+            "uuid": "00000000-0000-4000-8000-000000000001",
+            "nombre": "Persona 1",
+            "apellido": "Sintetica",
+            "email": "persona1@example.test",
+            "rol": "ciudadano",
+            "activo": 1,
+            "email_verificado": 0,
+            "avatar_url": null,
+            "telefono": null,
+            "created_at": "2026-11-19T03:05:21.000Z",
+            "updated_at": "2026-11-19T03:05:21.000Z",
+            "id_entidad": null,
+            "notification_preferences": null,
+            "google_id": null,
+            "facebook_id": null,
+            "ultimo_acceso": null
+          }
+        }
+      ],
+      "persistedViews": 4
+    }
+  ]
+}
