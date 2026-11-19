@@ -151,8 +151,9 @@ CREATE TABLE IF NOT EXISTS reportes (
   INDEX idx_reportes_estado_created_at (estado, created_at),
   INDEX idx_reportes_tipo_created_at (tipo_contaminacion, created_at),
   INDEX idx_reportes_confianza_evidencia (confianza_evidencia),
-  INDEX idx_reportes_latitud_longitud (latitud, longitud),
-  SPATIAL INDEX idx_punto_geo (punto_geo)
+  INDEX idx_reportes_latitud_longitud (latitud, longitud)
+  -- MySQL exige NOT NULL para indices SPATIAL. La ubicacion es opcional;
+  -- conservar punto_geo nullable y posponer ese indice hasta una migracion validada.
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================================

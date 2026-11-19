@@ -11,3 +11,8 @@ uploads
 tests
 docs
 *.log
+.npm-cache
+repomix-output.*
+Frontend
+certs
+.env.*

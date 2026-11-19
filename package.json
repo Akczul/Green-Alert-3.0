@@ -1,0 +1,29 @@
+{
+  "name": "greenalert",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "GreenAlert: frontend React y API Express consolidados",
+  "engines": { "node": ">=22.13.0" },
+  "scripts": {
+    "setup": "node scripts/setup.mjs",
+    "install:apps": "node scripts/run.mjs install",
+    "dev": "node scripts/run.mjs dev",
+    "dev:backend": "npm --prefix apps/backend run dev",
+    "dev:frontend": "npm --prefix apps/frontend run dev",
+    "start": "npm --prefix apps/backend start",
+    "build": "node scripts/run.mjs build",
+    "build:backend": "node scripts/check-backend.mjs",
+    "build:frontend": "npm --prefix apps/frontend run build",
+    "test": "node scripts/run.mjs test",
+    "test:backend": "npm --prefix apps/backend test",
+    "test:frontend": "npm --prefix apps/frontend test",
+    "test:smoke": "node scripts/smoke.mjs",
+    "lint": "npm --prefix apps/frontend run lint",
+    "docs:inventory": "node scripts/inventory.mjs",
+    "infra:config": "docker compose config --quiet",
+    "infra:up": "docker compose up --build -d",
+    "infra:db": "docker compose up -d mysql",
+    "infra:down": "docker compose down"
+  }
+}

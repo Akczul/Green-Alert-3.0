@@ -1,0 +1,23 @@
+name: GreenAlert validation
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            apps/backend/package-lock.json
+            apps/frontend/package-lock.json
+      - run: npm run install:apps
+      - run: npm run lint
+      - run: npm run build
+      - run: npm test
+      - run: npm run test:smoke
+      - run: npm run setup
+      - run: npm run infra:config

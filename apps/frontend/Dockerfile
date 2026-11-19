@@ -1,5 +1,5 @@
 # ── Stage 1: Base (Entorno Común) ──────────────────────────────────────────
-FROM node:20-alpine AS base
+FROM node:24-alpine AS base
 
 LABEL org.opencontainers.image.title="Green Alert Frontend" \
       org.opencontainers.image.description="SPA React + Vite para Green Alert" \
@@ -17,7 +17,7 @@ COPY package.json package-lock.json .npmrc ./
 FROM base AS development
 
 # Instalar todas las dependencias (incluyendo devDependencies para compilar)
-RUN npm install
+RUN npm ci
 
 # Copiar el código fuente completo del Frontend
 COPY . .
@@ -54,6 +54,7 @@ ARG VITE_FIREBASE_STORAGE_BUCKET
 ARG VITE_FIREBASE_MESSAGING_SENDER_ID
 ARG VITE_FIREBASE_APP_ID
 ARG VITE_FIREBASE_VAPID_KEY
+ARG VITE_GOOGLE_CLIENT_ID
 
 # Mapear los argumentos a variables de entorno para que Vite los detecte en el build
 ENV VITE_API_URL=$VITE_API_URL \
@@ -71,7 +72,8 @@ ENV VITE_API_URL=$VITE_API_URL \
     VITE_FIREBASE_STORAGE_BUCKET=$VITE_FIREBASE_STORAGE_BUCKET \
     VITE_FIREBASE_MESSAGING_SENDER_ID=$VITE_FIREBASE_MESSAGING_SENDER_ID \
     VITE_FIREBASE_APP_ID=$VITE_FIREBASE_APP_ID \
-    VITE_FIREBASE_VAPID_KEY=$VITE_FIREBASE_VAPID_KEY
+    VITE_FIREBASE_VAPID_KEY=$VITE_FIREBASE_VAPID_KEY \
+    VITE_GOOGLE_CLIENT_ID=$VITE_GOOGLE_CLIENT_ID
 
 # Copiar el código fuente
 COPY . .
@@ -96,7 +98,7 @@ EXPOSE 8080
 
 # Health check: verifica que nginx sirve el index.html correctamente
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD curl -f -s http://localhost:8080/ > /dev/null || exit 1
+    CMD wget -q -O /dev/null http://127.0.0.1:8080/ || exit 1
 
 # Comando para arrancar Nginx en primer plano
 CMD ["nginx", "-g", "daemon off;"]

@@ -5,7 +5,7 @@
 
 # Dependencias
 node_modules/
-package-lock.json
+# El lockfile se conserva para npm ci reproducible.
 yarn.lock
 pnpm-lock.yaml
 

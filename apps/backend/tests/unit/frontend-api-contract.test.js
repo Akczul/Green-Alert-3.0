@@ -6,26 +6,8 @@ import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const backendDir = path.resolve(path.dirname(__filename), '../..');
-const repoDir = path.resolve(backendDir, '..');
-const frontendApiCandidates = [
-  path.join(backendDir, 'Frontend', 'src', 'services', 'api.js'),
-  path.join(backendDir, 'Front', 'src', 'services', 'api.js'),
-  path.join(repoDir, 'Frontend', 'src', 'services', 'api.js'),
-  path.join(repoDir, 'Front', 'src', 'services', 'api.js'),
-];
-
-const resolveFrontendApiPath = async () => {
-  for (const candidate of frontendApiCandidates) {
-    try {
-      await fs.access(candidate);
-      return candidate;
-    } catch {
-      // intenta con la siguiente ruta
-    }
-  }
-
-  throw new Error('No se encontro Frontend/src/services/api.js en rutas conocidas.');
-};
+// Verifica siempre el cliente real. La copia historica Backend/Frontend no es la SPA.
+const resolveFrontendApiPath = async () => path.resolve(backendDir, '../frontend/src/services/api.js');
 
 const expectedFrontendContracts = [
   { method: 'get', path: '/health' },
@@ -33,6 +15,8 @@ const expectedFrontendContracts = [
   { method: 'post', path: '/auth/register' },
   { method: 'post', path: '/auth/google' },
   { method: 'post', path: '/auth/facebook' },
+  { method: 'get', path: '/auth/google/url' },
+  { method: 'get', path: '/auth/facebook/url' },
   { method: 'get', path: '/categorias' },
   { method: 'get', path: '/categorias/${codigo}' },
   { method: 'get', path: '/reportes/stats' },
@@ -44,6 +28,7 @@ const expectedFrontendContracts = [
   { method: 'get', path: '/reportes' },
   { method: 'get', path: '/reportes/${id}' },
   { method: 'post', path: '/reportes/analizar-imagen' },
+  { method: 'post', path: '/reportes/sugerir-contenido' },
   { method: 'patch', path: '/reportes/${id}' },
   { method: 'delete', path: '/reportes/${id}' },
   { method: 'get', path: '/reportes/export' },
@@ -75,6 +60,15 @@ const expectedFrontendContracts = [
   { method: 'patch', path: '/notificaciones/${uuid}/leida' },
   { method: 'patch', path: '/notificaciones/marcar-todas' },
   { method: 'delete', path: '/notificaciones/${uuid}' },
+  { method: 'get', path: '/entidades' },
+  { method: 'post', path: '/reportes/${id}/asignaciones' },
+  { method: 'get', path: '/entidades/mis-reportes' },
+  { method: 'get', path: '/entidades/mis-reportes/${id}' },
+  { method: 'patch', path: '/entidades/mis-reportes/${id}/atencion' },
+  { method: 'get', path: '/entidades/mis-alertas' },
+  { method: 'get', path: '/entidades/mis-alertas/no-leidas/count' },
+  { method: 'patch', path: '/entidades/mis-alertas/${id}/leer' },
+  { method: 'patch', path: '/entidades/mis-alertas/leer-todas' },
 ];
 
 const normalizeTemplate = (value) => value
@@ -99,7 +93,7 @@ const extractContracts = (source) => {
   return contracts;
 };
 
-test('frontend usa baseURL /api para que Vite haga proxy al backend sin prefijo interno', async () => {
+test('frontend conserva baseURL /api compatible con API_PREFIX=/api', async () => {
   const frontendApiPath = await resolveFrontendApiPath();
   const source = await fs.readFile(frontendApiPath, 'utf8');
 
@@ -127,8 +121,33 @@ test('contrato de frontend cubre modulos principales verificados por la suite', 
     'auth',
     'categorias',
     'chatbot',
+    'entidades',
     'health',
     'notificaciones',
     'reportes',
   ]);
+});
+
+test('cada endpoint literal del cliente real tiene una ruta Express del mismo metodo', async () => {
+  const source = await fs.readFile(await resolveFrontendApiPath(), 'utf8');
+  const modules = {
+    health: 'health', auth: 'auth', reportes: 'reporte', categorias: 'categoria-riesgo',
+    admin: 'admin', chatbot: 'chatbot', notificaciones: 'notificacion', entidades: 'entidad',
+  };
+  const registered = [];
+  for (const [prefix, file] of Object.entries(modules)) {
+    const { default: router } = await import(`../../routes/${file}.routes.js`);
+    for (const layer of router.stack) {
+      if (!layer.route) continue;
+      registered.push({
+        path: `/${prefix}${layer.route.path === '/' ? '' : layer.route.path}`,
+        methods: layer.route.methods,
+      });
+    }
+  }
+  const shape = (value) => value.replace(/\$\{[^}]+\}|:[^/]+/g, ':param');
+  for (const contract of extractContracts(source)) {
+    assert.ok(registered.some((route) => route.methods[contract.method] && shape(route.path) === shape(contract.path)),
+      `Ruta no registrada: ${contract.method} ${contract.path}`);
+  }
 });
