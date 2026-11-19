@@ -7,3 +7,5 @@ El Compose compartido está en la raíz para que sus rutas sean estables desde W
 El volumen `greenalert_mysql_data` es independiente de cualquier base anterior. El SQL de inicialización se ejecuta **solo en un volumen vacío**. No montar aquí un directorio de datos existente ni ejecutar el esquema completo sobre producción: contiene semillas, actualizaciones de entidades y procedimientos no repetibles. Las migraciones históricas se conservan en `apps/backend/migrations`, sin ejecución automática.
 
 Los Compose individuales se conservan como referencia histórica. Para ejecutar el proyecto completo se usa el de la raíz. SMTP, Cloudinary, OAuth y proveedores de IA necesitan configuración propia; por defecto el correo local usa transporte JSON.
+
+La integración ya se verificó con MySQL **8.4.11** y el stack completo. `compose.validation.yml` proporciona MySQL de prueba efímero; `compose.stack-validation.yml` adapta el Compose real a un proyecto único con otros puertos. Usar `npm run test:mysql:docker` y `npm run test:stack`: los runners generan configuración y retiran únicamente sus propios recursos. [Informe y pasos para Windows](../docs/validacion-mysql.md).

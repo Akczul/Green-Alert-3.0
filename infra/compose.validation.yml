@@ -1,0 +1,18 @@
+# Solo pruebas: proyecto unico por ejecucion, puerto aleatorio y datos efimeros.
+# No monta datos del proyecto principal ni del servicio Windows MySQL80.
+services:
+  mysql:
+    image: mysql:8.4.11
+    environment:
+      MYSQL_ROOT_PASSWORD: ${GREENALERT_TEST_ROOT_PASSWORD:?Ejecutar npm run test:mysql:docker}
+      MYSQL_ROOT_HOST: "%"
+    ports:
+      - "127.0.0.1:${GREENALERT_TEST_PORT:?Puerto asignado por el runner}:3306"
+    tmpfs:
+      - /var/lib/mysql:rw,size=1g
+    healthcheck:
+      test: [CMD-SHELL, 'MYSQL_PWD="$${MYSQL_ROOT_PASSWORD}" mysql -uroot -h127.0.0.1 -e "SELECT 1" >/dev/null 2>&1']
+      interval: 3s
+      timeout: 5s
+      retries: 40
+      start_period: 20s

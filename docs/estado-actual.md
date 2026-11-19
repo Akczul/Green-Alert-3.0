@@ -1,5 +1,7 @@
 # Auditoría del estado actual
 
+Este documento registra la auditoría inicial. Consultar la [validación posterior de MySQL y Docker](validacion-mysql.md) para las correcciones de catálogo, geometría y migraciones, y las pruebas reales ya ejecutadas.
+
 Fecha de revisión: **18 de noviembre de 2026**, America/Bogota. Evidencia: código de las ramas `main` indicadas en [procedencia](procedencia.md), manifests, lockfiles, configuración e inventarios de este monorepositorio. No se inspeccionó una base productiva ni una instalación desplegada.
 
 ## Arquitectura comprobada

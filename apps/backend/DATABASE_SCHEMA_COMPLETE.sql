@@ -451,6 +451,24 @@ VALUES
 (8, 'basura', 'Gestión de Residuos', 'Acumulación de basura o residuos', '🗑️', '#666666', 1, TRUE);
 
 -- ============================================================================
+-- Codigos actuales de React/backend; se conservan tambien los codigos historicos.
+-- Misma ampliacion aditiva que migrations/019_add_canonical_categories.sql.
+INSERT IGNORE INTO categorias_riesgo
+  (codigo, nombre, descripcion, icono, color_hex, nivel_prioridad_default, activo)
+VALUES
+  ('agua', 'Contaminacion de Agua', 'Contaminacion del recurso hidrico', 'droplet', '#3B82F6', 3, TRUE),
+  ('aire', 'Contaminacion del Aire', 'Presencia de contaminantes atmosfericos', 'wind', '#6B7280', 2, TRUE),
+  ('suelo', 'Contaminacion del Suelo', 'Degradacion o contaminacion del suelo', 'leaf', '#84CC16', 2, TRUE),
+  ('ruido', 'Contaminacion por Ruido', 'Exceso de ruido ambiental', 'volume2', '#A855F7', 2, TRUE),
+  ('residuos', 'Residuos y Desechos', 'Disposicion incorrecta de residuos', 'trash2', '#EF4444', 2, TRUE),
+  ('luminica', 'Contaminacion Luminica', 'Exceso de iluminacion artificial', 'lightbulb', '#F59E0B', 1, TRUE),
+  ('deforestacion', 'Deforestacion', 'Tala o perdida de cobertura forestal', 'trees', '#22C55E', 3, TRUE),
+  ('incendios_forestales', 'Incendios Forestales', 'Fuegos en bosques o vegetacion', 'flame', '#DC2626', 4, TRUE),
+  ('deslizamientos', 'Deslizamientos', 'Movimientos de masa en laderas', 'mountain', '#92400E', 4, TRUE),
+  ('avalanchas_fluviotorrenciales', 'Avalanchas Fluviotorrenciales', 'Crecidas subitas de rios y quebradas', 'waves', '#0EA5E9', 4, TRUE),
+  ('otro', 'Otro', 'Otros tipos de riesgo ambiental', 'helpCircle', '#6B7280', 1, TRUE);
+
+-- ============================================================================
 -- STORED PROCEDURES (Optional, for common operations)
 -- ============================================================================
 
@@ -473,13 +491,13 @@ BEGIN
     u.nombre,
     u.apellido,
     ST_Distance_Sphere(r.punto_geo, 
-      ST_GeomFromText(CONCAT('POINT(', p_longitude, ' ', p_latitude, ')'), 4326)
+      ST_GeomFromText(CONCAT('POINT(', p_longitude, ' ', p_latitude, ')'), 4326, 'axis-order=long-lat')
     ) / 1000 AS distancia_km
   FROM reportes r
   LEFT JOIN usuarios u ON u.id_usuario = r.id_usuario
   WHERE r.deleted_at IS NULL
     AND ST_Distance_Sphere(r.punto_geo, 
-      ST_GeomFromText(CONCAT('POINT(', p_longitude, ' ', p_latitude, ')'), 4326)
+      ST_GeomFromText(CONCAT('POINT(', p_longitude, ' ', p_latitude, ')'), 4326, 'axis-order=long-lat')
     ) / 1000 <= p_radio_km
   ORDER BY distancia_km ASC;
 END//
@@ -525,7 +543,7 @@ DELIMITER ;
 
 5. Geographic Data:
    - Store both lat/lon and POINT geometry
-   - POINT format must be: ST_GeomFromText('POINT(longitude latitude)', 4326)
+   - POINT format: ST_GeomFromText('POINT(longitude latitude)', 4326, 'axis-order=long-lat')
    - Note: longitude comes FIRST in POINT format
 
 6. Soft Deletes:

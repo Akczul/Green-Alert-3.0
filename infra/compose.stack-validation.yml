@@ -1,0 +1,28 @@
+# Override del Compose real: puertos libres y proveedores externos desactivados.
+# El runner asigna un proyecto unico y solo elimina sus propios recursos.
+services:
+  backend-prod:
+    ports: !override
+      - "127.0.0.1:${GREENALERT_BACKEND_TEST_PORT:?Puerto asignado por el runner}:3000"
+    environment:
+      JWT_SECRET: ${GREENALERT_STACK_JWT:?Secreto efimero del runner}
+      EMAIL_TRANSPORT: json
+      EMAIL_HOST: localhost
+      EMAIL_PORT: 587
+      EMAIL_USER: validation
+      EMAIL_PASS: validation-json-only
+      EMAIL_FROM: validation@example.test
+      GOOGLE_CLIENT_ID: ""
+      GOOGLE_CLIENT_SECRET: ""
+      FACEBOOK_APP_ID: ""
+      FACEBOOK_APP_SECRET: ""
+      CLOUDINARY_CLOUD_NAME: ""
+      CLOUDINARY_API_KEY: ""
+      CLOUDINARY_API_SECRET: ""
+      HF_API_KEY: ""
+      GROQ_API_KEY: ""
+      GEMINI_API_KEY: ""
+      FIREBASE_SERVICE_ACCOUNT_JSON: ""
+      FIREBASE_PROJECT_ID: ""
+      FIREBASE_CLIENT_EMAIL: ""
+      FIREBASE_PRIVATE_KEY: ""

@@ -1,5 +1,7 @@
 # Inventario funcional y visual
 
+Inventario de la auditoría inicial. Los resultados de persistencia, permisos y stack comprobados posteriormente están en la [validación real del sistema](validacion-mysql.md).
+
 “Implementado” significa que existe código y, donde corresponde, pruebas locales. No equivale a una operación acreditada contra datos o proveedores reales. El prompt no proporciona un catálogo funcional adicional: los pendientes se deducen de código/configuración y de la evolución solicitada, sin inventar requisitos de producto.
 
 | Funcionalidad | Evidencia | Estado y límites |

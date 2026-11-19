@@ -28,6 +28,9 @@ npm run build              # sintaxis backend y bundle frontend
 npm run lint               # ESLint del frontend, cero warnings
 npm test                   # node:test backend + Vitest frontend
 npm run test:smoke         # HTTP/proxy real; sin persistencia
+npm run test:mysql         # mysqld nativo separado, datos sintéticos y MySQL real
+npm run test:mysql:docker  # MySQL 8.4.11 temporal y la misma suite de integración
+npm run test:stack         # Compose real aislado + override; retira solo sus recursos
 npm run infra:config       # validar Compose sin exponer variables
 npm run docs:inventory     # regenerar endpoints/dependencias/nombres de variables
 ```
@@ -49,3 +52,7 @@ Node de referencia: 24. Ver `docs/verificacion.md` antes de afirmar qué entorno
 - Si se autoriza una extracción hexagonal: el dominio y los casos de uso no importan Express, mysql2, SDK de proveedores, modelos estáticos ni `process.env`; reciben puertos por constructor/fábrica. Los adaptadores implementan esos puertos y se ensamblan en un composition root.
 - No crear un contenedor de inyección o un bus distribuido antes de necesitarlos. JavaScript y fábricas explícitas permiten una extracción inicial pequeña.
 - No afirmar que FCM, EXIF, clasificación remota, SQL de arranque o contenedores funcionan sin verificarlos: hay limitaciones heredadas documentadas.
+- La validación real de SQL/Compose está en `docs/validacion-mysql.md`: 51 comprobaciones por motor, stack completo verificado. Los proveedores remotos siguen pendientes.
+- Los runners SQL nunca usan el servicio MySQL80 ni la base configurada en el .env del usuario: crean instancia/proyecto, base, puertos y credenciales propios. No convertirlos en comandos que borren o migren una base recibida arbitrariamente.
+- Al escribir geometría SRID 4326 desde POINT(longitud latitud), conservar `axis-order=long-lat`. No transformar geometría histórica automáticamente.
+- Las migraciones usan DATABASE() de la conexión; no añadir USE con un nombre de base fijo. 019 añade catálogo sin cambiar IDs/códigos/estado anteriores. No ejecutar toda la cadena sobre bootstrap completo.

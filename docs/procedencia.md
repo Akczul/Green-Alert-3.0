@@ -1,5 +1,7 @@
 # Procedencia e historial de la consolidación
 
+Este documento describe la importación y la fase de consolidación. La [fase posterior de validación](validacion-mysql.md) incluye correcciones puntuales de SQL y del modelo de reportes; las comparaciones de código original indicadas aquí corresponden a la primera entrega.
+
 Fuentes remotas comprobadas y descargadas completas, sin push:
 
 | Aplicación | Repositorio original | Rama | Commit importado | Commits alcanzables desde main |

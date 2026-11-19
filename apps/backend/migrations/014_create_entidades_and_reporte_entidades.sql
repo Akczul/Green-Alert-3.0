@@ -1,4 +1,4 @@
-USE `green-alert`;
+-- Aplicar sobre la base seleccionada por la conexion, sin cambiar DATABASE().
 
 CREATE TABLE IF NOT EXISTS entidades (
   id_entidad INT AUTO_INCREMENT PRIMARY KEY,

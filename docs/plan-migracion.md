@@ -2,6 +2,8 @@
 
 Solo la fase 0 pertenece a esta ejecución. Las fases siguientes son trabajo propuesto, pendiente de una nueva tarea. Mantener siempre rutas, estados, multipart, JSON, roles, pantallas y funcionalidades.
 
+**Actualización posterior:** ya se ejecutó una fase específica de [validación SQL y del stack](validacion-mysql.md), sin extracción hexagonal. Resuelve el arranque MySQL/Docker y la ampliación aditiva del catálogo; no habilita por sí misma el trabajo hexagonal ni proveedores remotos. Los pendientes de entorno indicados abajo reflejan el estado al redactar el plan original.
+
 ## Fase 0 — Consolidar y medir la base
 
 Entregada: aplicaciones bajo `apps/`, historial completo de main unido sin reescritura, scripts y CI compartidos, lockfile backend, ejemplos locales, Compose y documentación. Validaciones locales: sintaxis, lint, build, 259 pruebas y smoke. Contenedores, SQL real e integraciones remotas pendientes por disponibilidad del entorno/credenciales.

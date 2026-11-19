@@ -1,4 +1,4 @@
-USE `green-alert`;
+-- Aplicar sobre la base seleccionada por la conexion, sin cambiar DATABASE().
 
 CREATE TABLE IF NOT EXISTS alertas_entidad (
   id_alerta_entidad BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,

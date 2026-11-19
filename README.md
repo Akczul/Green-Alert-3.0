@@ -19,7 +19,7 @@ No se creó `packages/` porque todavía no existe código compartido estable que
 ## Requisitos
 
 - Node.js 24 como versión de referencia (`.nvmrc`); los comandos locales se verificaron con Node 26.13.0 y npm 11.20.0.
-- MySQL compatible con el esquema existente; el Compose propone MySQL 8.4 para una base **nueva y aislada**.
+- MySQL compatible con el esquema existente; el Compose utiliza MySQL **8.4.11** para una base **nueva y aislada**. También se verificó MySQL nativo **8.0.46**.
 - Docker Engine y Compose, si se usa la infraestructura local. Tener la CLI instalada no significa que el motor esté disponible.
 
 ## Preparar y ejecutar en desarrollo
@@ -52,7 +52,7 @@ En PowerShell, usar `npm.cmd` en lugar de `npm` si la política de ejecución bl
 
 No ejecutar `infra:db` si se va a usar un MySQL propio. Configurar `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` y SSL en `apps/backend/.env`, después ejecutar `npm run dev`. No se importaron ni modificaron datos existentes durante esta consolidación.
 
-El esquema completo es para inicializar un volumen vacío. No es un migrador idempotente: contiene semillas, actualizaciones y procedimientos. Las 18 migraciones históricas permanecen en `apps/backend/migrations`; revisar qué versiones ya están aplicadas y respaldar antes de usarlas sobre una base existente. La revisión SQL y su ejecución con MySQL real siguen pendientes en este entorno; ver [verificación](docs/verificacion.md).
+El esquema completo es para inicializar un volumen vacío. No es un migrador idempotente: contiene semillas, actualizaciones y procedimientos. Se conservan las 18 migraciones históricas y se añade `019`, que incorpora los códigos actuales del catálogo sin renombrar ni eliminar los anteriores. Se ejecutaron las 19 sobre una base sintética; revisar qué versiones ya están aplicadas antes de usar una base existente. No ejecutar la cadena histórica sobre el esquema completo. [Validación real de MySQL](docs/validacion-mysql.md).
 
 ### Servicios opcionales
 
@@ -72,7 +72,7 @@ npm run infra:config
 
 El backend no necesita compilación: `build:backend` comprueba la sintaxis de sus 125 archivos JS. El frontend genera `apps/frontend/dist`. `npm start` inicia la API desde su directorio, conservando la resolución de `.env` y `uploads`. La prueba smoke utiliza HTTP real con puertos efímeros, comprueba SPA/proxy/validación/autenticación y espera 503 al usar una base deliberadamente inaccesible; **no es una prueba de persistencia**.
 
-Las suites legacy, SMTP e integración remota se conservan y no se ejecutan automáticamente: pueden requerir credenciales, modificar datos o enviar correos. Consultar sus instrucciones originales y [resultados de esta fase](docs/verificacion.md).
+Las suites legacy, SMTP e integración remota se conservan y no se ejecutan automáticamente: pueden requerir credenciales, modificar datos o enviar correos. Las nuevas comprobaciones aisladas se ejecutan con `npm run test:mysql` (binarios nativos), `npm run test:mysql:docker` y `npm run test:stack` (stack Docker completo). [Resultados y límites](docs/validacion-mysql.md).
 
 ## Ejecutar todo con Docker
 
@@ -90,7 +90,7 @@ Abrir [GreenAlert en Docker](http://localhost:8080). Nginx sirve la SPA y reenv�
 
 Las variables Vite se incorporan al construir la imagen. Para Google/Firebase en Docker, completar los campos públicos `VITE_*` de `.env` en la raíz; Compose los pasa como argumentos de construcción. Para desarrollo con Vite, completar `apps/frontend/.env`. Esos archivos están excluidos de las imágenes. Nunca enviar secretos del backend como `VITE_*`. El entorno local predeterminado permite usar la plataforma sin configurar push.
 
-**Límite de verificación:** `docker compose config --quiet` pasó. El motor Docker no estuvo disponible; no se construyeron imágenes ni se ejecutó MySQL o el stack completo. No se afirma que las operaciones de datos o los servicios externos hayan sido validados.
+**Verificado con datos sintéticos:** 51 comprobaciones en MySQL 8.0.46, 51 en MySQL 8.4.11, 7 del stack Docker MySQL/Express/React-Nginx y 259 pruebas unitarias/frontend. Se comprobaron persistencia, autenticación, reportes, usuarios, evidencia local, instituciones y zonas. Cloudinary, SMTP, OAuth, push e inferencia remotos permanecen sin verificar. [Informe completo](docs/validacion-mysql.md).
 
 ## Auditoría y siguiente fase
 
@@ -103,5 +103,6 @@ Las variables Vite se incorporan al construir la imagen. Para Google/Firebase en
 - [Plan incremental de migración](docs/plan-migracion.md).
 - [Procedencia e historial Git](docs/procedencia.md).
 - [Informe de comandos y verificación](docs/verificacion.md).
+- [Validación posterior de MySQL y stack completo](docs/validacion-mysql.md).
 
 Siguiente paso propuesto: caracterizar y extraer **consulta de zonas de riesgo** detrás de un puerto de lectura de reportes, manteniendo el algoritmo y JSON actuales. Es una primera extracción pequeña, sin cambiar de framework ni base de datos. El detalle y sus criterios de aceptación están en el plan.

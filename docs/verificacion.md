@@ -1,5 +1,7 @@
 # Informe de consolidación y verificación
 
+**Informe histórico de la fase de auditoría.** Sus limitaciones de MySQL/Docker se resolvieron posteriormente en la [validación real del sistema](validacion-mysql.md). Los resultados de proveedores externos siguen pendientes.
+
 Ejecución local: **18 de noviembre de 2026**, America/Bogota. Windows/PowerShell, Git 2.55.0.windows.3, Node 26.13.0, npm 11.20.0 y Docker CLI 29.8.2. Python no está disponible y no fue necesario. Las versiones de referencia de Docker/CI son Node 24 y MySQL 8.4; no se ejecutaron esas imágenes.
 
 ## Resultado entregado

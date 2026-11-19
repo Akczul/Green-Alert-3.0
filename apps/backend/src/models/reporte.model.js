@@ -308,7 +308,7 @@ export const ReporteModel = {
            (?, ?, ?, ?, ?, ?, ?, ?,
             ?,
             ?, ?, ?, ?, ?,
-            ST_GeomFromText(CONCAT('POINT(', ?, ' ', ?, ')'), 4326))`,
+            ST_GeomFromText(CONCAT('POINT(', ?, ' ', ?, ')'), 4326, 'axis-order=long-lat'))`,
         [
           uuid,
           id_usuario, tipo_contaminacion, subcategoria, ESTADO_INICIAL_REPORTE, nivel_severidad, titulo, descripcion,
