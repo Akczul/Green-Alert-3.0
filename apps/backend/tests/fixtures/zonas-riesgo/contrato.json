@@ -1,0 +1,942 @@
+{
+  "reference": "a79b6ba",
+  "now": 1795003200000,
+  "cases": [
+    {
+      "name": "vacio",
+      "query": {},
+      "params": {
+        "dias": 30,
+        "desde": "2026-10-19T12:00:00.000Z",
+        "tipo": null,
+        "min_score": 30
+      },
+      "rows": [],
+      "expected": {
+        "actualizado_en": "2026-11-18T12:00:00.000Z",
+        "celda_grados": 0.05,
+        "zonas": []
+      }
+    },
+    {
+      "name": "periodos-y-geografia",
+      "query": {
+        "min_score": "0"
+      },
+      "params": {
+        "dias": 30,
+        "desde": "2026-10-19T12:00:00.000Z",
+        "tipo": null,
+        "min_score": 0
+      },
+      "rows": [
+        {
+          "id_reporte": 1,
+          "id_usuario": 999,
+          "autor_nombre": "No exponer",
+          "tipo_contaminacion": "agua",
+          "subcategoria": "vertimiento",
+          "estado": "en_proceso",
+          "nivel_severidad": "alto",
+          "latitud": "1.151",
+          "longitud": "-76.651",
+          "municipio": "Mocoa",
+          "departamento": "Putumayo",
+          "created_at": "2026-11-16T12:00:00.000Z"
+        },
+        {
+          "id_reporte": 2,
+          "id_usuario": 999,
+          "autor_nombre": "No exponer",
+          "tipo_contaminacion": "agua",
+          "subcategoria": "vertimiento",
+          "estado": "en_proceso",
+          "nivel_severidad": "medio",
+          "latitud": 1.152,
+          "longitud": -76.652,
+          "municipio": "Mocoa",
+          "departamento": "Putumayo",
+          "created_at": "2026-11-10T12:00:00.000Z"
+        },
+        {
+          "id_reporte": 3,
+          "id_usuario": 999,
+          "autor_nombre": "No exponer",
+          "tipo_contaminacion": "agua",
+          "subcategoria": "vertimiento",
+          "estado": "en_proceso",
+          "nivel_severidad": "medio",
+          "latitud": 1.151,
+          "longitud": -76.651,
+          "municipio": "Mocoa",
+          "departamento": "Putumayo",
+          "created_at": "2026-10-14T12:00:00.000Z"
+        },
+        {
+          "id_reporte": 4,
+          "id_usuario": 999,
+          "autor_nombre": "No exponer",
+          "tipo_contaminacion": "agua",
+          "subcategoria": "vertimiento",
+          "estado": "en_proceso",
+          "nivel_severidad": "medio",
+          "latitud": 1.151,
+          "longitud": -76.651,
+          "municipio": "Mocoa",
+          "departamento": "Putumayo",
+          "created_at": "2026-10-09T12:00:00.000Z"
+        },
+        {
+          "id_reporte": 5,
+          "id_usuario": 999,
+          "autor_nombre": "No exponer",
+          "tipo_contaminacion": "agua",
+          "subcategoria": "vertimiento",
+          "estado": "en_proceso",
+          "nivel_severidad": "medio",
+          "latitud": 1.151,
+          "longitud": -76.651,
+          "municipio": "Mocoa",
+          "departamento": "Putumayo",
+          "created_at": "2026-10-04T12:00:00.000Z"
+        },
+        {
+          "id_reporte": 6,
+          "id_usuario": 999,
+          "autor_nombre": "No exponer",
+          "tipo_contaminacion": "agua",
+          "subcategoria": "vertimiento",
+          "estado": "en_proceso",
+          "nivel_severidad": "medio",
+          "latitud": 1.151,
+          "longitud": -76.651,
+          "municipio": "Mocoa",
+          "departamento": "Putumayo",
+          "created_at": "2026-09-24T12:00:00.000Z"
+        },
+        {
+          "id_reporte": 7,
+          "id_usuario": 999,
+          "autor_nombre": "No exponer",
+          "tipo_contaminacion": "aire",
+          "subcategoria": "vertimiento",
+          "estado": "en_proceso",
+          "nivel_severidad": "bajo",
+          "latitud": -0.011,
+          "longitud": -120.011,
+          "municipio": "Mocoa",
+          "departamento": "Putumayo",
+          "created_at": "2026-10-19T12:00:00.000Z"
+        },
+        {
+          "id_reporte": 8,
+          "id_usuario": 999,
+          "autor_nombre": "No exponer",
+          "tipo_contaminacion": "suelo",
+          "subcategoria": "vertimiento",
+          "estado": "en_proceso",
+          "nivel_severidad": "critico",
+          "latitud": 10.411,
+          "longitud": -73.211,
+          "municipio": "Mocoa",
+          "departamento": "Putumayo",
+          "created_at": "2026-11-19T12:00:00.000Z"
+        },
+        {
+          "id_reporte": 9,
+          "id_usuario": 999,
+          "autor_nombre": "No exponer",
+          "tipo_contaminacion": "suelo",
+          "subcategoria": "vertimiento",
+          "estado": "en_proceso",
+          "nivel_severidad": "bajo",
+          "latitud": 10.412,
+          "longitud": -73.212,
+          "municipio": "Mocoa",
+          "departamento": "Putumayo",
+          "created_at": "2026-09-19T12:00:00.000Z"
+        },
+        {
+          "id_reporte": 10,
+          "id_usuario": 999,
+          "autor_nombre": "No exponer",
+          "tipo_contaminacion": "agua",
+          "subcategoria": "vertimiento",
+          "estado": "en_proceso",
+          "nivel_severidad": "medio",
+          "latitud": "invalida",
+          "longitud": -73,
+          "municipio": "Mocoa",
+          "departamento": "Putumayo",
+          "created_at": "2026-11-17T12:00:00.000Z"
+        },
+        {
+          "id_reporte": 11,
+          "id_usuario": 999,
+          "autor_nombre": "No exponer",
+          "tipo_contaminacion": "agua",
+          "subcategoria": "vertimiento",
+          "estado": "en_proceso",
+          "nivel_severidad": "medio",
+          "latitud": 11.111,
+          "longitud": -74.111,
+          "municipio": "Mocoa",
+          "departamento": "Putumayo",
+          "created_at": "2026-10-14T12:00:00.000Z"
+        }
+      ],
+      "expected": {
+        "actualizado_en": "2026-11-18T12:00:00.000Z",
+        "celda_grados": 0.05,
+        "zonas": [
+          {
+            "id": "10.4000:-73.2500",
+            "zona_id": "10.4000:-73.2500",
+            "centro": {
+              "lat": 10.425,
+              "lng": -73.225
+            },
+            "tipo_dominante": "suelo",
+            "subcategoria_dominante": "vertimiento",
+            "municipio": "Mocoa",
+            "departamento": "Putumayo",
+            "n_reportes": 1,
+            "n_reportes_previo": 1,
+            "tendencia": "estable",
+            "severidad_promedio": 4,
+            "ultimo_reporte": "2026-11-19T12:00:00.000Z",
+            "score": 100,
+            "nivel": "critico"
+          },
+          {
+            "id": "1.1500:-76.7000",
+            "zona_id": "1.1500:-76.7000",
+            "centro": {
+              "lat": 1.175,
+              "lng": -76.675
+            },
+            "tipo_dominante": "agua",
+            "subcategoria_dominante": "vertimiento",
+            "municipio": "Mocoa",
+            "departamento": "Putumayo",
+            "n_reportes": 2,
+            "n_reportes_previo": 4,
+            "tendencia": "bajando",
+            "severidad_promedio": 2.5,
+            "ultimo_reporte": "2026-11-16T12:00:00.000Z",
+            "score": 92,
+            "nivel": "critico"
+          },
+          {
+            "id": "-0.0500:-120.0500",
+            "zona_id": "-0.0500:-120.0500",
+            "centro": {
+              "lat": -0.025,
+              "lng": -120.025
+            },
+            "tipo_dominante": "aire",
+            "subcategoria_dominante": "vertimiento",
+            "municipio": "Mocoa",
+            "departamento": "Putumayo",
+            "n_reportes": 1,
+            "n_reportes_previo": 0,
+            "tendencia": "subiendo",
+            "severidad_promedio": 1,
+            "ultimo_reporte": "2026-10-19T12:00:00.000Z",
+            "score": 30,
+            "nivel": "bajo"
+          }
+        ]
+      }
+    },
+    {
+      "name": "categoria-normalizada",
+      "query": {
+        "tipo": " AGUA ",
+        "min_score": "0"
+      },
+      "params": {
+        "dias": 30,
+        "desde": "2026-10-19T12:00:00.000Z",
+        "tipo": "agua",
+        "min_score": 0
+      },
+      "rows": [
+        {
+          "id_reporte": 1,
+          "id_usuario": 999,
+          "autor_nombre": "No exponer",
+          "tipo_contaminacion": "agua",
+          "subcategoria": "vertimiento",
+          "estado": "en_proceso",
+          "nivel_severidad": "alto",
+          "latitud": "1.151",
+          "longitud": "-76.651",
+          "municipio": "Mocoa",
+          "departamento": "Putumayo",
+          "created_at": "2026-11-16T12:00:00.000Z"
+        },
+        {
+          "id_reporte": 2,
+          "id_usuario": 999,
+          "autor_nombre": "No exponer",
+          "tipo_contaminacion": "agua",
+          "subcategoria": "vertimiento",
+          "estado": "en_proceso",
+          "nivel_severidad": "medio",
+          "latitud": 1.152,
+          "longitud": -76.652,
+          "municipio": "Mocoa",
+          "departamento": "Putumayo",
+          "created_at": "2026-11-10T12:00:00.000Z"
+        },
+        {
+          "id_reporte": 3,
+          "id_usuario": 999,
+          "autor_nombre": "No exponer",
+          "tipo_contaminacion": "agua",
+          "subcategoria": "vertimiento",
+          "estado": "en_proceso",
+          "nivel_severidad": "medio",
+          "latitud": 1.151,
+          "longitud": -76.651,
+          "municipio": "Mocoa",
+          "departamento": "Putumayo",
+          "created_at": "2026-10-14T12:00:00.000Z"
+        },
+        {
+          "id_reporte": 4,
+          "id_usuario": 999,
+          "autor_nombre": "No exponer",
+          "tipo_contaminacion": "agua",
+          "subcategoria": "vertimiento",
+          "estado": "en_proceso",
+          "nivel_severidad": "medio",
+          "latitud": 1.151,
+          "longitud": -76.651,
+          "municipio": "Mocoa",
+          "departamento": "Putumayo",
+          "created_at": "2026-10-09T12:00:00.000Z"
+        },
+        {
+          "id_reporte": 5,
+          "id_usuario": 999,
+          "autor_nombre": "No exponer",
+          "tipo_contaminacion": "agua",
+          "subcategoria": "vertimiento",
+          "estado": "en_proceso",
+          "nivel_severidad": "medio",
+          "latitud": 1.151,
+          "longitud": -76.651,
+          "municipio": "Mocoa",
+          "departamento": "Putumayo",
+          "created_at": "2026-10-04T12:00:00.000Z"
+        },
+        {
+          "id_reporte": 6,
+          "id_usuario": 999,
+          "autor_nombre": "No exponer",
+          "tipo_contaminacion": "agua",
+          "subcategoria": "vertimiento",
+          "estado": "en_proceso",
+          "nivel_severidad": "medio",
+          "latitud": 1.151,
+          "longitud": -76.651,
+          "municipio": "Mocoa",
+          "departamento": "Putumayo",
+          "created_at": "2026-09-24T12:00:00.000Z"
+        },
+        {
+          "id_reporte": 10,
+          "id_usuario": 999,
+          "autor_nombre": "No exponer",
+          "tipo_contaminacion": "agua",
+          "subcategoria": "vertimiento",
+          "estado": "en_proceso",
+          "nivel_severidad": "medio",
+          "latitud": "invalida",
+          "longitud": -73,
+          "municipio": "Mocoa",
+          "departamento": "Putumayo",
+          "created_at": "2026-11-17T12:00:00.000Z"
+        },
+        {
+          "id_reporte": 11,
+          "id_usuario": 999,
+          "autor_nombre": "No exponer",
+          "tipo_contaminacion": "agua",
+          "subcategoria": "vertimiento",
+          "estado": "en_proceso",
+          "nivel_severidad": "medio",
+          "latitud": 11.111,
+          "longitud": -74.111,
+          "municipio": "Mocoa",
+          "departamento": "Putumayo",
+          "created_at": "2026-10-14T12:00:00.000Z"
+        }
+      ],
+      "expected": {
+        "actualizado_en": "2026-11-18T12:00:00.000Z",
+        "celda_grados": 0.05,
+        "zonas": [
+          {
+            "id": "1.1500:-76.7000",
+            "zona_id": "1.1500:-76.7000",
+            "centro": {
+              "lat": 1.175,
+              "lng": -76.675
+            },
+            "tipo_dominante": "agua",
+            "subcategoria_dominante": "vertimiento",
+            "municipio": "Mocoa",
+            "departamento": "Putumayo",
+            "n_reportes": 2,
+            "n_reportes_previo": 4,
+            "tendencia": "bajando",
+            "severidad_promedio": 2.5,
+            "ultimo_reporte": "2026-11-16T12:00:00.000Z",
+            "score": 92,
+            "nivel": "critico"
+          }
+        ]
+      }
+    },
+    {
+      "name": "score-minimo",
+      "query": {
+        "min_score": "95"
+      },
+      "params": {
+        "dias": 30,
+        "desde": "2026-10-19T12:00:00.000Z",
+        "tipo": null,
+        "min_score": 95
+      },
+      "rows": [
+        {
+          "id_reporte": 1,
+          "id_usuario": 999,
+          "autor_nombre": "No exponer",
+          "tipo_contaminacion": "agua",
+          "subcategoria": "vertimiento",
+          "estado": "en_proceso",
+          "nivel_severidad": "alto",
+          "latitud": "1.151",
+          "longitud": "-76.651",
+          "municipio": "Mocoa",
+          "departamento": "Putumayo",
+          "created_at": "2026-11-16T12:00:00.000Z"
+        },
+        {
+          "id_reporte": 2,
+          "id_usuario": 999,
+          "autor_nombre": "No exponer",
+          "tipo_contaminacion": "agua",
+          "subcategoria": "vertimiento",
+          "estado": "en_proceso",
+          "nivel_severidad": "medio",
+          "latitud": 1.152,
+          "longitud": -76.652,
+          "municipio": "Mocoa",
+          "departamento": "Putumayo",
+          "created_at": "2026-11-10T12:00:00.000Z"
+        },
+        {
+          "id_reporte": 3,
+          "id_usuario": 999,
+          "autor_nombre": "No exponer",
+          "tipo_contaminacion": "agua",
+          "subcategoria": "vertimiento",
+          "estado": "en_proceso",
+          "nivel_severidad": "medio",
+          "latitud": 1.151,
+          "longitud": -76.651,
+          "municipio": "Mocoa",
+          "departamento": "Putumayo",
+          "created_at": "2026-10-14T12:00:00.000Z"
+        },
+        {
+          "id_reporte": 4,
+          "id_usuario": 999,
+          "autor_nombre": "No exponer",
+          "tipo_contaminacion": "agua",
+          "subcategoria": "vertimiento",
+          "estado": "en_proceso",
+          "nivel_severidad": "medio",
+          "latitud": 1.151,
+          "longitud": -76.651,
+          "municipio": "Mocoa",
+          "departamento": "Putumayo",
+          "created_at": "2026-10-09T12:00:00.000Z"
+        },
+        {
+          "id_reporte": 5,
+          "id_usuario": 999,
+          "autor_nombre": "No exponer",
+          "tipo_contaminacion": "agua",
+          "subcategoria": "vertimiento",
+          "estado": "en_proceso",
+          "nivel_severidad": "medio",
+          "latitud": 1.151,
+          "longitud": -76.651,
+          "municipio": "Mocoa",
+          "departamento": "Putumayo",
+          "created_at": "2026-10-04T12:00:00.000Z"
+        },
+        {
+          "id_reporte": 6,
+          "id_usuario": 999,
+          "autor_nombre": "No exponer",
+          "tipo_contaminacion": "agua",
+          "subcategoria": "vertimiento",
+          "estado": "en_proceso",
+          "nivel_severidad": "medio",
+          "latitud": 1.151,
+          "longitud": -76.651,
+          "municipio": "Mocoa",
+          "departamento": "Putumayo",
+          "created_at": "2026-09-24T12:00:00.000Z"
+        },
+        {
+          "id_reporte": 7,
+          "id_usuario": 999,
+          "autor_nombre": "No exponer",
+          "tipo_contaminacion": "aire",
+          "subcategoria": "vertimiento",
+          "estado": "en_proceso",
+          "nivel_severidad": "bajo",
+          "latitud": -0.011,
+          "longitud": -120.011,
+          "municipio": "Mocoa",
+          "departamento": "Putumayo",
+          "created_at": "2026-10-19T12:00:00.000Z"
+        },
+        {
+          "id_reporte": 8,
+          "id_usuario": 999,
+          "autor_nombre": "No exponer",
+          "tipo_contaminacion": "suelo",
+          "subcategoria": "vertimiento",
+          "estado": "en_proceso",
+          "nivel_severidad": "critico",
+          "latitud": 10.411,
+          "longitud": -73.211,
+          "municipio": "Mocoa",
+          "departamento": "Putumayo",
+          "created_at": "2026-11-19T12:00:00.000Z"
+        },
+        {
+          "id_reporte": 9,
+          "id_usuario": 999,
+          "autor_nombre": "No exponer",
+          "tipo_contaminacion": "suelo",
+          "subcategoria": "vertimiento",
+          "estado": "en_proceso",
+          "nivel_severidad": "bajo",
+          "latitud": 10.412,
+          "longitud": -73.212,
+          "municipio": "Mocoa",
+          "departamento": "Putumayo",
+          "created_at": "2026-09-19T12:00:00.000Z"
+        },
+        {
+          "id_reporte": 10,
+          "id_usuario": 999,
+          "autor_nombre": "No exponer",
+          "tipo_contaminacion": "agua",
+          "subcategoria": "vertimiento",
+          "estado": "en_proceso",
+          "nivel_severidad": "medio",
+          "latitud": "invalida",
+          "longitud": -73,
+          "municipio": "Mocoa",
+          "departamento": "Putumayo",
+          "created_at": "2026-11-17T12:00:00.000Z"
+        },
+        {
+          "id_reporte": 11,
+          "id_usuario": 999,
+          "autor_nombre": "No exponer",
+          "tipo_contaminacion": "agua",
+          "subcategoria": "vertimiento",
+          "estado": "en_proceso",
+          "nivel_severidad": "medio",
+          "latitud": 11.111,
+          "longitud": -74.111,
+          "municipio": "Mocoa",
+          "departamento": "Putumayo",
+          "created_at": "2026-10-14T12:00:00.000Z"
+        }
+      ],
+      "expected": {
+        "actualizado_en": "2026-11-18T12:00:00.000Z",
+        "celda_grados": 0.05,
+        "zonas": [
+          {
+            "id": "10.4000:-73.2500",
+            "zona_id": "10.4000:-73.2500",
+            "centro": {
+              "lat": 10.425,
+              "lng": -73.225
+            },
+            "tipo_dominante": "suelo",
+            "subcategoria_dominante": "vertimiento",
+            "municipio": "Mocoa",
+            "departamento": "Putumayo",
+            "n_reportes": 1,
+            "n_reportes_previo": 1,
+            "tendencia": "estable",
+            "severidad_promedio": 4,
+            "ultimo_reporte": "2026-11-19T12:00:00.000Z",
+            "score": 100,
+            "nivel": "critico"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ventana-corta",
+      "query": {
+        "dias": "7",
+        "min_score": "0"
+      },
+      "params": {
+        "dias": 7,
+        "desde": "2026-11-11T12:00:00.000Z",
+        "tipo": null,
+        "min_score": 0
+      },
+      "rows": [
+        {
+          "id_reporte": 1,
+          "id_usuario": 999,
+          "autor_nombre": "No exponer",
+          "tipo_contaminacion": "agua",
+          "subcategoria": "vertimiento",
+          "estado": "en_proceso",
+          "nivel_severidad": "alto",
+          "latitud": "1.151",
+          "longitud": "-76.651",
+          "municipio": "Mocoa",
+          "departamento": "Putumayo",
+          "created_at": "2026-11-16T12:00:00.000Z"
+        },
+        {
+          "id_reporte": 2,
+          "id_usuario": 999,
+          "autor_nombre": "No exponer",
+          "tipo_contaminacion": "agua",
+          "subcategoria": "vertimiento",
+          "estado": "en_proceso",
+          "nivel_severidad": "medio",
+          "latitud": 1.152,
+          "longitud": -76.652,
+          "municipio": "Mocoa",
+          "departamento": "Putumayo",
+          "created_at": "2026-11-10T12:00:00.000Z"
+        },
+        {
+          "id_reporte": 8,
+          "id_usuario": 999,
+          "autor_nombre": "No exponer",
+          "tipo_contaminacion": "suelo",
+          "subcategoria": "vertimiento",
+          "estado": "en_proceso",
+          "nivel_severidad": "critico",
+          "latitud": 10.411,
+          "longitud": -73.211,
+          "municipio": "Mocoa",
+          "departamento": "Putumayo",
+          "created_at": "2026-11-19T12:00:00.000Z"
+        },
+        {
+          "id_reporte": 10,
+          "id_usuario": 999,
+          "autor_nombre": "No exponer",
+          "tipo_contaminacion": "agua",
+          "subcategoria": "vertimiento",
+          "estado": "en_proceso",
+          "nivel_severidad": "medio",
+          "latitud": "invalida",
+          "longitud": -73,
+          "municipio": "Mocoa",
+          "departamento": "Putumayo",
+          "created_at": "2026-11-17T12:00:00.000Z"
+        }
+      ],
+      "expected": {
+        "actualizado_en": "2026-11-18T12:00:00.000Z",
+        "celda_grados": 0.05,
+        "zonas": [
+          {
+            "id": "10.4000:-73.2500",
+            "zona_id": "10.4000:-73.2500",
+            "centro": {
+              "lat": 10.425,
+              "lng": -73.225
+            },
+            "tipo_dominante": "suelo",
+            "subcategoria_dominante": "vertimiento",
+            "municipio": "Mocoa",
+            "departamento": "Putumayo",
+            "n_reportes": 1,
+            "n_reportes_previo": 0,
+            "tendencia": "subiendo",
+            "severidad_promedio": 4,
+            "ultimo_reporte": "2026-11-19T12:00:00.000Z",
+            "score": 100,
+            "nivel": "critico"
+          },
+          {
+            "id": "1.1500:-76.7000",
+            "zona_id": "1.1500:-76.7000",
+            "centro": {
+              "lat": 1.175,
+              "lng": -76.675
+            },
+            "tipo_dominante": "agua",
+            "subcategoria_dominante": "vertimiento",
+            "municipio": "Mocoa",
+            "departamento": "Putumayo",
+            "n_reportes": 1,
+            "n_reportes_previo": 1,
+            "tendencia": "estable",
+            "severidad_promedio": 3,
+            "ultimo_reporte": "2026-11-16T12:00:00.000Z",
+            "score": 86,
+            "nivel": "critico"
+          }
+        ]
+      }
+    },
+    {
+      "name": "coercion-original",
+      "query": {
+        "dias": "7.9dias",
+        "min_score": " "
+      },
+      "params": {
+        "dias": 7,
+        "desde": "2026-11-11T12:00:00.000Z",
+        "tipo": null,
+        "min_score": 0
+      },
+      "rows": [
+        {
+          "id_reporte": 1,
+          "id_usuario": 999,
+          "autor_nombre": "No exponer",
+          "tipo_contaminacion": "agua",
+          "subcategoria": "vertimiento",
+          "estado": "en_proceso",
+          "nivel_severidad": "alto",
+          "latitud": "1.151",
+          "longitud": "-76.651",
+          "municipio": "Mocoa",
+          "departamento": "Putumayo",
+          "created_at": "2026-11-16T12:00:00.000Z"
+        },
+        {
+          "id_reporte": 2,
+          "id_usuario": 999,
+          "autor_nombre": "No exponer",
+          "tipo_contaminacion": "agua",
+          "subcategoria": "vertimiento",
+          "estado": "en_proceso",
+          "nivel_severidad": "medio",
+          "latitud": 1.152,
+          "longitud": -76.652,
+          "municipio": "Mocoa",
+          "departamento": "Putumayo",
+          "created_at": "2026-11-10T12:00:00.000Z"
+        },
+        {
+          "id_reporte": 8,
+          "id_usuario": 999,
+          "autor_nombre": "No exponer",
+          "tipo_contaminacion": "suelo",
+          "subcategoria": "vertimiento",
+          "estado": "en_proceso",
+          "nivel_severidad": "critico",
+          "latitud": 10.411,
+          "longitud": -73.211,
+          "municipio": "Mocoa",
+          "departamento": "Putumayo",
+          "created_at": "2026-11-19T12:00:00.000Z"
+        },
+        {
+          "id_reporte": 10,
+          "id_usuario": 999,
+          "autor_nombre": "No exponer",
+          "tipo_contaminacion": "agua",
+          "subcategoria": "vertimiento",
+          "estado": "en_proceso",
+          "nivel_severidad": "medio",
+          "latitud": "invalida",
+          "longitud": -73,
+          "municipio": "Mocoa",
+          "departamento": "Putumayo",
+          "created_at": "2026-11-17T12:00:00.000Z"
+        }
+      ],
+      "expected": {
+        "actualizado_en": "2026-11-18T12:00:00.000Z",
+        "celda_grados": 0.05,
+        "zonas": [
+          {
+            "id": "10.4000:-73.2500",
+            "zona_id": "10.4000:-73.2500",
+            "centro": {
+              "lat": 10.425,
+              "lng": -73.225
+            },
+            "tipo_dominante": "suelo",
+            "subcategoria_dominante": "vertimiento",
+            "municipio": "Mocoa",
+            "departamento": "Putumayo",
+            "n_reportes": 1,
+            "n_reportes_previo": 0,
+            "tendencia": "subiendo",
+            "severidad_promedio": 4,
+            "ultimo_reporte": "2026-11-19T12:00:00.000Z",
+            "score": 100,
+            "nivel": "critico"
+          },
+          {
+            "id": "1.1500:-76.7000",
+            "zona_id": "1.1500:-76.7000",
+            "centro": {
+              "lat": 1.175,
+              "lng": -76.675
+            },
+            "tipo_dominante": "agua",
+            "subcategoria_dominante": "vertimiento",
+            "municipio": "Mocoa",
+            "departamento": "Putumayo",
+            "n_reportes": 1,
+            "n_reportes_previo": 1,
+            "tendencia": "estable",
+            "severidad_promedio": 3,
+            "ultimo_reporte": "2026-11-16T12:00:00.000Z",
+            "score": 86,
+            "nivel": "critico"
+          }
+        ]
+      }
+    },
+    {
+      "name": "solo-anteriores",
+      "query": {
+        "min_score": "0"
+      },
+      "params": {
+        "dias": 30,
+        "desde": "2026-10-19T12:00:00.000Z",
+        "tipo": null,
+        "min_score": 0
+      },
+      "rows": [
+        {
+          "id_reporte": 12,
+          "id_usuario": 999,
+          "autor_nombre": "No exponer",
+          "tipo_contaminacion": "agua",
+          "subcategoria": "vertimiento",
+          "estado": "en_proceso",
+          "nivel_severidad": "medio",
+          "latitud": 4.1,
+          "longitud": -74.1,
+          "municipio": "Mocoa",
+          "departamento": "Putumayo",
+          "created_at": "2026-10-09T12:00:00.000Z"
+        }
+      ],
+      "expected": {
+        "actualizado_en": "2026-11-18T12:00:00.000Z",
+        "celda_grados": 0.05,
+        "zonas": []
+      }
+    },
+    {
+      "name": "score-tope",
+      "query": {
+        "min_score": "100"
+      },
+      "params": {
+        "dias": 30,
+        "desde": "2026-10-19T12:00:00.000Z",
+        "tipo": null,
+        "min_score": 100
+      },
+      "rows": [
+        {
+          "id_reporte": 13,
+          "id_usuario": 999,
+          "autor_nombre": "No exponer",
+          "tipo_contaminacion": "agua",
+          "subcategoria": "vertimiento",
+          "estado": "en_proceso",
+          "nivel_severidad": "critico",
+          "latitud": 1.151,
+          "longitud": -76.651,
+          "municipio": "Mocoa",
+          "departamento": "Putumayo",
+          "created_at": "2026-11-18T12:00:00.000Z"
+        },
+        {
+          "id_reporte": 14,
+          "id_usuario": 999,
+          "autor_nombre": "No exponer",
+          "tipo_contaminacion": "agua",
+          "subcategoria": "vertimiento",
+          "estado": "en_proceso",
+          "nivel_severidad": "critico",
+          "latitud": 1.152,
+          "longitud": -76.652,
+          "municipio": "Mocoa",
+          "departamento": "Putumayo",
+          "created_at": "2026-11-18T12:00:00.000Z"
+        },
+        {
+          "id_reporte": 15,
+          "id_usuario": 999,
+          "autor_nombre": "No exponer",
+          "tipo_contaminacion": "agua",
+          "subcategoria": "vertimiento",
+          "estado": "en_proceso",
+          "nivel_severidad": "critico",
+          "latitud": 1.153,
+          "longitud": -76.653,
+          "municipio": "Mocoa",
+          "departamento": "Putumayo",
+          "created_at": "2026-11-18T12:00:00.000Z"
+        }
+      ],
+      "expected": {
+        "actualizado_en": "2026-11-18T12:00:00.000Z",
+        "celda_grados": 0.05,
+        "zonas": [
+          {
+            "id": "1.1500:-76.7000",
+            "zona_id": "1.1500:-76.7000",
+            "centro": {
+              "lat": 1.175,
+              "lng": -76.675
+            },
+            "tipo_dominante": "agua",
+            "subcategoria_dominante": "vertimiento",
+            "municipio": "Mocoa",
+            "departamento": "Putumayo",
+            "n_reportes": 3,
+            "n_reportes_previo": 0,
+            "tendencia": "subiendo",
+            "severidad_promedio": 4,
+            "ultimo_reporte": "2026-11-18T12:00:00.000Z",
+            "score": 100,
+            "nivel": "critico"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -57,6 +57,7 @@ try {
     assert.equal((await api('GET', '/health')).database, 'conectada');
   });
   let auth;
+  let pilotReport;
   const profile = { nombre: 'Docker', apellido: 'Prueba', email: 'docker@example.test', password: 'PruebaDocker2026!' };
   await check('Registro y login a través del frontend Docker', async () => {
     await api('POST', '/auth/register', profile, null, 201);
@@ -64,15 +65,29 @@ try {
     assert.ok(auth.token);
     assert.equal((await api('GET', '/auth/perfil', null, auth.token)).user.email, profile.email);
   });
-  await check('Crear, consultar y borrar reporte usando categoría canónica', async () => {
+  await check('Crear y consultar reporte usando categoría canónica', async () => {
     const { reporte } = await api('POST', '/reportes', {
       tipo_contaminacion: 'agua', nivel_severidad: 'alto', titulo: 'Reporte Docker sintético',
       direccion: 'Dirección de prueba', latitud: 1.15, longitud: -76.65,
     }, auth.token, 201);
     const detail = await api('GET', `/reportes/${reporte.id_reporte}`, null, auth.token);
     assert.equal(detail.reporte.titulo, 'Reporte Docker sintético');
-    await api('DELETE', `/reportes/${reporte.id_reporte}`, null, auth.token);
-    await api('GET', `/reportes/${reporte.id_reporte}`, null, null, 404);
+    pilotReport = reporte;
+  });
+  await check('Piloto hexagonal: consulta geográfica y alertas por Nginx con Node 24', async () => {
+    // Fixture exclusivamente dentro del contenedor/base sintéticos de este proyecto.
+    await docker(['exec', '-T', 'backend-prod', 'node', '--input-type=module', '-e', "import pool from './src/config/database.js'; await pool.execute('UPDATE usuarios SET rol=? WHERE email=?',['admin','docker@example.test']); await pool.end();"]);
+    auth = await api('POST', '/auth/login', profile);
+    await api('PATCH', `/reportes/${pilotReport.id_reporte}`, { estado: 'en_proceso' }, auth.token);
+    const zones = await api('GET', '/reportes/zonas-riesgo?min_score=0', null, auth.token);
+    assert.equal(zones.zonas.length, 1);
+    assert.equal(zones.zonas[0].n_reportes, 1);
+    assert.equal(zones.zonas[0].tipo_dominante, 'agua');
+    const alerts = await api('GET', '/reportes/alertas-predictivas?min_score=0&nivel_min=bajo');
+    assert.equal(alerts.alertas[0].zona_id, zones.zonas[0].zona_id);
+    await api('DELETE', `/reportes/${pilotReport.id_reporte}`, null, auth.token);
+    await api('GET', `/reportes/${pilotReport.id_reporte}`, null, null, 404);
+    assert.deepEqual((await api('GET', '/reportes/zonas-riesgo?min_score=0', null, auth.token)).zonas, []);
   });
   await check('Nginx reenvía imágenes /uploads sin interceptarlas como assets estáticos', async () => {
     const encoded = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aWQAAAABJRU5ErkJggg==';

@@ -1,7 +1,10 @@
+import { createMysqlReporteReader } from '../modules/zonas-riesgo/adapters/outbound/mysql-reporte-reader.js';
 import pool from '../config/database.js';
 import { tableExists } from '../config/schema-compat.js';
 import { CATEGORIAS_FALLBACK } from './categoria-riesgo.model.js';
 import { randomUUID } from 'crypto';
+
+const reporteAnaliticaReader = createMysqlReporteReader({ pool });
 
 export const ESTADO_INICIAL_REPORTE = 'pendiente';
 export const ESTADOS_REPORTE_PERMITIDOS = [
@@ -598,45 +601,8 @@ export const ReporteModel = {
     return rows;
   },
 
-  findParaPrediccion: async ({ desde, tipo } = {}) => {
-    const conditions = [
-      'r.deleted_at IS NULL',
-      'r.latitud IS NOT NULL',
-      'r.longitud IS NOT NULL',
-      "r.estado IN ('en_proceso', 'resuelto')",
-    ];
-    const params = [];
-
-    if (desde) {
-      conditions.push('r.created_at >= ?');
-      params.push(desde);
-    }
-
-    if (tipo) {
-      conditions.push('r.tipo_contaminacion = ?');
-      params.push(tipo);
-    }
-
-    const [rows] = await pool.execute(
-      `SELECT
-         r.id_reporte,
-         r.tipo_contaminacion,
-         r.subcategoria,
-         r.estado,
-         r.nivel_severidad,
-         r.latitud,
-         r.longitud,
-         r.municipio,
-         r.departamento,
-         r.created_at
-       FROM reportes r
-       WHERE ${conditions.join(' AND ')}
-       ORDER BY r.created_at DESC`,
-      params
-    );
-
-    return rows;
-  },
+  // Compatibilidad con consumidores heredados; el SQL vive en el adaptador.
+  findParaPrediccion: async (params) => reporteAnaliticaReader.findParaPrediccion(params),
 
   findTrending: async ({ limit = 12 } = {}) => {
     const safeLimit = Math.max(1, Math.min(50, parseInt(limit, 10) || 12));

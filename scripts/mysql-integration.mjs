@@ -5,6 +5,7 @@ import { randomBytes, randomUUID } from 'node:crypto';
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { freePort } from './mysql-sandbox.mjs';
+import { runZonasRiesgoIntegration } from './zonas-riesgo-integration.mjs';
 
 export async function runIntegration({ root, admin, config, database, directory, result }) {
   const password = randomBytes(24).toString('hex');
@@ -197,6 +198,7 @@ export async function runIntegration({ root, admin, config, database, directory,
       const alerts = await request('GET', '/reportes/alertas-predictivas?min_score=0&nivel_min=bajo&lat=1.15&lng=-76.65&radio_km=20');
       assert.ok(alerts.alertas.length > 0);
     });
+    await runZonasRiesgoIntegration({ check, request, admin, state });
     await check('Evidencia local: fixture SQL, lectura HTTP y borrado lógico', async () => {
       const filename = 'evidencia-sintetica.png';
       const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aWQAAAABJRU5ErkJggg==', 'base64');

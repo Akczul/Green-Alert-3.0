@@ -1,6 +1,6 @@
 # GreenAlert
 
-Monorepositorio de la plataforma ambiental existente. Conserva la SPA **React 18 + Vite 5** y la API **Express 4 + MySQL**. El backend es una aplicación Node.js por capas; no usa NestJS ni microservicios. Esta fase consolida, configura y documenta; la arquitectura hexagonal y las nuevas bases de datos quedan planificadas.
+Monorepositorio de la plataforma ambiental existente. Conserva la SPA **React 18 + Vite 5** y la API **Express 4 + MySQL**. La consulta de zonas de riesgo tiene un [piloto hexagonal implementado](docs/piloto-hexagonal-zonas-riesgo.md); el resto del backend continúa por capas. No usa NestJS ni microservicios. Las nuevas bases de datos y ML siguen pendientes de decisión.
 
 ```text
 GreenAlert/                 # carpeta de trabajo actual: GreenAlert3.0
@@ -104,5 +104,6 @@ Las variables Vite se incorporan al construir la imagen. Para Google/Firebase en
 - [Procedencia e historial Git](docs/procedencia.md).
 - [Informe de comandos y verificación](docs/verificacion.md).
 - [Validación posterior de MySQL y stack completo](docs/validacion-mysql.md).
+- [Piloto hexagonal de zonas: estructura, puertos, archivos y pruebas](docs/piloto-hexagonal-zonas-riesgo.md).
 
-Siguiente paso propuesto: caracterizar y extraer **consulta de zonas de riesgo** detrás de un puerto de lectura de reportes, manteniendo el algoritmo y JSON actuales. Es una primera extracción pequeña, sin cambiar de framework ni base de datos. El detalle y sus criterios de aceptación están en el plan.
+El piloto de consulta de zonas está completado y verificado: **278 pruebas**, **57 comprobaciones MySQL Docker** y **8 del stack completo**. Conserva el contrato anterior, la geografía y la invalidación de caché. La entrega se detiene aquí; la migración de los demás módulos requiere revisar los resultados y una nueva tarea.

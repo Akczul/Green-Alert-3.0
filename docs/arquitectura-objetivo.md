@@ -1,5 +1,7 @@
 # Arquitectura objetivo: evolución incremental
 
+La primera extracción ya está implementada en [el piloto de zonas de riesgo](piloto-hexagonal-zonas-riesgo.md). Este documento conserva la propuesta general para los demás módulos; no significa que hayan sido migrados.
+
 **Propuesta, todavía no implementada.** La primera extracción debe funcionar con Express y MySQL existentes. Adoptar NestJS no es requisito de arquitectura hexagonal y añadirlo ahora mezclaría migración de framework con cambio de dependencias.
 
 La dirección de dependencias propuesta es `adaptadores → aplicación → dominio`. Los puertos de salida pertenecen a la aplicación que los necesita. Los adaptadores implementan contratos; los casos de uso reciben implementaciones desde un composition root. Un archivo llamado `repository` que siga importando el modelo SQL global dentro del caso de uso no aplica inversión de dependencias.

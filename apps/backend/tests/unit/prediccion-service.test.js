@@ -11,7 +11,7 @@ import {
   parseAlertasParams,
   parseZonasParams,
 } from '../../src/services/prediccion.service.js';
-import { ReporteModel } from '../../src/models/reporte.model.js';
+import pool from '../../src/config/database.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const backendDir = path.resolve(path.dirname(__filename), '../..');
@@ -57,7 +57,7 @@ const reportesBase = [
 
 test('calcularZonasRiesgo agrupa por grilla y no expone datos personales', async (t) => {
   invalidatePrediccionCache();
-  t.mock.method(ReporteModel, 'findParaPrediccion', async () => reportesBase);
+  t.mock.method(pool, 'execute', async () => [reportesBase]);
 
   const result = await calcularZonasRiesgo(parseZonasParams({ min_score: '0' }));
 
@@ -72,7 +72,7 @@ test('calcularZonasRiesgo agrupa por grilla y no expone datos personales', async
 
 test('calcularAlertasPredictivas filtra por nivel, tipo, distancia y limite', async (t) => {
   invalidatePrediccionCache();
-  t.mock.method(ReporteModel, 'findParaPrediccion', async () => reportesBase);
+  t.mock.method(pool, 'execute', async () => [reportesBase]);
 
   const result = await calcularAlertasPredictivas(parseAlertasParams({
     min_score: '0',
@@ -93,7 +93,7 @@ test('calcularAlertasPredictivas filtra por nivel, tipo, distancia y limite', as
 
 test('prediccion responde listas vacias sin datos', async (t) => {
   invalidatePrediccionCache();
-  t.mock.method(ReporteModel, 'findParaPrediccion', async () => []);
+  t.mock.method(pool, 'execute', async () => [[]]);
 
   const zonas = await calcularZonasRiesgo(parseZonasParams({}));
   const alertas = await calcularAlertasPredictivas(parseAlertasParams({}));
@@ -104,19 +104,19 @@ test('prediccion responde listas vacias sin datos', async (t) => {
 
 test('prediccion usa cache TTL hasta invalidar', async (t) => {
   invalidatePrediccionCache();
-  t.mock.method(ReporteModel, 'findParaPrediccion', async () => reportesBase);
+  t.mock.method(pool, 'execute', async () => [reportesBase]);
 
   await calcularZonasRiesgo(parseZonasParams({ min_score: '0' }));
   await calcularZonasRiesgo(parseZonasParams({ min_score: '0' }));
 
-  assert.equal(ReporteModel.findParaPrediccion.mock.callCount(), 1);
+  assert.equal(pool.execute.mock.callCount(), 1);
   assert.equal(getPrediccionCacheSize() > 0, true);
 
   invalidatePrediccionCache();
   assert.equal(getPrediccionCacheSize(), 0);
 
   await calcularZonasRiesgo(parseZonasParams({ min_score: '0' }));
-  assert.equal(ReporteModel.findParaPrediccion.mock.callCount(), 2);
+  assert.equal(pool.execute.mock.callCount(), 2);
 });
 
 test('parseAlertasParams valida parametros geograficos y nivel', () => {
@@ -142,14 +142,12 @@ test('parseAlertasParams valida parametros geograficos y nivel', () => {
   );
 });
 
-test('ReporteModel.findParaPrediccion solo usa reportes moderados con ubicacion', async () => {
+test('adaptador MySQL de prediccion solo usa reportes moderados con ubicacion', async () => {
   const source = await fs.readFile(
-    path.join(backendDir, 'src/models/reporte.model.js'),
+    path.join(backendDir, 'src/modules/zonas-riesgo/adapters/outbound/mysql-reporte-reader.js'),
     'utf8'
   );
-  const start = source.indexOf('findParaPrediccion: async');
-  const end = source.indexOf('findTrending: async', start);
-  const section = source.slice(start, end);
+  const section = source;
 
   assert.match(section, /r\.deleted_at IS NULL/);
   assert.match(section, /r\.latitud IS NOT NULL/);

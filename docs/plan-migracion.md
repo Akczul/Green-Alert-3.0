@@ -1,14 +1,19 @@
 # Plan de migración por fases
 
-Solo la fase 0 pertenece a esta ejecución. Las fases siguientes son trabajo propuesto, pendiente de una nueva tarea. Mantener siempre rutas, estados, multipart, JSON, roles, pantallas y funcionalidades.
+Estado actualizado después del [piloto de consulta de zonas](piloto-hexagonal-zonas-riesgo.md). Se completaron consolidación, [validación SQL/stack](validacion-mysql.md) y la primera extracción hexagonal. Mantener siempre rutas, estados, multipart, JSON, roles, pantallas y funcionalidades. Las demás migraciones no se inician automáticamente.
 
-**Actualización posterior:** ya se ejecutó una fase específica de [validación SQL y del stack](validacion-mysql.md), sin extracción hexagonal. Resuelve el arranque MySQL/Docker y la ampliación aditiva del catálogo; no habilita por sí misma el trabajo hexagonal ni proveedores remotos. Los pendientes de entorno indicados abajo reflejan el estado al redactar el plan original.
+| Etapa | Estado |
+| --- | --- |
+| Fase 0: consolidación | Completada |
+| Validación SQL/Docker | Completada en entornos sintéticos; proveedores externos pendientes |
+| Fase 1: requisitos del piloto | Esquema validado, catálogo ampliado, contrato y ocho fixtures previos, reloj controlado y lecturas de caché verificados; benchmark de carga y proveedores quedan diferidos |
+| Fase 2: consulta de zonas | Completada: dominio, caso, puertos, reader MySQL, caché, adaptador HTTP y composición |
+| Alertas como caso independiente | Pendiente; conserva lógica heredada y reutiliza el caso de zonas |
+| Fases 3–7 | No iniciadas; requieren revisión y nueva tarea |
 
 ## Fase 0 — Consolidar y medir la base
 
-Entregada: aplicaciones bajo `apps/`, historial completo de main unido sin reescritura, scripts y CI compartidos, lockfile backend, ejemplos locales, Compose y documentación. Validaciones locales: sintaxis, lint, build, 259 pruebas y smoke. Contenedores, SQL real e integraciones remotas pendientes por disponibilidad del entorno/credenciales.
-
-Cierre operativo pendiente antes de afirmar stack completo: disponer de Docker/MySQL de prueba, ejecutar `npm run infra:up`, revisar `docker compose ps`/logs, comprobar `/api/health` 200 y ensayar registro/login/reportes en datos sintéticos con Cloudinary de prueba. No usar datos productivos ni enviar correo real accidentalmente.
+Entregada: aplicaciones bajo `apps/`, historial completo de main unido sin reescritura, scripts y CI compartidos, lockfile backend, ejemplos locales, Compose y documentación. La fase SQL posterior acreditó MySQL nativo/Docker y stack completo. Los proveedores externos mantienen sus pendientes; no usar datos productivos ni enviar correo real accidentalmente.
 
 ## Fase 1 — Resolver discrepancias y caracterizar comportamiento
 
@@ -22,16 +27,16 @@ Salida: contrato conocido y repetible, esquema sintético inicializado, problema
 
 ## Fase 2 — Primera extracción: consultar zonas de riesgo
 
-Dependencia: fixtures de fase 1. Alcance acotado a `prediccion.service` y sus adaptadores; no mover el controlador entero de reportes.
+**Consulta de zonas completada.** Fixtures previos en `tests/fixtures/zonas-riesgo/contrato.json` y contrato en [contrato-zonas-riesgo.md](contrato-zonas-riesgo.md). El SQL de lectura vive en el adaptador; ReporteModel conserva un método delegado de compatibilidad. No se movió el controlador entero de reportes.
 
-1. Extraer funciones puras de agrupación por cuadrícula, score y tendencia. Preservar orden, redondeos, tratamiento de fechas/coordenadas y pesos actuales.
-2. Definir puertos propios de aplicación: `ReporteAnaliticaReader.findParaPrediccion`, `Clock.now` y `Cache.get/set/invalidate`. DTO de entrada/salida con objetos simples.
-3. Crear fábrica `createConsultarZonasRiesgo({reporteReader, clock, cache})`; sin importar modelos, Express, SDK o entorno.
-4. Implementar adaptador inicial sobre `ReporteModel.findParaPrediccion` existente. Encapsular Map y TTL actual en un adaptador; mantener invalidación tras altas/cambios/borrado.
-5. Ensamblar en bootstrap y hacer que el controlador existente traduzca query/errores al caso de uso. Mantener `/reportes/zonas-riesgo`, autorización admin/moderador y respuesta exacta.
-6. Migrar `ConsultarAlertasPredictivas` después de probar zonas, conservando JWT opcional y filtros geográficos.
+1. Extraer funciones puras de agrupación por cuadrícula, score y tendencia. Preservar orden, redondeos, tratamiento de fechas/coordenadas y pesos actuales. **Completado.**
+2. Definir puertos propios de aplicación: `ReporteAnaliticaReader.findParaPrediccion`, `Clock.now` y `PredictionCache.get/set/clear`. DTO de entrada/salida con objetos simples. **Completado.**
+3. Crear fábrica `createConsultarZonasRiesgo({reporteReader, clock, cache})`; sin importar modelos, Express, SDK o entorno. **Completado.**
+4. Implementar adaptador MySQL con la consulta original de `ReporteModel.findParaPrediccion`, dejando el método como puente. Encapsular Map y TTL actual; mantener invalidación tras altas/cambios/borrado. **Completado.**
+5. Ensamblar en bootstrap y hacer que el adaptador HTTP traduzca query/errores al caso de uso, reexportado desde el controlador existente. Mantener `/reportes/zonas-riesgo`, autorización admin/moderador y respuesta exacta. **Completado.**
+6. **Pendiente de revisión posterior:** extraer `ConsultarAlertasPredictivas` como caso propio, conservando JWT opcional y filtros geográficos. Este piloto solo conecta las alertas heredadas al caso de zonas y a su caché compartida.
 
-Criterios de aceptación: fixtures antes/después equivalentes; algoritmo, claves, TTL, ventanas y JSON sin cambios; caso de uso ejecutable con dobles en memoria; pruebas HTTP de permisos/validación; suite completa, build/lint y lectura SQL de integración pasan. El dominio/aplicación no importan infraestructura. Comprobar también invalidación para evitar servir datos previos a una actualización.
+Criterios acreditados: ocho fixtures antes/después equivalentes; algoritmo, claves, TTL, ventanas y JSON conservados; caso ejecutable con dobles en memoria; contratos HTTP, guardia de imports, 278 pruebas completas, build/lint, 57 comprobaciones MySQL y 8 del stack pasan. Invalidación por severidad/moderación/borrado verificada también para alertas. No se cambió el esquema ni la escritura espacial.
 
 Reversión: volver a conectar el servicio original en bootstrap; ninguna migración de base requerida. Si cambia el JSON, dividir el cambio y volver al contrato existente antes de continuar.
 

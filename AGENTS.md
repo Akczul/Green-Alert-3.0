@@ -5,7 +5,7 @@
 - Este repositorio consolida Green-Alert/Backend y Green-Alert/Frontend. Los SHA de origen están en `docs/procedencia.md`; ambos historiales son ancestros de `main`.
 - Backend: JavaScript ESM, Express 4, `mysql2/promise`, SQL explícito. Rutas en `apps/backend/routes`, middleware en `middlewares`, controladores/modelos/servicios en `src`.
 - Frontend: React 18 JSX, Vite 5, React Router 6, Tailwind 3, Axios, Leaflet, Firebase. Mantener las pantallas y los componentes originales.
-- No hay NestJS, gateway distribuido ni microservicios. No describir como hexagonal la implementación actual. La propuesta está en `docs/arquitectura-objetivo.md`.
+- No hay NestJS, gateway distribuido ni microservicios. Solo la consulta de zonas tiene un piloto hexagonal real; el resto sigue por capas. Ver `docs/piloto-hexagonal-zonas-riesgo.md` y la propuesta restante en `docs/arquitectura-objetivo.md`.
 - Instalaciones independientes por aplicación. No introducir workspaces, hoisting ni otro gestor sin justificar cómo se preservan los lockfiles y contratos.
 
 ## Contratos y convenciones
@@ -56,3 +56,7 @@ Node de referencia: 24. Ver `docs/verificacion.md` antes de afirmar qué entorno
 - Los runners SQL nunca usan el servicio MySQL80 ni la base configurada en el .env del usuario: crean instancia/proyecto, base, puertos y credenciales propios. No convertirlos en comandos que borren o migren una base recibida arbitrariamente.
 - Al escribir geometría SRID 4326 desde POINT(longitud latitud), conservar `axis-order=long-lat`. No transformar geometría histórica automáticamente.
 - Las migraciones usan DATABASE() de la conexión; no añadir USE con un nombre de base fijo. 019 añade catálogo sin cambiar IDs/códigos/estado anteriores. No ejecutar toda la cadena sobre bootstrap completo.
+- El piloto se ensambla en `src/bootstrap/zonas-riesgo.js`. Dominio/aplicación reciben reader, reloj y caché por fábrica; no importar modelos, pool, Express, entorno o adaptadores desde esas capas.
+- `prediccion.service.js` y `ReporteModel.findParaPrediccion` son puentes para consumidores heredados. Conservar una sola consulta SQL en el adaptador y una sola caché productiva compartida con alertas.
+- Los ocho fixtures de `tests/fixtures/zonas-riesgo/contrato.json` provienen de a79b6ba antes del refactor. No regenerarlos desde el código nuevo para ocultar regresiones; un cambio de contrato exige revisión explícita.
+- Esta fase termina en consulta de zonas. No extraer alertas u otros módulos como efecto secundario de mantenimiento del piloto.
