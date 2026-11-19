@@ -1,0 +1,114 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gray-950 text-gray-100 antialiased;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-green-500 hover:bg-green-400 text-gray-950 font-semibold px-5 py-2.5 rounded-lg transition-all duration-200 active:scale-95;
+  }
+  .btn-secondary {
+    @apply border border-green-500 text-green-400 hover:bg-green-500/10 font-medium px-5 py-2.5 rounded-lg transition-all duration-200 active:scale-95;
+  }
+  .card {
+    @apply bg-gray-900 border border-gray-800 rounded-xl p-4 sm:p-6 lg:p-8;
+  }
+  .badge {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium;
+  }
+  /* Mapa — filtros por estilo de tile */
+  /* isolation: isolate crea un stacking context propio para Leaflet,
+     evitando que sus z-indices (400, 1000) se filtren al documento global */
+  .leaflet-container {
+    isolation: isolate;
+  }
+  .ga-map-dark .leaflet-tile-pane {
+    filter: brightness(1.35) saturate(0.75);
+  }
+  .ga-map-satellite .leaflet-tile-pane {
+    filter: brightness(1.05) contrast(1.05) saturate(1.1);
+  }
+  /* .ga-map-light (Voyager): sin filtro, los colores son correctos por defecto */
+
+  .scrollbar-dark {
+    scrollbar-width: thin;
+    scrollbar-color: #374151 transparent;
+  }
+  .scrollbar-dark::-webkit-scrollbar {
+    width: 4px;
+  }
+  .scrollbar-dark::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar-dark::-webkit-scrollbar-thumb {
+    background: #374151;
+    border-radius: 9999px;
+  }
+  .scrollbar-dark::-webkit-scrollbar-thumb:hover {
+    background: #4b5563;
+  }
+}
+
+/* ── Nebula hero animations ────────────────────────────────── */
+/* Lava-lamp: cada blob sube desde abajo, se hincha, llega arriba y vuelve */
+@keyframes lava-rise-1 {
+  0%   { transform: translateY(0%)   scale(1)    ; opacity: 0.55; }
+  20%  { transform: translateY(-18%) scale(1.08) ; opacity: 0.85; }
+  45%  { transform: translateY(-42%) scale(1.14) ; opacity: 1;    }
+  70%  { transform: translateY(-68%) scale(1.06) ; opacity: 0.80; }
+  90%  { transform: translateY(-88%) scale(0.94) ; opacity: 0.50; }
+  100% { transform: translateY(0%)   scale(1)    ; opacity: 0.55; }
+}
+@keyframes lava-rise-2 {
+  0%   { transform: translateY(0%)   scale(1.05) rotate(0deg);   opacity: 0.50; }
+  25%  { transform: translateY(-25%) scale(1.18) rotate(4deg);   opacity: 0.90; }
+  55%  { transform: translateY(-55%) scale(1.10) rotate(-3deg);  opacity: 0.95; }
+  80%  { transform: translateY(-82%) scale(0.97) rotate(2deg);   opacity: 0.60; }
+  100% { transform: translateY(0%)   scale(1.05) rotate(0deg);   opacity: 0.50; }
+}
+@keyframes lava-rise-3 {
+  0%   { transform: translateY(0%)   scale(0.92); opacity: 0.45; }
+  30%  { transform: translateY(-30%) scale(1.12); opacity: 0.88; }
+  60%  { transform: translateY(-62%) scale(1.20); opacity: 1;    }
+  85%  { transform: translateY(-84%) scale(1.04); opacity: 0.65; }
+  100% { transform: translateY(0%)   scale(0.92); opacity: 0.45; }
+}
+@keyframes lava-pulse {
+  0%, 100% { opacity: 0.70; transform: scale(1);    }
+  50%       { opacity: 1;   transform: scale(1.10); }
+}
+
+/* ── AUREL mascota flotante ───────────────────────────────── */
+@keyframes aurel-float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-7px); }
+}
+.aurel-float {
+  animation: aurel-float 3s ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes ga-loading-slide {
+  0%   { transform: translateX(-110%); }
+  100% { transform: translateX(310%); }
+}
+.ga-loading-bar {
+  animation: ga-loading-slide 1.15s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* prefers-reduced-motion: desactiva todas las animaciones/transiciones */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

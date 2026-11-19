@@ -1,0 +1,1353 @@
+import { useEffect, useState, lazy, Suspense, useMemo, useCallback } from 'react';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { checkHealth, getStats, getReportes, exportReportes, getStatsCategoria, getStatsTimeline, getHeatmapPoints, getZonasRiesgo, getAlertasPredictivas, getTrendingReportes } from '../services/api';
+import {
+  ClipboardList, Search, CheckCircle2, Users,
+  MapPin, TrendingUp, ArrowRight, Activity, Clock, Filter, X,
+  AlertCircle, Percent, FileDown, Loader2,
+  BarChart3, LineChart as LineIcon, Flame,
+  Brain, TrendingDown, Minus, RefreshCw,
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import { CountUp } from '../utils/animations.jsx';
+import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
+import { helpers, CONFIGURACION_CATEGORIAS } from '../constants/categorias';
+import { generarReportesPDF } from '../utils/reportesPdf';
+import BarChart from '../components/charts/BarChart';
+import LineChart from '../components/charts/LineChart';
+import TendenciasIACard from '../components/dashboard/TendenciasIACard.jsx';
+import {
+  ESTADO_REPORTE_TEXT_CLASS,
+  ESTADO_SEGUIMIENTO_LABEL,
+  getEstadoSeguimientoReporte,
+} from '../utils/reporteEstado';
+
+const ReportsMap = lazy(() => import('../components/ReportsMap'));
+
+function greeting() {
+  const h = new Date().getHours();
+  if (h < 12) return 'Buenos días';
+  if (h < 18) return 'Buenas tardes';
+  return 'Buenas noches';
+}
+
+// Isolated so the ticker ONLY re-renders this tiny component, not the whole page
+function LiveClock() {
+  const [now, setNow] = useState(new Date());
+  useEffect(() => {
+    const t = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(t);
+  }, []);
+  const DIAS  = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const dia  = `${DIAS[now.getDay()]}, ${now.getDate()} de ${MESES[now.getMonth()]} de ${now.getFullYear()}`;
+  const hora = now.toLocaleTimeString('es-CO');
+  return (
+    <p className="text-sm text-gray-500 flex items-center gap-1.5">
+      <Clock size={13} className="shrink-0" />
+      {dia} · <span className="tabular-nums">{hora}</span>
+    </p>
+  );
+}
+
+
+
+// Animated SVG donut chart
+const DONUT_R = 50;
+const DONUT_C = 2 * Math.PI * DONUT_R;
+
+function DonutChart({ segments, total }) {
+  let cumDeg = -90;
+  return (
+    <svg viewBox="0 0 120 120" className="w-full h-full" aria-label="Distribución por categoría">
+      <circle cx={60} cy={60} r={DONUT_R} fill="none" stroke="#1f2937" strokeWidth={14} />
+      {segments.map((s, i) => {
+        const frac    = s.count / total;
+        const dashLen = Math.max(0, frac * DONUT_C - 2);
+        const dashGap = DONUT_C - dashLen;
+        const rot     = cumDeg;
+        cumDeg += frac * 360;
+        return (
+          <g key={s.key} transform={`rotate(${rot}, 60, 60)`}>
+            <motion.circle
+              cx={60} cy={60} r={DONUT_R}
+              fill="none" stroke={s.color} strokeWidth={14} strokeLinecap="butt"
+              initial={{ strokeDasharray: `0 ${DONUT_C}` }}
+              animate={{ strokeDasharray: `${dashLen} ${dashGap}` }}
+              transition={{ duration: 0.9, delay: i * 0.1, ease: 'easeOut' }}
+            />
+          </g>
+        );
+      })}
+      <text x={60} y={55} textAnchor="middle" fontSize="20" fontWeight="800" fill="white">{total}</text>
+      <text x={60} y={69} textAnchor="middle" fontSize="8.5" fill="#6b7280">reportes</text>
+    </svg>
+  );
+}
+
+export default function Dashboard() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { showToast } = useToast();
+  const [health,     setHealth]     = useState({ status: 'cargando', database: '...', timestamp: null });
+  const [loading,    setLoading]    = useState(true);
+  const [stats,      setStats]      = useState(null);
+  const [statsRefreshing, setStatsRefreshing] = useState(false);
+  const [activity,   setActivity]   = useState([]);
+  const [actLoading, setActLoading] = useState(true);
+  const [exporting,  setExporting]  = useState(false);
+  const [mapFilters, setMapFilters] = useState({ categoria: '', estado: '', soloMios: false, dateFrom: '', dateTo: '' });
+
+  // FE-20: estado de gráficos analíticos y heatmap
+  const [catData,      setCatData]      = useState([]);
+  const [timelineData, setTimelineData] = useState([]);
+  const [bucket,       setBucket]       = useState('week');
+  const [heatmapPoints, setHeatmapPoints] = useState([]);
+  const [mapMode,      setMapMode]      = useState('cluster'); // 'cluster' | 'heatmap' | 'prediccion'
+  const [chartsLoading, setChartsLoading] = useState(true);
+
+  // FE-26: zonas de riesgo predictivas + alertas (admin/moderador)
+  const [zonasRiesgo,    setZonasRiesgo]    = useState([]);
+  const [zonasLoading,   setZonasLoading]   = useState(false);
+  const [zonasError,     setZonasError]     = useState(false);
+  const [prediccionDias, setPrediccionDias] = useState(90);
+  const [prediccionMin,  setPrediccionMin]  = useState(30);
+  const [alertas,        setAlertas]        = useState([]);
+  const [alertasLoading, setAlertasLoading] = useState(false);
+  const [alertasError,   setAlertasError]   = useState(false);
+  const [alertasNivel,   setAlertasNivel]   = useState('alto');
+  const [alertasTipo,    setAlertasTipo]    = useState('');
+  const [mapFlyTo,       setMapFlyTo]       = useState(null);
+
+  // Trending reports tab dentro del activity feed
+  const [activityTab,     setActivityTab]     = useState('reciente'); // 'reciente' | 'tendencia'
+  const [trending,        setTrending]        = useState([]);
+  const [trendingLoading, setTrendingLoading] = useState(false);
+
+  const fetchHealth = async () => {
+    setLoading(true);
+    try {
+      const { data } = await checkHealth();
+      setHealth(data);
+    } catch {
+      setHealth({ status: 'error', message: 'No se pudo conectar al servidor', database: 'desconectada' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // FE-21: refresca stats + actividad sin tocar loaders del primer render
+  const refreshData = useCallback(async ({ silent = true } = {}) => {
+    if (!silent) setStatsRefreshing(true);
+    try {
+      const [s, r] = await Promise.allSettled([
+        getStats(),
+        getReportes({ limit: 50 }),
+      ]);
+      if (s.status === 'fulfilled') setStats(s.value.data.data.stats);
+      if (r.status === 'fulfilled') setActivity(r.value.data.data.reportes ?? []);
+    } finally {
+      if (!silent) setStatsRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchHealth();
+    getStats()
+      .then(({ data }) => setStats(data.data.stats))
+      .catch(() => {});
+    getReportes({ limit: 50 })
+      .then(({ data }) => { setActivity(data.data.reportes ?? []); setActLoading(false); })
+      .catch(() => setActLoading(false));
+  }, []);
+
+  // FE-20: carga de datos analíticos (solo admin/moderador) — paralelo
+  useEffect(() => {
+    if (user?.rol !== 'admin' && user?.rol !== 'moderador') return;
+    setChartsLoading(true);
+    Promise.allSettled([
+      getStatsCategoria(),
+      getHeatmapPoints(),
+    ]).then(([cat, heat]) => {
+      if (cat.status === 'fulfilled') setCatData(cat.value.data?.data?.data ?? []);
+      if (heat.status === 'fulfilled') setHeatmapPoints(heat.value.data?.data?.data ?? []);
+    }).finally(() => setChartsLoading(false));
+  }, [user?.rol]);
+
+  // FE-20: timeline depende de bucket (week/month) — refetch al cambiar
+  useEffect(() => {
+    if (user?.rol !== 'admin' && user?.rol !== 'moderador') return;
+    getStatsTimeline({ bucket, limit: 12 })
+      .then(({ data }) => setTimelineData(data?.data?.data ?? []))
+      .catch(() => setTimelineData([]));
+  }, [user?.rol, bucket]);
+
+  // FE-26: zonas de riesgo predictivas — solo admin/moderador, sólo si el usuario activa la capa.
+  const fetchZonas = useCallback(() => {
+    if (user?.rol !== 'admin' && user?.rol !== 'moderador') return;
+    setZonasLoading(true);
+    setZonasError(false);
+    getZonasRiesgo({ dias: prediccionDias, min_score: prediccionMin })
+      .then(({ data }) => setZonasRiesgo(data?.data?.zonas ?? []))
+      .catch(() => { setZonasError(true); setZonasRiesgo([]); })
+      .finally(() => setZonasLoading(false));
+  }, [user?.rol, prediccionDias, prediccionMin]);
+
+  useEffect(() => {
+    if (mapMode !== 'prediccion') return;
+    fetchZonas();
+  }, [mapMode, fetchZonas]);
+
+  // FE-26: alertas predictivas — admin/moderador; carga al montar y al cambiar filtros.
+  const fetchAlertas = useCallback(() => {
+    if (user?.rol !== 'admin' && user?.rol !== 'moderador') return;
+    setAlertasLoading(true);
+    setAlertasError(false);
+    const params = { limite: 20, nivel_min: alertasNivel, dias: prediccionDias };
+    if (alertasTipo) params.tipo = alertasTipo;
+    getAlertasPredictivas(params)
+      .then(({ data }) => setAlertas(data?.data?.alertas ?? []))
+      .catch(() => { setAlertasError(true); setAlertas([]); })
+      .finally(() => setAlertasLoading(false));
+  }, [user?.rol, alertasNivel, alertasTipo, prediccionDias]);
+
+  useEffect(() => {
+    fetchAlertas();
+  }, [fetchAlertas]);
+
+  // Trending — carga solo cuando el usuario activa esa pestaña
+  useEffect(() => {
+    if (activityTab !== 'tendencia' || trending.length > 0) return;
+    setTrendingLoading(true);
+    getTrendingReportes({ limit: 8 })
+      .then(({ data }) => setTrending(data?.data?.reportes ?? []))
+      .catch(() => setTrending([]))
+      .finally(() => setTrendingLoading(false));
+  }, [activityTab, trending.length]);
+
+  // FE-21: auto-refresh KPIs cada 30s (solo admin/moderador, evita carga innecesaria)
+  useEffect(() => {
+    if (user?.rol !== 'admin' && user?.rol !== 'moderador') return;
+    const id = setInterval(() => {
+      setStatsRefreshing(true);
+      refreshData({ silent: true }).finally(() => setStatsRefreshing(false));
+    }, 30000);
+    return () => clearInterval(id);
+  }, [user?.rol, refreshData]);
+
+  // FE-21: descarga PDF estilizado con los reportes filtrados (mismo estilo que DescargarDatos)
+  const handleExportPdf = async () => {
+    if (exporting) return;
+    setExporting(true);
+    try {
+      const params = { format: 'json' };
+      if (mapFilters.categoria) params.tipo_contaminacion = mapFilters.categoria;
+      if (mapFilters.estado)    params.estado             = mapFilters.estado;
+      if (mapFilters.dateFrom)  params.desde              = mapFilters.dateFrom;
+      if (mapFilters.dateTo)    params.hasta              = mapFilters.dateTo + ' 23:59:59';
+
+      const { data } = await exportReportes(params);
+      const reportes = data?.data?.reportes ?? [];
+
+      await generarReportesPDF({
+        reportes,
+        filtros: mapFilters,
+        usuario: [user?.nombre, user?.apellido].filter(Boolean).join(' ') || user?.email || '',
+      });
+      showToast(`PDF generado: ${reportes.length} reporte${reportes.length !== 1 ? 's' : ''}.`, 'success');
+    } catch (err) {
+      const msg = err?.response?.status === 403
+        ? 'No tienes permiso para exportar.'
+        : 'No se pudo generar el PDF.';
+      showToast(msg, 'error');
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const isOk    = health.status === 'ok';
+  const isAdmin = user?.rol === 'admin' || user?.rol === 'moderador';
+
+  // ── KPI rol y métricas personales (deben ir antes de donutSource) ─────────
+  const rol = user?.rol;
+  // Number() coercion guards against string/int mismatch between MySQL and localStorage
+  const misReportes   = activity.filter(r => Number(r.id_usuario) === Number(user?.id_usuario));
+  const misPendientes = misReportes.filter(r => ['pendiente', 'en_proceso'].includes(getEstadoSeguimientoReporte(r))).length;
+  const misResueltos  = misReportes.filter(r => getEstadoSeguimientoReporte(r) === 'resuelto').length;
+  const _misCriticos  = misReportes.filter(r => r.nivel_severidad === 'critico' || r.nivel_severidad === 'alto').length;
+  const pendientesGlobales = activity.filter(r => getEstadoSeguimientoReporte(r) === 'pendiente').length;
+
+  // FE-21: % resolución calculado a partir de stats globales (sin NaN si total=0)
+  const porcentajeResolucion = stats?.total_reportes > 0
+    ? Math.round((Number(stats.resueltos) / Number(stats.total_reportes)) * 100)
+    : 0;
+
+  // FE-17: filtros del mapa (client-side, tiempo real)
+  const mapReports = useMemo(() => {
+    let list = activity;
+    if (mapFilters.soloMios) list = list.filter(r => Number(r.id_usuario) === Number(user?.id_usuario));
+    if (mapFilters.categoria) list = list.filter(r => r.tipo_contaminacion === mapFilters.categoria);
+    if (mapFilters.estado) list = list.filter(r => getEstadoSeguimientoReporte(r) === mapFilters.estado);
+    if (mapFilters.dateFrom) list = list.filter(r => new Date(r.created_at) >= new Date(mapFilters.dateFrom));
+    if (mapFilters.dateTo) list = list.filter(r => new Date(r.created_at) <= new Date(mapFilters.dateTo + 'T23:59:59'));
+    return list;
+  }, [activity, mapFilters, user]);
+
+  const hasMapFilters = mapFilters.categoria || mapFilters.estado || mapFilters.soloMios || mapFilters.dateFrom || mapFilters.dateTo;
+  const resetMapFilters = () => setMapFilters({ categoria: '', estado: '', soloMios: false, dateFrom: '', dateTo: '' });
+
+  // Aplica los mismos filtros de panel al heatmap (client-side)
+  const heatmapFiltered = useMemo(() => {
+    let list = heatmapPoints;
+    if (mapFilters.categoria) list = list.filter(r => r.tipo_contaminacion === mapFilters.categoria);
+    if (mapFilters.estado) list = list.filter(r => getEstadoSeguimientoReporte(r) === mapFilters.estado);
+    if (mapFilters.dateFrom) list = list.filter(r => new Date(r.created_at) >= new Date(mapFilters.dateFrom));
+    if (mapFilters.dateTo) list = list.filter(r => new Date(r.created_at) <= new Date(mapFilters.dateTo + 'T23:59:59'));
+    return list;
+  }, [heatmapPoints, mapFilters]);
+
+  const MAP_ESTADO_LABEL = { pendiente: 'Pendiente', en_proceso: 'En proceso', resuelto: 'Resuelto', rechazado: 'Rechazado' };
+  const mapSelectCls = 'bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-green-500 transition-colors';
+
+  // Donut chart data — siempre muestra la distribución comunitaria
+  const donutSource = activity;
+  const catCount = donutSource.reduce((acc, r) => {
+    acc[r.tipo_contaminacion] = (acc[r.tipo_contaminacion] || 0) + 1;
+    return acc;
+  }, {});
+  const donutData = Object.entries(catCount)
+    .sort((a, b) => b[1] - a[1]).slice(0, 6)
+    .map(([key, count]) => {
+      const cfg = helpers.obtenerConfig(key);
+      return { key, count, color: cfg?.color ?? '#6b7280', nombre: cfg?.nombre ?? key };
+    });
+  const donutTotal = donutData.reduce((s, d) => s + d.count, 0);
+
+  // ── KPI cards según rol ──────────────────────────────────────────────────
+
+  const statsCards = rol === 'ciudadano' ? [
+    // ── Tus reportes (personales) — primeros 3 ──────────────────────
+    { label: 'Mis reportes',    Icon: ClipboardList, value: misReportes.length, accent: 'text-emerald-400', border: 'border-t-emerald-500', bg: 'bg-emerald-500/15', glow: '#10b981', tooltip: 'Reportes que has enviado a GreenAlert' },
+    { label: 'En seguimiento',  Icon: Clock,         value: misPendientes,      accent: 'text-amber-400',   border: 'border-t-amber-500',   bg: 'bg-amber-500/15',   glow: '#f59e0b', tooltip: 'Tus reportes pendientes o en revisión por los moderadores' },
+    { label: 'Mis resueltos',   Icon: CheckCircle2,  value: misResueltos,       accent: 'text-green-400',   border: 'border-t-green-500',   bg: 'bg-green-500/15',   glow: '#22c55e', tooltip: 'Tus reportes que ya fueron atendidos exitosamente' },
+    // ── La comunidad (contexto global) — últimos 3 ──────────────────
+    { label: 'Este mes',        Icon: TrendingUp,    value: stats?.reportes_este_mes,  accent: 'text-blue-400',   border: 'border-t-blue-500',   bg: 'bg-blue-500/15',   glow: '#3b82f6', tooltip: 'Reportes nuevos en toda la comunidad durante este mes' },
+    { label: 'Municipios',      Icon: MapPin,        value: stats?.municipios_activos, accent: 'text-violet-400', border: 'border-t-violet-500', bg: 'bg-violet-500/15', glow: '#8b5cf6', tooltip: 'Municipios con al menos un reporte registrado en la plataforma' },
+    { label: 'Total comunidad', Icon: Activity,      value: stats?.total_reportes,     accent: 'text-teal-400',   border: 'border-t-teal-500',   bg: 'bg-teal-500/15',   glow: '#14b8a6', tooltip: 'Total de reportes registrados por toda la comunidad' },
+  ] : rol === 'moderador' ? [
+    // Cola de trabajo del moderador
+    { label: 'En proceso',      Icon: Search,        value: stats?.en_proceso,         accent: 'text-amber-400',   border: 'border-t-amber-500',   bg: 'bg-amber-500/15',   glow: '#f59e0b', tooltip: 'Reportes en atencion por entidades o moderacion' },
+    { label: 'Pendientes',      Icon: AlertCircle,   value: pendientesGlobales,        accent: 'text-rose-400',    border: 'border-t-rose-500',    bg: 'bg-rose-500/15',    glow: '#f43f5e', tooltip: 'Reportes en estado pendiente, sin asignar aún' },
+    { label: 'Total reportes',  Icon: TrendingUp,    value: stats?.total_reportes,     accent: 'text-blue-400',    border: 'border-t-blue-500',    bg: 'bg-blue-500/15',    glow: '#3b82f6', tooltip: 'Volumen total de reportes' },
+    { label: 'Resueltos',       Icon: CheckCircle2,  value: stats?.resueltos,          accent: 'text-green-400',   border: 'border-t-green-500',   bg: 'bg-green-500/15',   glow: '#22c55e', tooltip: 'Reportes gestionados exitosamente' },
+    { label: '% Resolución',    Icon: Percent,       value: porcentajeResolucion,      suffix: '%', accent: 'text-teal-400',  border: 'border-t-teal-500',    bg: 'bg-teal-500/15',    glow: '#14b8a6', tooltip: 'Porcentaje de reportes que terminaron en estado resuelto' },
+    { label: 'Municipios',      Icon: MapPin,        value: stats?.municipios_activos, accent: 'text-violet-400',  border: 'border-t-violet-500',  bg: 'bg-violet-500/15',  glow: '#8b5cf6', tooltip: 'Municipios activos en la plataforma' },
+    { label: 'Este mes',        Icon: ClipboardList, value: stats?.reportes_este_mes,  accent: 'text-emerald-400', border: 'border-t-emerald-500', bg: 'bg-emerald-500/15', glow: '#10b981', tooltip: 'Nuevos reportes en el mes actual' },
+    { label: 'Usuarios',        Icon: Users,         value: stats?.total_usuarios,     accent: 'text-orange-400',  border: 'border-t-orange-500',  bg: 'bg-orange-500/15',  glow: '#f97316', tooltip: 'Ciudadanos registrados' },
+  ] : [
+    // Admin — visión completa del sistema
+    { label: 'Total reportes',  Icon: TrendingUp,    value: stats?.total_reportes,     accent: 'text-blue-400',    border: 'border-t-blue-500',    bg: 'bg-blue-500/15',    glow: '#3b82f6', tooltip: 'Total de reportes en la plataforma' },
+    { label: 'Resueltos',       Icon: CheckCircle2,  value: stats?.resueltos,          accent: 'text-green-400',   border: 'border-t-green-500',   bg: 'bg-green-500/15',   glow: '#22c55e', tooltip: 'Reportes cerrados exitosamente' },
+    { label: 'Pendientes',      Icon: AlertCircle,   value: pendientesGlobales,        accent: 'text-rose-400',    border: 'border-t-rose-500',    bg: 'bg-rose-500/15',    glow: '#f43f5e', tooltip: 'Reportes en estado pendiente, sin moderar' },
+    { label: '% Resolución',    Icon: Percent,       value: porcentajeResolucion,      suffix: '%', accent: 'text-teal-400',  border: 'border-t-teal-500',    bg: 'bg-teal-500/15',    glow: '#14b8a6', tooltip: 'Porcentaje del total que terminó en estado resuelto' },
+    { label: 'En proceso',      Icon: Search,        value: stats?.en_proceso,         accent: 'text-amber-400',   border: 'border-t-amber-500',   bg: 'bg-amber-500/15',   glow: '#f59e0b', tooltip: 'Reportes en atencion' },
+    { label: 'Municipios',      Icon: MapPin,        value: stats?.municipios_activos, accent: 'text-violet-400',  border: 'border-t-violet-500',  bg: 'bg-violet-500/15',  glow: '#8b5cf6', tooltip: 'Municipios con reportes activos' },
+    { label: 'Este mes',        Icon: ClipboardList, value: stats?.reportes_este_mes,  accent: 'text-emerald-400', border: 'border-t-emerald-500', bg: 'bg-emerald-500/15', glow: '#10b981', tooltip: 'Nuevos reportes este mes' },
+    { label: 'Usuarios',        Icon: Users,         value: stats?.total_usuarios,     accent: 'text-orange-400',  border: 'border-t-orange-500',  bg: 'bg-orange-500/15',  glow: '#f97316', tooltip: 'Total de usuarios registrados' },
+  ];
+
+  if (rol === 'entidad') {
+    return <Navigate to="/entidad" replace />;
+  }
+
+  // Helper para renderizar un header de sección (estilo referente con ícono + línea)
+  const renderSection = (label, Icon, bg, iconCls) => (
+    <div className="flex items-center gap-2.5 mb-3">
+      <div className={`w-6 h-6 rounded-md ${bg} flex items-center justify-center shrink-0`}>
+        <Icon className={`w-3.5 h-3.5 ${iconCls}`} />
+      </div>
+      <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest leading-none">{label}</span>
+      <div className="flex-1 h-px bg-gray-800/70" />
+    </div>
+  );
+
+  // Helper para renderizar una KPI card individual
+  const renderCard = (s, i) => (
+    <motion.div
+      key={s.label}
+      title={s.tooltip}
+      className={`relative overflow-hidden bg-gray-900/80 border border-gray-800/80 ${s.border} border-t-2 rounded-xl p-3 sm:p-4 flex items-center gap-2 sm:gap-4 cursor-default`}
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.04 * i, duration: 0.35 }}
+    >
+      {/* Glow de fondo sutil */}
+      <div
+        className="absolute -bottom-4 -left-4 w-20 h-20 rounded-full blur-2xl opacity-10 pointer-events-none"
+        style={{ background: s.glow }}
+      />
+      {/* Icono */}
+      <div className={`w-8 h-8 sm:w-10 sm:h-10 ${s.bg} rounded-lg flex items-center justify-center shrink-0`}>
+        <s.Icon className={`w-4 h-4 sm:w-5 sm:h-5 ${s.accent}`} />
+      </div>
+      {/* Contenido */}
+      <div className="min-w-0 flex-1">
+        <p className="text-[9px] sm:text-[10px] font-semibold text-gray-500 uppercase tracking-wider leading-none mb-1 sm:mb-1.5 truncate">{s.label}</p>
+        <div className="flex items-baseline gap-0.5">
+          <CountUp target={s.value} className={`text-xl sm:text-2xl font-extrabold leading-none ${s.accent}`} />
+          {s.suffix && <span className={`text-sm sm:text-base font-extrabold leading-none ${s.accent}`}>{s.suffix}</span>}
+        </div>
+      </div>
+    </motion.div>
+  );
+
+  return (
+    <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-10 py-8 sm:py-10">
+
+      {/* ── Header ─────────────────────────────────────────────────────── */}
+      <motion.div
+        className="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4"
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+      >
+        <div className="space-y-1">
+          <LiveClock />
+          <h1 className="text-2xl sm:text-3xl font-bold text-white">
+            {greeting()}, <span className="text-green-400">{user?.nombre ?? 'ciudadano'}</span>
+          </h1>
+          <p className="text-gray-500 text-sm">
+            {rol === 'ciudadano'
+              ? 'Tu contribución al monitoreo ambiental ciudadano.'
+              : rol === 'moderador'
+              ? 'Panel de moderación — gestiona la cola de reportes pendientes.'
+              : 'Panel de administración — vista completa del sistema.'}
+          </p>
+        </div>
+
+        {/* FE-21: indicador discreto de auto-refresh KPIs (solo admin/moderador) */}
+        {isAdmin && statsRefreshing && (
+          <span
+            className="flex items-center gap-1.5 text-[11px] text-gray-500 shrink-0"
+            title="Actualizando KPIs en tiempo real"
+          >
+            <Loader2 size={12} className="animate-spin" />
+            <span className="hidden sm:inline">Actualizando…</span>
+          </span>
+        )}
+        {/* Server status card */}
+        <div className={`flex items-center gap-3 px-4 py-2.5 rounded-2xl border shrink-0 transition-colors ${
+          loading
+            ? 'border-gray-700 bg-gray-900/60'
+            : isOk
+            ? 'border-green-800/60 bg-green-950/20'
+            : 'border-red-800/60 bg-red-950/20'
+        }`}>
+          <div className="relative shrink-0">
+            <Activity
+              size={18}
+              className={loading ? 'text-gray-600' : isOk ? 'text-green-400' : 'text-red-400'}
+            />
+            <span className={`absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full border border-gray-900 ${
+              loading ? 'bg-gray-500 animate-pulse' : isOk ? 'bg-green-400 animate-pulse' : 'bg-red-400'
+            }`} />
+          </div>
+          <div className="flex flex-col">
+            <span className={`text-sm font-semibold leading-tight ${
+              loading ? 'text-gray-400' : isOk ? 'text-green-400' : 'text-red-400'
+            }`}>
+              {loading ? 'Verificando…' : isOk ? 'Servicio OK' : 'Servicio caído'}
+            </span>
+            <span className="text-[10px] text-gray-500 leading-tight">
+              {loading ? '—' : isOk ? `${health.database}` : health.message ?? 'Sin conexión'}
+            </span>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* ── Health banner (solo admin/moderador) ───────────────────────── */}
+      {isAdmin && (
+        <motion.div
+          className={`mb-6 flex items-center justify-between gap-4 px-4 py-3 rounded-xl border text-sm ${
+            loading
+              ? 'border-gray-700 bg-gray-900/40'
+              : isOk
+              ? 'border-green-800/50 bg-green-950/20'
+              : 'border-red-700 bg-red-950/20'
+          }`}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.15 }}
+        >
+          <div className="flex items-center gap-3">
+            <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${
+              loading ? 'bg-gray-500 animate-pulse' : isOk ? 'bg-green-400 animate-pulse' : 'bg-red-400'
+            }`} />
+            <span className={loading ? 'text-gray-500' : isOk ? 'text-green-400' : 'text-red-400'}>
+              {loading
+                ? 'Verificando conexión…'
+                : isOk
+                ? `Servidor OK · Base de datos ${health.database}`
+                : health.message || 'Error de conexión'}
+            </span>
+          </div>
+          <button
+            onClick={fetchHealth}
+            disabled={loading}
+            className="text-xs text-gray-500 hover:text-gray-300 transition-colors disabled:opacity-40 shrink-0"
+          >
+            {loading ? 'Verificando…' : 'Actualizar'}
+          </button>
+        </motion.div>
+      )}
+
+      {/* ── KPI Cards ─────────────────────────────────────────────────── */}
+      <section className="mb-6">
+        {rol === 'ciudadano' ? (
+          <div className="space-y-5">
+            <div>
+              {renderSection('Mis reportes', ClipboardList, 'bg-emerald-500/15', 'text-emerald-400')}
+              <div className="grid grid-cols-3 gap-3">
+                {statsCards.slice(0, 3).map((s, i) => renderCard(s, i))}
+              </div>
+            </div>
+            <div>
+              {renderSection('La comunidad', Users, 'bg-blue-500/15', 'text-blue-400')}
+              <div className="grid grid-cols-3 gap-3">
+                {statsCards.slice(3).map((s, i) => renderCard(s, i + 3))}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-5">
+            <div>
+              {renderSection(
+                rol === 'admin' ? 'Vista general' : 'Cola de trabajo',
+                rol === 'admin' ? TrendingUp : Search,
+                rol === 'admin' ? 'bg-blue-500/15' : 'bg-amber-500/15',
+                rol === 'admin' ? 'text-blue-400' : 'text-amber-400'
+              )}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {statsCards.slice(0, 4).map((s, i) => renderCard(s, i))}
+              </div>
+            </div>
+            <div>
+              {renderSection('Actividad y comunidad', Activity, 'bg-violet-500/15', 'text-violet-400')}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {statsCards.slice(4).map((s, i) => renderCard(s, i + 4))}
+              </div>
+            </div>
+          </div>
+        )}
+      </section>
+
+      {/* ── Acceso rápido a mis reportes (solo ciudadano) ────────────── */}
+      {rol === 'ciudadano' && (
+        <Link to="/reports">
+          <motion.div
+            className="mb-8 flex items-center justify-between px-5 py-4 bg-gray-900/50 border border-gray-800/60 rounded-2xl hover:border-green-500/30 transition-colors group cursor-pointer"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.38, duration: 0.4 }}
+          >
+            <div>
+              <p className="text-sm font-medium text-white">Ver mis reportes</p>
+              <p className="text-[11px] text-gray-500 mt-0.5">Gestiona y da seguimiento a tus reportes enviados</p>
+            </div>
+            <ArrowRight size={16} className="text-gray-600 group-hover:text-green-400 transition-colors shrink-0" />
+          </motion.div>
+        </Link>
+      )}
+
+      {/* ── Donut chart + Activity feed ─────────────────────────────────── */}
+      <section className="mb-8 grid lg:grid-cols-[55%_1fr] gap-5">
+
+        {/* Donut */}
+        <div className="card flex flex-col gap-5">
+          <div>
+            <h2 className="font-semibold text-white">Distribución por categoría</h2>
+            <p className="text-xs text-gray-500 mt-0.5">
+              {`${donutTotal} reportes · distribución de la comunidad`}
+            </p>
+          </div>
+          {donutData.length === 0 ? (
+            <div className="flex-1 flex items-center justify-center py-10 text-sm text-gray-600">Sin datos aún</div>
+          ) : (
+            <div className="flex flex-col sm:flex-row items-center gap-6">
+              <div className="w-44 h-44 shrink-0">
+                <DonutChart segments={donutData} total={donutTotal} />
+              </div>
+              <div className="flex-1 space-y-3 w-full">
+                {donutData.map((s, i) => {
+                  const pct = Math.round((s.count / donutTotal) * 100);
+                  return (
+                    <div key={s.key} className="flex items-center gap-3">
+                      <span className="w-2.5 h-2.5 rounded-sm shrink-0" style={{ background: s.color }} />
+                      <span className="text-xs text-gray-400 flex-1 truncate">{s.nombre}</span>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <div className="w-20 h-1.5 bg-gray-800 rounded-full overflow-hidden">
+                          <motion.div
+                            className="h-full rounded-full"
+                            style={{ background: s.color }}
+                            initial={{ width: 0 }}
+                            animate={{ width: `${pct}%` }}
+                            transition={{ duration: 0.7, delay: 0.12 * i, ease: 'easeOut' }}
+                          />
+                        </div>
+                        <span className="text-xs font-bold tabular-nums w-4 text-right" style={{ color: s.color }}>{s.count}</span>
+                        <span className="text-[10px] text-gray-600 w-7 text-right">{pct}%</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* ── Insights rápidos ── */}
+          {donutData.length > 0 && (
+            <div className="mt-auto pt-4 border-t border-gray-800 grid grid-cols-3 gap-3">
+              {/* Top categoría */}
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[10px] uppercase tracking-wider text-gray-600">Top categoría</span>
+                <span
+                  className="text-xs font-semibold truncate"
+                  style={{ color: donutData[0]?.color }}
+                  title={donutData[0]?.nombre}
+                >
+                  {donutData[0]?.nombre ?? '—'}
+                </span>
+                <span className="text-[11px] text-gray-500 tabular-nums">
+                  {donutTotal > 0 ? Math.round((donutData[0]?.count / donutTotal) * 100) : 0}% del total
+                </span>
+              </div>
+              {/* Tasa de resolución */}
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[10px] uppercase tracking-wider text-gray-600">Resolución</span>
+                <span className="text-xs font-semibold text-green-400 tabular-nums">{porcentajeResolucion}%</span>
+                <span className="text-[11px] text-gray-500 tabular-nums">
+                  {stats?.resueltos ?? 0} de {stats?.total_reportes ?? donutTotal}
+                </span>
+              </div>
+              {/* Pendientes */}
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[10px] uppercase tracking-wider text-gray-600">Pendientes</span>
+                <span className="text-xs font-semibold text-amber-400 tabular-nums">
+                  {stats?.pendientes ?? pendientesGlobales}
+                </span>
+                <span className="text-[11px] text-gray-500">requieren atención</span>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Activity feed */}
+        <div className="card flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="font-semibold text-white">
+                {activityTab === 'reciente' ? 'Actividad reciente' : 'En tendencia'}
+              </h2>
+              <p className="text-xs text-gray-500 mt-0.5">
+                {activityTab === 'reciente'
+                  ? (rol === 'ciudadano' ? 'Tus últimos reportes' : 'Últimos reportes enviados')
+                  : 'Los más votados y vistos por la comunidad'}
+              </p>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              {/* Toggle tabs */}
+              <div className="flex bg-gray-900 border border-gray-800 rounded-lg p-0.5 text-xs">
+                <button
+                  onClick={() => setActivityTab('reciente')}
+                  className={`px-2.5 py-1 rounded-md transition-colors ${
+                    activityTab === 'reciente' ? 'bg-green-600 text-white' : 'text-gray-400 hover:text-gray-200'
+                  }`}
+                >
+                  Reciente
+                </button>
+                <button
+                  onClick={() => setActivityTab('tendencia')}
+                  className={`flex items-center gap-1 px-2.5 py-1 rounded-md transition-colors ${
+                    activityTab === 'tendencia' ? 'bg-amber-500 text-white' : 'text-gray-400 hover:text-gray-200'
+                  }`}
+                >
+                  <TrendingUp size={10} /> Tendencia
+                </button>
+              </div>
+              <Link to="/reports" className="text-xs text-green-400 hover:text-green-300 flex items-center gap-1 transition-colors">
+                Ver todos <ArrowRight size={11} />
+              </Link>
+            </div>
+          </div>
+
+          {/* Reciente tab */}
+          {activityTab === 'reciente' && (
+          <div className="flex flex-col gap-2 overflow-y-auto scrollbar-dark" style={{ maxHeight: '340px' }}>
+            {actLoading ? (
+              Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="p-3 rounded-lg border-l-4 border-l-gray-700 bg-gray-800/30 animate-pulse">
+                  <div className="h-3 bg-gray-700 rounded w-3/4 mb-2" />
+                  <div className="h-2.5 bg-gray-700 rounded w-1/2" />
+                </div>
+              ))
+            ) : (rol === 'ciudadano' ? misReportes : activity).length === 0 ? (
+              <div className="flex-1 flex flex-col items-center justify-center gap-2 py-10 text-center">
+                <ClipboardList className="w-9 h-9 text-gray-700" />
+                <p className="text-sm text-gray-500">{rol === 'ciudadano' ? 'Aún no has enviado reportes' : 'No hay reportes aún'}</p>
+              </div>
+            ) : (
+              (rol === 'ciudadano' ? misReportes : activity).slice(0, 8).map((r, i) => {
+                const cfg   = helpers.obtenerConfig(r.tipo_contaminacion);
+                const color = cfg?.color ?? '#6b7280';
+                const estadoSeguimiento = getEstadoSeguimientoReporte(r);
+                const estTooltip = {
+                  pendiente: 'En espera de atencion',
+                  en_proceso: 'Una entidad o moderador ya esta actuando sobre este reporte',
+                  resuelto: 'El problema ha sido atendido y el caso esta cerrado',
+                  rechazado: 'El reporte no cumplio los criterios de validacion',
+                };
+                const sevBorder = { bajo:'border-l-green-400', medio:'border-l-orange-400', alto:'border-l-red-400', critico:'border-l-rose-400' };
+                const sevText   = { bajo:'text-green-400', medio:'text-orange-400', alto:'text-red-400', critico:'text-rose-400' };
+                const sevLabel  = { bajo:'Baja', medio:'Media', alto:'Alta', critico:'Crítico' };
+                const lugar = [r.municipio, r.departamento].filter(Boolean).join(', ') || r.direccion || '';
+                return (
+                  <motion.button
+                    key={r.id_reporte}
+                    onClick={() => navigate(`/reports/${r.id_reporte}`)}
+                    className={`w-full text-left p-3 rounded-lg border-l-4 ${sevBorder[r.nivel_severidad] ?? 'border-l-gray-600'} bg-gray-800/30 hover:bg-gray-800/60 transition-colors`}
+                    initial={{ opacity: 0, x: 10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.05 * i, duration: 0.3 }}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <span className="w-2 h-2 rounded-full shrink-0" style={{ background: color }} />
+                        <span className="text-xs font-semibold text-gray-200 truncate">{cfg?.nombre ?? r.tipo_contaminacion}</span>
+                      </div>
+                      <span className={`text-[10px] font-medium shrink-0 ${sevText[r.nivel_severidad] ?? 'text-gray-500'}`}>
+                        {sevLabel[r.nivel_severidad]}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-gray-500 mt-0.5 pl-3.5 truncate">{r.titulo}</p>
+                    <div className="flex items-center justify-between mt-1 pl-3.5">
+                      <span className="text-[10px] text-gray-600 truncate">{lugar}</span>
+                      <span
+                        className={`text-[10px] font-medium ml-2 shrink-0 cursor-help ${ESTADO_REPORTE_TEXT_CLASS[estadoSeguimiento] ?? 'text-gray-400'}`}
+                        title={estTooltip[estadoSeguimiento]}
+                      >
+                        {ESTADO_SEGUIMIENTO_LABEL[estadoSeguimiento] ?? estadoSeguimiento}
+                      </span>
+                    </div>
+                  </motion.button>
+                );
+              })
+            )}
+          </div>
+          )}
+
+          {/* Tendencia tab */}
+          {activityTab === 'tendencia' && (
+          <div className="flex flex-col gap-2 overflow-y-auto scrollbar-dark" style={{ maxHeight: '340px' }}>
+            {trendingLoading ? (
+              Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="p-3 rounded-lg border-l-4 border-l-gray-700 bg-gray-800/30 animate-pulse">
+                  <div className="h-3 bg-gray-700 rounded w-3/4 mb-2" />
+                  <div className="h-2.5 bg-gray-700 rounded w-1/2" />
+                </div>
+              ))
+            ) : trending.length === 0 ? (
+              <div className="flex-1 flex flex-col items-center justify-center gap-2 py-10 text-center">
+                <TrendingUp className="w-9 h-9 text-gray-700" />
+                <p className="text-sm text-gray-500">Aún no hay reportes con votos o vistas suficientes.</p>
+              </div>
+            ) : (
+              trending.map((r, i) => {
+                const cfg   = helpers.obtenerConfig(r.tipo_contaminacion);
+                const color = cfg?.color ?? '#6b7280';
+                const sevBorder = { bajo:'border-l-green-400', medio:'border-l-orange-400', alto:'border-l-red-400', critico:'border-l-rose-400' };
+                const sevText   = { bajo:'text-green-400', medio:'text-orange-400', alto:'text-red-400', critico:'text-rose-400' };
+                const sevLabel  = { bajo:'Baja', medio:'Media', alto:'Alta', critico:'Crítico' };
+                const lugar = [r.municipio, r.departamento].filter(Boolean).join(', ') || r.direccion || '';
+                return (
+                  <motion.button
+                    key={r.id_reporte}
+                    onClick={() => navigate(`/reports/${r.id_reporte}`)}
+                    className={`w-full text-left p-3 rounded-lg border-l-4 ${sevBorder[r.nivel_severidad] ?? 'border-l-gray-600'} bg-gray-800/30 hover:bg-gray-800/60 transition-colors`}
+                    initial={{ opacity: 0, x: 10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.05 * i, duration: 0.3 }}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <span className="w-2 h-2 rounded-full shrink-0" style={{ background: color }} />
+                        <span className="text-xs font-semibold text-gray-200 truncate">{cfg?.nombre ?? r.tipo_contaminacion}</span>
+                      </div>
+                      <span className={`text-[10px] font-medium shrink-0 ${sevText[r.nivel_severidad] ?? 'text-gray-500'}`}>
+                        {sevLabel[r.nivel_severidad]}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-gray-500 mt-0.5 pl-3.5 truncate">{r.titulo}</p>
+                    <div className="flex items-center justify-between mt-1 pl-3.5">
+                      <span className="text-[10px] text-gray-600 truncate">{lugar}</span>
+                      <span className="flex items-center gap-2 text-[10px] shrink-0 ml-2">
+                        <span className="text-amber-400 font-semibold tabular-nums flex items-center gap-0.5">
+                          <TrendingUp size={9} /> {Number(r.votos_relevancia) || 0}
+                        </span>
+                        <span className="text-gray-600 tabular-nums">{Number(r.vistas) || 0} vistas</span>
+                      </span>
+                    </div>
+                  </motion.button>
+                );
+              })
+            )}
+          </div>
+          )}
+        </div>
+      </section>
+
+      {/* ── FE-20: Sección de gráficos analíticos (solo admin/moderador) ── */}
+      {isAdmin && (
+        <section className="mb-8 grid lg:grid-cols-2 gap-5">
+
+          {/* Bar chart por categoría */}
+          <motion.div
+            className="card flex flex-col gap-4"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+          >
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <BarChart3 size={16} className="text-green-400" />
+                <div>
+                  <h2 className="font-semibold text-white text-sm">Reportes por categoría</h2>
+                  <p className="text-xs text-gray-500 mt-0.5">Top {Math.min(catData.length, 8)} · todos los tiempos</p>
+                </div>
+              </div>
+            </div>
+            {chartsLoading ? (
+              <div className="space-y-2.5 py-2">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <div key={i} className="h-5 bg-gray-800/40 rounded-md animate-pulse" />
+                ))}
+              </div>
+            ) : (
+              <BarChart
+                data={catData.map(d => {
+                  const cfg = helpers.obtenerConfig(d.codigo ?? d.categoria);
+                  return {
+                    label: d.nombre ?? cfg?.nombre ?? d.codigo ?? d.categoria,
+                    value: Number(d.total_reportes ?? d.total) || 0,
+                    color: d.color_hex ?? cfg?.color ?? '#22c55e',
+                  };
+                })}
+              />
+            )}
+          </motion.div>
+
+          {/* Line chart temporal */}
+          <motion.div
+            className="card flex flex-col gap-4"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.08 }}
+          >
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <LineIcon size={16} className="text-green-400" />
+                <div>
+                  <h2 className="font-semibold text-white text-sm">Línea temporal</h2>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    Últimas {timelineData.length} {bucket === 'week' ? 'semanas' : 'meses'}
+                  </p>
+                </div>
+              </div>
+              {/* Toggle bucket */}
+              <div className="flex bg-gray-900 border border-gray-800 rounded-lg p-0.5 text-xs">
+                <button
+                  onClick={() => setBucket('week')}
+                  className={`px-3 py-1 rounded-md transition-colors ${
+                    bucket === 'week'
+                      ? 'bg-green-600 text-white'
+                      : 'text-gray-400 hover:text-gray-200'
+                  }`}
+                >
+                  Semana
+                </button>
+                <button
+                  onClick={() => setBucket('month')}
+                  className={`px-3 py-1 rounded-md transition-colors ${
+                    bucket === 'month'
+                      ? 'bg-green-600 text-white'
+                      : 'text-gray-400 hover:text-gray-200'
+                  }`}
+                >
+                  Mes
+                </button>
+              </div>
+            </div>
+            {chartsLoading ? (
+              <div className="h-44 bg-gray-800/40 rounded-md animate-pulse" />
+            ) : (
+              <LineChart data={timelineData} bucket={bucket} />
+            )}
+          </motion.div>
+        </section>
+      )}
+
+      {/* FE-27 · Tendencias y patrones detectados por la IA (admin/moderador) */}
+      {isAdmin && (
+        <section className="mb-10">
+          <TendenciasIACard />
+        </section>
+      )}
+
+      {/* FE-26: Alertas predictivas (admin/moderador) — encima del mapa para que "Ver en el mapa" baje al mapa */}
+      {isAdmin && (
+        <section className="mb-10 space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <Brain size={16} className="text-violet-400" />
+              <h2 className="font-semibold text-white">Alertas predictivas</h2>
+            </div>
+            <div className="flex flex-wrap items-center gap-2 text-xs">
+              <label className="flex items-center gap-1.5 text-gray-400">
+                Nivel mín.
+                <select
+                  value={alertasNivel}
+                  onChange={(e) => setAlertasNivel(e.target.value)}
+                  className="bg-gray-900 border border-gray-800 rounded-md px-2 py-1 text-gray-200"
+                >
+                  <option value="bajo">Bajo</option>
+                  <option value="medio">Medio</option>
+                  <option value="alto">Alto</option>
+                  <option value="critico">Crítico</option>
+                </select>
+              </label>
+              <label className="flex items-center gap-1.5 text-gray-400">
+                Tipo
+                <select
+                  value={alertasTipo}
+                  onChange={(e) => setAlertasTipo(e.target.value)}
+                  className="bg-gray-900 border border-gray-800 rounded-md px-2 py-1 text-gray-200"
+                >
+                  <option value="">Todos</option>
+                  {Object.keys(CONFIGURACION_CATEGORIAS).map((k) => (
+                    <option key={k} value={k}>{CONFIGURACION_CATEGORIAS[k]?.nombre ?? k}</option>
+                  ))}
+                </select>
+              </label>
+              <button
+                type="button"
+                onClick={fetchAlertas}
+                disabled={alertasLoading}
+                className="flex items-center gap-1 px-2 py-1 rounded-md bg-gray-900 border border-gray-800 text-gray-300 hover:text-white hover:border-gray-700 disabled:opacity-50"
+                aria-label="Actualizar alertas predictivas"
+              >
+                <RefreshCw size={12} className={alertasLoading ? 'animate-spin' : ''} />
+                Actualizar
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setMapMode('prediccion');
+                  requestAnimationFrame(() => {
+                    const el = document.getElementById('mapa-reportes');
+                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  });
+                }}
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-violet-600/20 border border-violet-500/30 text-violet-300 hover:bg-violet-600/30 transition-colors text-xs"
+              >
+                <Brain size={12} /> Ver mapa predictivo
+              </button>
+            </div>
+          </div>
+
+          <div className="bg-gray-900/60 border border-gray-800 rounded-2xl p-4">
+            {alertasLoading ? (
+              <div className="space-y-2">
+                {[0, 1, 2].map((i) => (
+                  <div key={i} className="h-14 rounded-lg bg-gray-800/40 animate-pulse" />
+                ))}
+              </div>
+            ) : alertasError ? (
+              <div className="text-center py-6">
+                <p className="text-sm text-red-400 mb-2">No se pudieron cargar las alertas predictivas.</p>
+                <button
+                  type="button"
+                  onClick={fetchAlertas}
+                  className="text-xs text-violet-400 hover:text-violet-300 underline"
+                >
+                  Reintentar
+                </button>
+              </div>
+            ) : alertas.length === 0 ? (
+              <div className="text-center py-6 text-sm text-gray-500">
+                Sin alertas activas con los criterios actuales. Esto es buena señal: no se detectan zonas con tendencia al alza significativa.
+              </div>
+            ) : (
+              <ul className="divide-y divide-gray-800/60">
+                {alertas.map((a) => {
+                  const color = a.nivel === 'critico' ? '#dc2626'
+                    : a.nivel === 'alto' ? '#fb923c'
+                    : a.nivel === 'medio' ? '#facc15' : '#22c55e';
+                  const tipoNombre = CONFIGURACION_CATEGORIAS?.[a.tipo_dominante]?.nombre ?? a.tipo_dominante ?? '—';
+                  const lugar = [a.municipio, a.departamento].filter(Boolean).join(', ') || '—';
+                  const TendIcon = a.tendencia === 'subiendo' ? TrendingUp
+                    : a.tendencia === 'bajando' ? TrendingDown : Minus;
+                  const tendColor = a.tendencia === 'subiendo' ? 'text-red-400'
+                    : a.tendencia === 'bajando' ? 'text-green-400' : 'text-gray-400';
+                  const tendLabel = a.tendencia === 'subiendo' ? 'tendencia al alza'
+                    : a.tendencia === 'bajando' ? 'tendencia a la baja' : 'tendencia estable';
+                  const ultimoStr = a.ultimo_reporte
+                    ? new Date(a.ultimo_reporte).toLocaleDateString('es-CO', { day: 'numeric', month: 'short' })
+                    : null;
+                  return (
+                    <li key={a.id} className="flex flex-wrap items-center gap-3 py-3">
+                      <span
+                        className="px-2 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider shrink-0"
+                        style={{ background: `${color}22`, color, border: `1px solid ${color}55` }}
+                      >
+                        {a.nivel}
+                      </span>
+                      <div className="flex-1 min-w-[180px]">
+                        <p className="text-sm text-white font-medium">
+                          {tipoNombre}{a.subcategoria_dominante ? ` · ${a.subcategoria_dominante}` : ''}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          📍 {lugar}
+                          {ultimoStr && <span className="ml-2 text-gray-600">· último: {ultimoStr}</span>}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-3 text-xs text-gray-400">
+                        <span className="tabular-nums">
+                          <strong className="text-gray-200">{a.n_reportes}</strong>
+                          {a.n_reportes_previo != null && (
+                            <span className="text-gray-600"> / {a.n_reportes_previo} prev.</span>
+                          )}
+                        </span>
+                        <span className={`flex items-center gap-1 ${tendColor}`} aria-label={tendLabel} title={tendLabel}>
+                          <TendIcon size={14} aria-hidden="true" />
+                        </span>
+                        <span className="tabular-nums text-gray-500">score {a.score}</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMapMode('prediccion');
+                          setMapFlyTo({ lat: a.centro.lat, lng: a.centro.lng, zoom: 13 });
+                          requestAnimationFrame(() => {
+                            const el = document.getElementById('mapa-reportes');
+                            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                          });
+                        }}
+                        className="text-xs text-violet-400 hover:text-violet-300 inline-flex items-center gap-1 shrink-0"
+                      >
+                        Ver en el mapa <ArrowRight size={12} />
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+            <p className="mt-3 text-[10px] text-gray-500 italic">
+              Estas alertas comparan los últimos {prediccionDias} días con el período anterior del mismo tamaño. Son una guía para priorizar y no reemplazan análisis técnicos ni alertas oficiales.
+            </p>
+          </div>
+        </section>
+      )}
+
+      <section>
+        {/* ── Header + leyenda ── */}
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <div>
+            <h2 className="font-semibold text-white">Mapa de reportes</h2>
+            <p className="text-xs text-gray-500 mt-0.5">
+              {mapMode === 'heatmap'
+                ? `${heatmapFiltered.length} punto${heatmapFiltered.length !== 1 ? 's' : ''} en el mapa de calor`
+                : mapMode === 'prediccion'
+                ? `${zonasRiesgo.length} zona${zonasRiesgo.length !== 1 ? 's' : ''} de riesgo identificada${zonasRiesgo.length !== 1 ? 's' : ''}`
+                : `${mapReports.length} reporte${mapReports.length !== 1 ? 's' : ''} visible${mapReports.length !== 1 ? 's' : ''}`}
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-3 text-xs text-gray-400">
+            {/* FE-20: toggle heatmap (solo admin/moderador) */}
+            {isAdmin && (
+              <div className="flex bg-gray-900 border border-gray-800 rounded-lg p-0.5">
+                <button
+                  onClick={() => setMapMode('cluster')}
+                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-colors ${
+                    mapMode === 'cluster'
+                      ? 'bg-green-600 text-white'
+                      : 'text-gray-400 hover:text-gray-200'
+                  }`}
+                  title="Ver markers agrupados"
+                >
+                  <MapPin size={12} /> Markers
+                </button>
+                <button
+                  onClick={() => setMapMode('heatmap')}
+                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-colors ${
+                    mapMode === 'heatmap'
+                      ? 'bg-orange-600 text-white'
+                      : 'text-gray-400 hover:text-gray-200'
+                  }`}
+                  title="Ver mapa de calor por severidad"
+                >
+                  <Flame size={12} /> Heatmap
+                </button>
+                <button
+                  onClick={() => setMapMode('prediccion')}
+                  aria-pressed={mapMode === 'prediccion'}
+                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-colors ${
+                    mapMode === 'prediccion'
+                      ? 'bg-violet-600 text-white'
+                      : 'text-gray-400 hover:text-gray-200'
+                  }`}
+                  title="Ver zonas de riesgo predictivas (modelo basado en reportes recientes)"
+                >
+                  <Brain size={12} /> Predictivo
+                </button>
+              </div>
+            )}
+            {/* FE-26: filtros del modelo predictivo (solo cuando la capa esta activa) */}
+            {isAdmin && mapMode === 'prediccion' && (
+              <div className="flex flex-wrap items-center gap-2">
+                <label className="flex items-center gap-1 text-gray-400">
+                  Ventana
+                  <select
+                    value={prediccionDias}
+                    onChange={(e) => setPrediccionDias(Number(e.target.value))}
+                    className="bg-gray-900 border border-gray-800 rounded-md px-2 py-1 text-gray-200"
+                    aria-label="Ventana en dias para el calculo predictivo"
+                  >
+                    <option value={30}>30 d</option>
+                    <option value={60}>60 d</option>
+                    <option value={90}>90 d</option>
+                    <option value={180}>180 d</option>
+                    <option value={365}>365 d</option>
+                  </select>
+                </label>
+                <label className="flex items-center gap-1 text-gray-400">
+                  Score mín.
+                  <select
+                    value={prediccionMin}
+                    onChange={(e) => setPrediccionMin(Number(e.target.value))}
+                    className="bg-gray-900 border border-gray-800 rounded-md px-2 py-1 text-gray-200"
+                    aria-label="Score minimo de zonas mostradas"
+                  >
+                    <option value={0}>0</option>
+                    <option value={20}>20</option>
+                    <option value={30}>30</option>
+                    <option value={50}>50</option>
+                    <option value={70}>70</option>
+                  </select>
+                </label>
+                <button
+                  type="button"
+                  onClick={fetchZonas}
+                  disabled={zonasLoading}
+                  className="flex items-center gap-1 px-2 py-1 rounded-md bg-gray-900 border border-gray-800 text-gray-300 hover:text-white hover:border-gray-700 disabled:opacity-50"
+                  aria-label="Actualizar zonas de riesgo"
+                >
+                  <RefreshCw size={12} className={zonasLoading ? 'animate-spin' : ''} />
+                </button>
+              </div>
+            )}
+            {mapMode === 'cluster' ? (
+              <>
+                <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-red-500 inline-block" />Pendiente</span>
+                <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-orange-400 inline-block" />En proceso</span>
+                <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-green-400 inline-block" />Resuelto</span>
+                <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-gray-500 inline-block" />Rechazado</span>
+              </>
+            ) : (
+              <>
+                <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-green-500 inline-block" />Bajo</span>
+                <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-yellow-400 inline-block" />Medio</span>
+                <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-orange-500 inline-block" />Alto</span>
+                <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-red-600 inline-block" />Crítico</span>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* ── FE-17: Panel de filtros — oculto en modo predictivo (tiene sus propios controles) ── */}
+        {mapMode !== 'prediccion' && (<motion.div
+          className="bg-gray-900/60 border border-gray-800 rounded-2xl p-4 mb-4 space-y-3"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.12 }}
+        >
+          <div className="flex flex-wrap gap-2 items-center">
+            <div className="flex items-center gap-1.5 text-gray-500 shrink-0 mr-0.5">
+              <Filter size={13} />
+              <span className="text-[11px] font-semibold uppercase tracking-wide">Filtros</span>
+            </div>
+            <div className="flex gap-2 overflow-x-auto pb-0.5 flex-1">
+              <select
+                value={mapFilters.categoria}
+                onChange={e => setMapFilters(f => ({ ...f, categoria: e.target.value }))}
+                className={mapSelectCls}
+              >
+                <option value="">Todas las categorías</option>
+                {Object.entries(CONFIGURACION_CATEGORIAS).map(([key, cfg]) => (
+                  <option key={key} value={key}>{cfg.nombre}</option>
+                ))}
+              </select>
+              <select
+                value={mapFilters.estado}
+                onChange={e => setMapFilters(f => ({ ...f, estado: e.target.value }))}
+                className={mapSelectCls}
+              >
+                <option value="">Todos los estados</option>
+                {Object.entries(MAP_ESTADO_LABEL).map(([k, v]) => (
+                  <option key={k} value={k}>{v}</option>
+                ))}
+              </select>
+              <label className="flex flex-col gap-0.5">
+                <span className="text-[9px] text-gray-600 uppercase tracking-widest pl-1">Desde</span>
+                <input
+                  type="date"
+                  value={mapFilters.dateFrom}
+                  onChange={e => setMapFilters(f => ({ ...f, dateFrom: e.target.value }))}
+                  className={mapSelectCls}
+                  style={{ colorScheme: 'dark' }}
+                />
+              </label>
+              <label className="flex flex-col gap-0.5">
+                <span className="text-[9px] text-gray-600 uppercase tracking-widest pl-1">Hasta</span>
+                <input
+                  type="date"
+                  value={mapFilters.dateTo}
+                  onChange={e => setMapFilters(f => ({ ...f, dateTo: e.target.value }))}
+                  className={mapSelectCls}
+                  style={{ colorScheme: 'dark' }}
+                />
+              </label>
+            </div>
+            {rol === 'ciudadano' && (
+              <label className="flex items-center gap-2 text-sm text-gray-400 cursor-pointer select-none shrink-0">
+                <input
+                  type="checkbox"
+                  checked={mapFilters.soloMios}
+                  onChange={e => setMapFilters(f => ({ ...f, soloMios: e.target.checked }))}
+                  className="w-4 h-4 accent-green-500 rounded"
+                />
+                Solo los míos
+              </label>
+            )}
+
+            {/* FE-21: Exportar reportes filtrados a PDF (solo admin/moderador) */}
+            {isAdmin && (
+              <motion.button
+                onClick={handleExportPdf}
+                disabled={exporting}
+                title={`Exportar ${mapReports.length} reporte${mapReports.length !== 1 ? 's' : ''} filtrado${mapReports.length !== 1 ? 's' : ''} a PDF`}
+                whileTap={exporting ? {} : { scale: 0.92 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+                className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium border border-green-700/50 bg-green-950/30 hover:bg-green-900/40 hover:border-green-600 text-green-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+              >
+                {exporting
+                  ? <Loader2 size={13} className="animate-spin" />
+                  : <FileDown size={13} />}
+                {exporting ? 'Generando…' : 'Exportar PDF'}
+              </motion.button>
+            )}
+          </div>
+
+          {/* Badges de filtros activos */}
+          <AnimatePresence>
+            {hasMapFilters && (
+              <motion.div
+                className="flex flex-wrap gap-2 items-center"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                {mapFilters.categoria && (
+                  <button
+                    onClick={() => setMapFilters(f => ({ ...f, categoria: '' }))}
+                    className="badge bg-green-500/10 text-green-400 border border-green-500/20 hover:bg-green-500/20 transition-colors"
+                  >
+                    {CONFIGURACION_CATEGORIAS[mapFilters.categoria]?.nombre ?? mapFilters.categoria}
+                    <X size={11} />
+                  </button>
+                )}
+                {mapFilters.estado && (
+                  <button
+                    onClick={() => setMapFilters(f => ({ ...f, estado: '' }))}
+                    className="badge bg-blue-500/10 text-blue-400 border border-blue-500/20 hover:bg-blue-500/20 transition-colors"
+                  >
+                    {MAP_ESTADO_LABEL[mapFilters.estado] ?? mapFilters.estado}
+                    <X size={11} />
+                  </button>
+                )}
+                {mapFilters.dateFrom && (
+                  <button
+                    onClick={() => setMapFilters(f => ({ ...f, dateFrom: '' }))}
+                    className="badge bg-gray-500/10 text-gray-400 border border-gray-700 hover:bg-gray-500/20 transition-colors"
+                  >
+                    Desde: {mapFilters.dateFrom} <X size={11} />
+                  </button>
+                )}
+                {mapFilters.dateTo && (
+                  <button
+                    onClick={() => setMapFilters(f => ({ ...f, dateTo: '' }))}
+                    className="badge bg-gray-500/10 text-gray-400 border border-gray-700 hover:bg-gray-500/20 transition-colors"
+                  >
+                    Hasta: {mapFilters.dateTo} <X size={11} />
+                  </button>
+                )}
+                {mapFilters.soloMios && (
+                  <button
+                    onClick={() => setMapFilters(f => ({ ...f, soloMios: false }))}
+                    className="badge bg-violet-500/10 text-violet-400 border border-violet-500/20 hover:bg-violet-500/20 transition-colors"
+                  >
+                    Solo los míos <X size={11} />
+                  </button>
+                )}
+                <button
+                  onClick={resetMapFilters}
+                  className="text-xs text-gray-500 hover:text-red-400 transition-colors ml-1"
+                >
+                  Limpiar todo
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>)}
+
+        <div id="mapa-reportes" className="rounded-xl overflow-hidden border border-gray-800 h-[360px] sm:h-[540px] lg:h-[700px]">
+          <Suspense fallback={
+            <div className="h-full flex items-center justify-center bg-gray-900 text-gray-500 text-sm">Cargando mapa…</div>
+          }>
+            <ReportsMap
+              reports={mapMode === 'heatmap' ? heatmapFiltered : mapReports}
+              mode={mapMode}
+              zonas={zonasRiesgo}
+              flyTo={mapFlyTo}
+            />
+          </Suspense>
+        </div>
+        {mapMode === 'prediccion' && (
+          <p className="text-[11px] text-gray-500 mt-2 italic">
+            Estimación basada en reportes de los últimos {prediccionDias} días. No representa una alerta oficial.
+            {zonasLoading && <span className="ml-2 text-violet-400">Cargando zonas…</span>}
+            {zonasError && (
+              <button
+                type="button"
+                onClick={fetchZonas}
+                className="ml-2 text-red-400 hover:text-red-300 underline"
+              >
+                Error al cargar. Reintentar
+              </button>
+            )}
+          </p>
+        )}
+      </section>
+    </div>
+  );
+}
