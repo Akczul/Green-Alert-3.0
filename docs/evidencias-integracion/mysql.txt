@@ -1,0 +1,69 @@
+
+> greenalert@1.0.0 test:mysql:docker
+> node scripts/validate-mysql.mjs --docker
+
+Iniciando MySQL Docker aislado para validación...
+Esquema real creado: 12 tablas, 17 relaciones.
+Browserslist: browsers data (caniuse-lite) is 9 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+OK: SPA y health real a través del proxy Vite
+OK: Registro ciudadano y hash scrypt persistidos
+OK: Registro duplicado rechazado sin duplicar usuario
+OK: Login real y contraseña incorrecta
+OK: Perfil y actualización persistida
+OK: Rotación de refresh y rechazo de reutilización
+11:36:06 p. m. [vite] ✨ optimized dependencies changed. reloading
+OK: Administración: fixture de admin, login y lista de usuarios
+OK: Catálogo inicial compatible con las categorías de la interfaz
+OK: Alta de reporte con ubicación y persistencia MySQL
+OK: Coordenadas geográficas POINT conservan latitud y longitud
+OK: Procedimiento de radio geográfico encuentra el reporte en su ubicación
+OK: Alta sin coordenadas conserva ubicación opcional
+OK: Listado, detalle y paginación con total real
+OK: Edición del propietario y rechazo de otro ciudadano
+OK: Asignaciones y alertas institucionales persistidas
+OK: Moderación, cambio de estado y notificación persistida
+OK: Estadísticas SQL, categorías y tendencias con datos reales
+OK: Likes y vistas únicas persistidos
+OK: Zonas de riesgo reales y permisos
+OK: Piloto: adaptador MySQL filtra estados, borrado, coordenadas, fecha y categoría
+OK: Piloto: caso con reader real y endpoint por Vite producen las mismas zonas
+OK: Piloto: filtros y normalización de categoría mantienen el contrato geográfico
+OK: Piloto: cambiar severidad invalida zonas y alertas heredadas
+OK: Piloto: moderación y borrado refrescan resultados geográficos cacheados
+OK: Piloto: roles y errores de query en la ruta real de Express
+OK: Evidencia local: fixture SQL, lectura HTTP y borrado lógico
+OK: Upload sin Cloudinary falla explícitamente y no deja evidencia SQL
+OK: Claves foráneas rechazan evidencia huérfana
+OK: Categoría agua y longitud fuera de +/-90 funcionan en MySQL
+OK: Exportación JSON y archivo XLSX reales
+OK: Borrado lógico de reporte conserva fila y oculta consulta
+OK: Logout revoca refresh persistido
+OK: Administración desactiva y borra lógicamente usuarios
+Cerrando servidores HTTP de validación...
+OK: Migración 001_add_otp_columns_usuarios.sql
+OK: Migración 002_add_comentario_moderacion_reportes.sql
+OK: Migración 003_add_google_oauth_support.sql
+OK: Migración 004_add_facebook_oauth_support.sql
+OK: Migración 005_add_email_verification_token.sql
+OK: Migración 006_create_refresh_tokens.sql
+OK: Migración 007_set_reportes_estado_default_pendiente.sql
+OK: Migración 008_add_notification_preferences_to_usuarios.sql
+OK: Migración 009_create_reporte_likes.sql
+OK: Migración 010_create_reporte_vistas.sql
+OK: Migración 011_add_prediction_indexes.sql
+OK: Migración 012_create_notificaciones.sql
+OK: Migración 013_create_fcm_tokens.sql
+OK: Migración 014_create_entidades_and_reporte_entidades.sql
+OK: Migración 015_add_confianza_evidencia_reportes.sql
+OK: Migración 016_add_cloudinary_metadata_evidencias.sql
+OK: Migración 017_consolidate_reportes_estado_simple.sql
+OK: Migración 018_create_alertas_entidad.sql
+OK: Migración 019_add_canonical_categories.sql
+OK: Migración 020_add_revocable_sessions.sql
+OK: Migración 021_integration_outbox_cache.sql
+OK: Migración 022_session_activity_audit.sql
+OK: Migración 023_admin_mfa.sql
+Contenedor de validación propio eliminado; sin volúmenes persistentes.
+Resultado: 61 correctas, 0 fallidas.

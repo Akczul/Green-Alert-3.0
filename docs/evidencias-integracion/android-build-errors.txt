@@ -1,0 +1,23 @@
+## Ruta larga
+
+> Task :react-native-screens:buildCMakeRelWithDebInfo[arm64-v8a] FAILED
+C/C++: ninja: error: manifest 'build.ninja' still dirty after 100 tries
+> Task :react-native-worklets:buildCMakeRelWithDebInfo[arm64-v8a][worklets] FAILED
+C/C++: ninja: error: manifest 'build.ninja' still dirty after 100 tries
+  ninja: error: manifest 'build.ninja' still dirty after 100 tries
+  ninja: error: manifest 'build.ninja' still dirty after 100 tries
+BUILD FAILED in 19m 30s
+
+## Ruta corta
+
+> Task :app:buildCMakeRelWithDebInfo[arm64-v8a] FAILED
+C/C++: ninja: error: Stat(rngesturehandler_codegen_autolinked_build/CMakeFiles/react_codegen_rngesturehandler_codegen.dir/D_/ga-final-build/node_modules/react-native-gesture-handler/shared/shadowNodes/react/renderer/components/rngesturehandler_codegen/RNGestureHandlerDetectorShadowNode.cpp.o): Filename longer than 260 characters
+  ninja: error: Stat(rngesturehandler_codegen_autolinked_build/CMakeFiles/react_codegen_rngesturehandler_codegen.dir/D_/ga-final-build/node_modules/react-native-gesture-handler/shared/shadowNodes/react/renderer/components/rngesturehandler_codegen/RNGestureHandlerDetectorShadowNode.cpp.o): Filename longer than 260 characters
+BUILD FAILED in 10m 35s
+
+## Config plugin CMake retirado
+
+> Task :app:buildCMakeRelWithDebInfo[arm64-v8a] FAILED
+C/C++: ninja: error: Stat(rngesturehandler_codegen_autolinked_build/CMakeFiles/react_codegen_rngesturehandler_codegen.dir/D_/ga-final-build/node_modules/react-native-gesture-handler/shared/shadowNodes/react/renderer/components/rngesturehandler_codegen/RNGestureHandlerDetectorShadowNode.cpp.o): Filename longer than 260 characters
+  ninja: error: Stat(rngesturehandler_codegen_autolinked_build/CMakeFiles/react_codegen_rngesturehandler_codegen.dir/D_/ga-final-build/node_modules/react-native-gesture-handler/shared/shadowNodes/react/renderer/components/rngesturehandler_codegen/RNGestureHandlerDetectorShadowNode.cpp.o): Filename longer than 260 characters
+BUILD FAILED in 2m 8s

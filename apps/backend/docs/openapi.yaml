@@ -317,7 +317,7 @@ components:
             $ref: "#/components/schemas/ApiError"
           example:
             status: error
-            message: El nivel de severidad debe ser uno de: bajo, medio, alto, critico.
+            message: "El nivel de severidad debe ser uno de: bajo, medio, alto, critico."
     Unauthorized:
       description: Token ausente, invalido o credenciales incorrectas.
       content:
@@ -595,7 +595,7 @@ paths:
   /auth/login:
     post:
       tags: [Autenticacion]
-      summary: Inicia sesion con email y contrasena.
+      summary: Inicia sesion con email, contrasena y TOTP cuando MFA administrativa es obligatoria.
       requestBody:
         required: true
         content:
@@ -612,6 +612,10 @@ paths:
                   type: string
                   format: password
                   example: Password123
+                totp:
+                  type: string
+                  pattern: '^[0-9]{6}$'
+                  description: Requerido para rol admin cuando ADMIN_MFA_REQUIRED=true; código de autenticador de un solo uso.
       responses:
         "200":
           description: Sesion iniciada.
@@ -621,6 +625,8 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "403":
           $ref: "#/components/responses/Forbidden"
+        "429":
+          description: Límite de intentos de acceso alcanzado.
         "500":
           $ref: "#/components/responses/ServerError"
   /auth/refresh:

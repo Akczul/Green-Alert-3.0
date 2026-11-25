@@ -1,0 +1,9 @@
+{
+  "files": 43,
+  "differences": [],
+  "buildRoot": "D:/ga-final-build",
+  "abis": [
+    "arm64-v8a"
+  ],
+  "apiUrl": "http://192.168.18.11:8080/api"
+}

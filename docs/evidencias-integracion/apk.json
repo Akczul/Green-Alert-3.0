@@ -1,0 +1,8 @@
+{
+  "exists": false,
+  "path": null,
+  "blocker": "Ninja/CMake en Windows rechazó un objeto C++ de react-native-gesture-handler por superar 260 caracteres; tres intentos locales fallidos. No hay APK instalable verificada.",
+  "attempts": 3,
+  "device": "adb sin dispositivos conectados",
+  "linuxAlternative": "Documentada, no ejecutada"
+}

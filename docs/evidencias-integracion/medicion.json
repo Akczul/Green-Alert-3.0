@@ -1,0 +1,6 @@
+{
+  "requests": 12,
+  "sequentialMs": 496.9337999999989,
+  "concurrentMs": 1205.256299999979,
+  "scope": "Lecturas reales HTTP proxy, E/S concurrente; muestra exploratoria local, sin promesa de speedup"
+}

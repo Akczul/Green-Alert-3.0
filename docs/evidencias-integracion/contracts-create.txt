@@ -1,0 +1,45 @@
+
+> greenalert@1.0.0 test:reportes:creacion
+> node scripts/validate-reportes-create.mjs
+
+Iniciando MySQL Docker aislado para validación...
+OK: anonymous
+OK: invalid-jwt
+OK: minimal
+OK: coordinates
+OK: partial-coordinates
+OK: zero-coordinates
+OK: accepted-ia
+OK: invalid-ia-json
+OK: invalid-ia-confidence
+OK: ignored-ia
+OK: missing-category
+OK: unknown-category
+OK: missing-severity
+OK: invalid-severity
+OK: short-title
+OK: short-address
+OK: invalid-latitude
+OK: invalid-longitude
+OK: non-numeric-coordinate
+OK: entity
+OK: admin
+OK: moderator
+OK: missing-author
+OK: insert-fail
+OK: ia-fail
+OK: images
+OK: image-video
+OK: ten-images
+OK: eleven-files
+OK: two-videos
+OK: corrupt-file
+OK: invalid-mime
+OK: upload-fail
+OK: second-upload-fail
+OK: evidence-fail
+OK: second-evidence-fail
+OK: cleanup-fail
+OK: assignment-fail
+38 contratos de creación: 37 equivalentes y 1 rechazo anticipado documentado por seguridad.
+Contenedor de validación propio eliminado; sin volúmenes persistentes.
