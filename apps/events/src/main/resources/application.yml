@@ -1,0 +1,48 @@
+server:
+  port: ${PORT:8080}
+  shutdown: graceful
+  tomcat:
+    threads:
+      max: 32
+    max-http-form-post-size: 256KB
+spring:
+  application:
+    name: greenalert-events
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
+      accept-float-as-int: false
+    mapper:
+      allow-coercion-of-scalars: false
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics
+  endpoint:
+    health:
+      show-details: never
+      probes:
+        enabled: true
+      group:
+        readiness:
+          include: readinessState,cassandra,druid
+events:
+  service-token: ${EVENTS_SERVICE_TOKEN}
+  reconcile-token: ${EVENTS_RECONCILE_TOKEN}
+  cassandra-host: ${CASSANDRA_HOST:localhost}
+  cassandra-port: ${CASSANDRA_PORT:9042}
+  cassandra-datacenter: ${CASSANDRA_DATACENTER:datacenter1}
+  cassandra-keyspace: ${CASSANDRA_KEYSPACE:greenalert_events}
+  cassandra-user: ${CASSANDRA_USER:}
+  cassandra-password: ${CASSANDRA_PASSWORD:}
+  druid-query-url: ${DRUID_QUERY_URL:http://localhost:8082}
+  druid-task-url: ${DRUID_TASK_URL:http://localhost:8081}
+  workers: ${EVENTS_WORKERS:4}
+  queue-capacity: ${EVENTS_QUEUE_CAPACITY:128}
+  druid-task-timeout-seconds: ${DRUID_TASK_TIMEOUT_SECONDS:180}
+springdoc:
+  swagger-ui:
+    path: /docs
