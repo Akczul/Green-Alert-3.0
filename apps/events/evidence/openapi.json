@@ -1,0 +1,469 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "GreenAlert Events",
+    "description": "API interna. Identidad de servicio, no credenciales de usuarios. Rangos [from,to) UTC.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:32775",
+      "description": "Generated server url"
+    }
+  ],
+  "security": [
+    {
+      "service": []
+    }
+  ],
+  "paths": {
+    "/api/v1/reconciliation/{day}": {
+      "post": {
+        "tags": [
+          "event-controller"
+        ],
+        "summary": "Reconstruir día UTC completo en Druid; requiere token de reconciliación",
+        "operationId": "reconcile",
+        "parameters": [
+          {
+            "name": "day",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnvelopeProjection"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/events": {
+      "post": {
+        "tags": [
+          "event-controller"
+        ],
+        "summary": "Registrar evento inmutable; mismo ID/contenido permite reintento",
+        "operationId": "register",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnvironmentalEvent"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Persistido en Cassandra",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnvelopeReceipt"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Reintento idempotente",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnvelopeReceipt"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "ID con contenido diferente",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnvelopeReceipt"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/events/batches": {
+      "post": {
+        "tags": [
+          "event-controller"
+        ],
+        "summary": "Lote hasta 64 eventos; fallo puede ser parcial, repetir IDs originales",
+        "operationId": "batch",
+        "parameters": [
+          {
+            "name": "mode",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "concurrent",
+              "enum": [
+                "sequential",
+                "concurrent"
+              ]
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Batch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnvelopeListReceipt"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/reports/{reportId}/events": {
+      "get": {
+        "tags": [
+          "event-controller"
+        ],
+        "summary": "Historial ascendente, rango [from,to), máximo 366 días; truncado a limit",
+        "operationId": "history",
+        "parameters": [
+          {
+            "name": "reportId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnvelopeListEnvironmentalEvent"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/indicators": {
+      "get": {
+        "tags": [
+          "event-controller"
+        ],
+        "summary": "Agregados Druid con límites de hora UTC; events cuenta eventos y reportsCreated hechos REPORT_CREATED",
+        "operationId": "indicators",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "[a-zA-Z0-9_-]{1,64}"
+            }
+          },
+          {
+            "name": "severity",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "maximum": 5,
+              "minimum": 0
+            }
+          },
+          {
+            "name": "zone",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "[a-zA-Z0-9_-]{1,64}"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnvelopeJsonNode"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "EnvelopeProjection": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/Projection"
+          }
+        }
+      },
+      "Projection": {
+        "type": "object",
+        "properties": {
+          "taskId": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "sourceEvents": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "interval": {
+            "type": "string"
+          }
+        }
+      },
+      "EnvironmentalEvent": {
+        "type": "object",
+        "properties": {
+          "eventId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reportId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "schemaVersion": {
+            "type": "integer",
+            "format": "int32",
+            "maximum": 1,
+            "minimum": 1
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "REPORT_CREATED",
+              "REPORT_STATUS_CHANGED",
+              "ENVIRONMENTAL_OBSERVATION"
+            ]
+          },
+          "occurredAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "sourceRevision": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "category": {
+            "type": "string",
+            "pattern": "[a-zA-Z0-9_-]{1,64}"
+          },
+          "severity": {
+            "type": "integer",
+            "format": "int32",
+            "maximum": 5,
+            "minimum": 0
+          },
+          "zone": {
+            "type": "string",
+            "pattern": "[a-zA-Z0-9_-]{1,64}"
+          }
+        },
+        "required": [
+          "eventId",
+          "occurredAt",
+          "reportId",
+          "type"
+        ]
+      },
+      "EnvelopeReceipt": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/Receipt"
+          }
+        }
+      },
+      "Receipt": {
+        "type": "object",
+        "properties": {
+          "eventId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "created": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Batch": {
+        "type": "object",
+        "properties": {
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EnvironmentalEvent"
+            },
+            "maxItems": 64,
+            "minItems": 0
+          }
+        },
+        "required": [
+          "events"
+        ]
+      },
+      "EnvelopeListReceipt": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Receipt"
+            }
+          }
+        }
+      },
+      "EnvelopeListEnvironmentalEvent": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EnvironmentalEvent"
+            }
+          }
+        }
+      },
+      "EnvelopeJsonNode": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/JsonNode"
+          }
+        }
+      },
+      "JsonNode": {}
+    },
+    "securitySchemes": {
+      "service": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  }
+}
