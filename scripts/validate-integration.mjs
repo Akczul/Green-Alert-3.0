@@ -60,12 +60,15 @@ async function sql(query, values=[]) {
   return JSON.parse(await docker(['exec','-T','backend-prod','node','--input-type=module','-e',
     `import pool from './src/config/database.js'; const [r]=await pool.execute(${JSON.stringify(query)},${JSON.stringify(values)}); console.log(JSON.stringify(r)); await pool.end();`]));
 }
-let auth; let citizen; let report; let run; let countAfterInvalidation;
+let auth; let citizen; let report; let run; let countAfterInvalidation; let readyAdmin=false;
 const suffix=randomBytes(5).toString('hex');
 const profile={nombre:'Integracion',apellido:'Sintetica',email:suffix+'@example.test',password:'Senderos ambientales conservan agua '+suffix};
 try {
   if (!reuse) await docker(['network','create',env.GREENALERT_NETWORK],false);
   await check('Compose global compilado y todos los servicios saludables', () => docker(['up','--build','-d','--wait','--wait-timeout','600']));
+  // Cada repetición del sandbox comienza con un proceso limpio, igual que un proyecto nuevo.
+  // Evita sumar los intentos del runner anterior al rate limit productivo, que sigue en 5.
+  if(reuse) { await docker(['restart','backend-prod']); await eventually(()=>api('GET','/health')); }
   await check('React compilado y proxy HTTP hacia Express/MySQL', async () => {
     assert.match(await (await fetch(origin)).text(), /id="root"/);
     assert.equal((await api('GET','/health')).database,'conectada');
@@ -91,9 +94,10 @@ try {
       `import {adminMfa} from './src/bootstrap/admin-mfa.js'; const f=await adminMfa.provision(${Number(adminId)});console.log(f.initialCode);process.exit();`])).trim();
     auth=await api('POST','/auth/login',{...profile,totp:code});
     await api('POST','/auth/login',{...profile,totp:code},null,403);
+    readyAdmin=true;
     await api('PATCH','/reportes/'+report.id_reporte,{estado:'en_proceso'},auth.token);
   });
-  if (!report || !auth?.token) throw new Error('No hay reporte/sesión administrativa de prueba.');
+  if (!report || !readyAdmin) throw new Error('No hay reporte/sesión administrativa de prueba; se omiten recorridos dependientes.');
   await check('React/proxy → Express → FastAPI → MongoDB conserva ejecución de snapshot MySQL',async()=>{
     run=await api('POST','/integracion/analisis/riesgo',{dias:30},auth.token);
     assert.equal(run.source_kind,'mysql'); assert.ok(run.results.zonas.length);

@@ -11,7 +11,7 @@ export default function IntegracionAmbiental() {
       const response = kind === 'riesgo'
         ? await analizarRiesgoAmbiental()
         : await consultarIndicadoresAmbientales();
-      setResult(response.data.data);
+      setResult({ kind, data: response.data.data });
     } catch (e) { setError(e.response?.data?.message || 'No fue posible consultar el servicio ambiental.'); }
     finally { setBusy(false); }
   }
@@ -25,7 +25,26 @@ export default function IntegracionAmbiental() {
       </div>
       {busy && <p role="status">Procesando…</p>}
       {error && <p role="alert" className="text-red-300">{error}</p>}
-      {result && <pre aria-live="polite" className="max-h-80 overflow-auto whitespace-pre-wrap text-xs text-gray-200">{JSON.stringify(result, null, 2)}</pre>}
+      {result?.kind === 'riesgo' && <div aria-live="polite" className="space-y-3">
+        <p className="text-sm text-gray-300">Zonas identificadas: {result.data.results?.zonas?.length ?? 0}</p>
+        <ul className="max-h-80 overflow-auto space-y-2">
+          {(result.data.results?.zonas ?? []).map((zone,index)=><li key={zone.zona_id}
+            className="rounded-lg bg-gray-800 p-3 text-sm text-gray-200">
+            <strong>{zone.municipio || `Zona ${index+1}`}</strong> · {zone.tipo_dominante?.replaceAll('_',' ')}
+            <p>{zone.n_reportes} reportes · Riesgo {zone.nivel} · Puntuación {zone.score}/100 · Tendencia {zone.tendencia}</p>
+          </li>)}
+        </ul>
+      </div>}
+      {result?.kind === 'indicadores' && <div aria-live="polite" className="max-h-80 overflow-auto">
+        {!result.data.length ? <p className="text-sm text-gray-300">No hay indicadores en el período consultado.</p> :
+          <table className="w-full text-left text-sm text-gray-300">
+            <thead><tr><th className="p-2">Hora UTC</th><th className="p-2">Categoría</th><th className="p-2">Eventos</th><th className="p-2">Reportes creados</th></tr></thead>
+            <tbody>{result.data.map((row,index)=><tr key={index} className="border-t border-gray-700">
+              <td className="p-2">{row.hour}</td><td className="p-2">{row.category?.replaceAll('_',' ') || 'Sin categoría'}</td>
+              <td className="p-2">{row.events}</td><td className="p-2">{row.reportsCreated}</td>
+            </tr>)}</tbody>
+          </table>}
+      </div>}
     </section>
   );
 }

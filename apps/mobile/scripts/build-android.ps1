@@ -1,5 +1,7 @@
 ﻿param()
 $ErrorActionPreference = 'Stop'
+$mobileArchitectures = if ($env:GREENALERT_ANDROID_ABIS) { $env:GREENALERT_ANDROID_ABIS } else { 'arm64-v8a,x86_64' }
+if ($mobileArchitectures -notmatch '^(arm64-v8a|x86_64|armeabi-v7a|x86)(,(arm64-v8a|x86_64|armeabi-v7a|x86))*$') { throw 'Arquitecturas Android inválidas.' }
 Set-Location -LiteralPath (Split-Path $PSScriptRoot -Parent)
 if (-not $env:EXPO_PUBLIC_API_URL) { throw 'Define EXPO_PUBLIC_API_URL (URL accesible desde el teléfono).' }
 $apiUri = [Uri]$env:EXPO_PUBLIC_API_URL
@@ -15,7 +17,7 @@ if ($LASTEXITCODE -ne 0) { throw 'Falló prebuild Android.' }
 Push-Location android
 try {
   # APK de evaluación autocontenida: JS empaquetado y firma debug local, nunca para publicar.
-  .\gradlew.bat :app:assembleRelease --no-daemon
+  .\gradlew.bat :app:assembleRelease --no-daemon --max-workers=2 --no-parallel "-PreactNativeArchitectures=$mobileArchitectures"
   if ($LASTEXITCODE -ne 0) { throw 'Falló Gradle. No se generó una APK verificada.' }
 } finally { Pop-Location }
 $mobileApk = Join-Path $PWD 'android\app\build\outputs\apk\release\app-release.apk'

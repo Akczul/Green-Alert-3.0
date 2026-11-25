@@ -12,6 +12,7 @@ const resolveFrontendApiPath = async () => path.resolve(backendDir, '../frontend
 const expectedFrontendContracts = [
   { method: 'post', path: '/integracion/analisis/riesgo' },
   { method: 'get', path: '/integracion/indicadores' },
+  { method: 'get', path: '/integracion/reportes/${id}/historial' },
   { method: 'get', path: '/health' },
   { method: 'post', path: '/auth/login' },
   { method: 'post', path: '/auth/register' },

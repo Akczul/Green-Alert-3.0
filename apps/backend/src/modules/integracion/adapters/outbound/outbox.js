@@ -14,7 +14,7 @@ export function createOutbox({ pool, publish }) {
         let delivered = 0;
         // Paralelismo acotado sobre eventos independientes; cada publicación conserva su ID.
         for (let offset = 0; offset < rows.length; offset += 4) {
-          await Promise.all(rows.slice(offset, offset + 4).map(async row => {
+          const outcomes = await Promise.allSettled(rows.slice(offset, offset + 4).map(async row => {
             const payload = typeof row.payload === 'string' ? JSON.parse(row.payload) : row.payload;
             const event = { ...payload, eventId: row.event_id, reportId: row.report_uuid,
               schemaVersion: 1, sourceRevision: Number(row.id), zone: null };
@@ -30,6 +30,8 @@ export function createOutbox({ pool, publish }) {
                 last_error='DEPENDENCY_UNAVAILABLE', available_at=TIMESTAMPADD(SECOND, ?, UTC_TIMESTAMP(3)) WHERE id=?`, [delay, row.id]);
             }
           }));
+          const failure = outcomes.find(item => item.status === 'rejected');
+          if (failure) throw failure.reason;
         }
         return { delivered, selected: rows.length };
       } finally {

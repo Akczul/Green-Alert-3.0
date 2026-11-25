@@ -7,6 +7,7 @@ const api = axios.create({
 
 export const analizarRiesgoAmbiental = () => api.post('/integracion/analisis/riesgo', { dias: 30 }, { timeout: 40000 });
 export const consultarIndicadoresAmbientales = () => api.get('/integracion/indicadores', { timeout: 40000 });
+export const consultarHistorialAmbiental = id => api.get(`/integracion/reportes/${id}/historial`, { timeout: 40000 });
 
 // ── Decodifica expiración del JWT sin librería ─────────────────────────────
 const getTokenExp = (token) => {
