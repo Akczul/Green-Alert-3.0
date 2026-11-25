@@ -1,0 +1,11 @@
+*
+!requirements.lock
+!pytest.ini
+!greenalert_analytics
+!greenalert_analytics/**
+!scripts
+!scripts/**
+!tests
+!tests/**
+**/__pycache__
+**/.pytest_cache
