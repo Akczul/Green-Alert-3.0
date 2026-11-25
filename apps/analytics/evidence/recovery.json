@@ -1,0 +1,1 @@
+{"recovered_runs": 3, "new_inference_after_restart": true, "metrics": {"mae": 1.2808149727195581, "rmse": 1.7053596419913433, "r2": 0.9505898336750459, "baseline_lag1_mae": 1.95, "train_samples": 320, "test_samples": 80, "train_through": "2025-08-04", "test_from": "2025-08-11", "test_through": "2025-12-22", "protocol": "temporal_holdout_one_step_observed_lags"}}

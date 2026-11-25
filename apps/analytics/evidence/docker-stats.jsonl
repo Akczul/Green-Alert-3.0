@@ -1,0 +1,2 @@
+{"BlockIO":"4.12MB / 0B","CPUPerc":"0.34%","Container":"a8894b82ba89290d53e5a3b93bf8320dfc0c2d0687fa5c7ee1d5057ff407200a","ID":"a8894b82ba89","MemPerc":"12.88%","MemUsage":"197.8MiB / 1.5GiB","Name":"ga-analytics-c3fcba17c359-api-1","NetIO":"7.89MB / 7.54MB","PIDs":"8"}
+{"BlockIO":"9.04MB / 410kB","CPUPerc":"35.81%","Container":"a74e7fa4652de6fc032ee6de98a7efffd7d087d960d759bb02b5bd6e5ea18325","ID":"a74e7fa4652d","MemPerc":"45.88%","MemUsage":"352.4MiB / 768MiB","Name":"ga-analytics-c3fcba17c359-mongo-1","NetIO":"39.9kB / 7.85MB","PIDs":"64"}
