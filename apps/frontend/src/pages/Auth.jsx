@@ -173,7 +173,7 @@ export default function Auth() {
     if (loginLoading) return;
     setLoginLoading(true);
     try {
-      const userData = await login(loginForm.email, loginForm.password);
+      const userData = await login(loginForm.email, loginForm.password, loginForm.totp);
       showToast(`¡Bienvenido, ${userData.nombre}!`, 'success', 5000, {
         position: 'top-center',
         subtitle: 'Has iniciado sesión correctamente',
@@ -355,6 +355,12 @@ export default function Auth() {
                       </div>
                     </div>
 
+                    <label className="block text-sm text-gray-300">
+                      Código del autenticador para administradores
+                      <input autoComplete="one-time-code" inputMode="numeric" pattern="[0-9]{6}" maxLength={6}
+                        value={loginForm.totp || ''} onChange={e => setLoginForm(f => ({ ...f, totp: e.target.value }))}
+                        className="mt-2 w-full rounded-xl border border-gray-700 bg-gray-800 px-4 py-2.5" />
+                    </label>
                     <button
                       type="submit" disabled={loginLoading}
                       className="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed h-11"

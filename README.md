@@ -1,17 +1,38 @@
 # GreenAlert
 
-Monorepositorio de la plataforma ambiental existente. Conserva la SPA **React 18 + Vite 5** y la API **Express 4 + MySQL**. La consulta de zonas de riesgo tiene un [piloto hexagonal implementado](docs/piloto-hexagonal-zonas-riesgo.md), extendido a [cuatro lecturas](docs/hexagonal-reportes-lectura.md) y a [creación de reportes](docs/hexagonal-reportes-creacion.md); los demás módulos y escrituras continúan por capas. No usa NestJS ni microservicios. Las nuevas bases de datos y ML siguen pendientes de decisión.
+GreenAlert integra la web **React**, la API principal **Express/MySQL**, cálculo ambiental **FastAPI/MongoDB**, eventos **Spring/Cassandra/Druid**, caché **Redis** y un cliente **React Native Android**. Se preservan las pantallas y contratos existentes. Los módulos hexagonales cubren zonas, lectura y creación de reportes, identidad e integración; otros flujos permanecen por capas.
+
+## Ejecutar la integración final
+
+```powershell
+npm.cmd run install:apps
+npm.cmd run setup:integracion
+npm.cmd run infra:final:config
+npm.cmd run infra:final:up
+# Abrir http://localhost:8080
+```
+
+Requiere Docker/Compose con contenedores Linux. El script crea la red externa; cada proyecto tiene sus volúmenes. Para detener conservando datos: `npm.cmd run infra:final:down`. No ejecutar el esquema completo sobre una base existente.
+
+Manual, migraciones, MFA administrativa y límites: [integración final](docs/integracion-final.md). Resultados y pendientes: [verificación final](docs/verificacion-final.md), [trazabilidad](docs/trazabilidad-integracion.md). Informe: [editable HTML](docs/entrega/informe-greenalert.html) y [PDF](docs/entrega/informe-greenalert.pdf).
+
+El stack final exige TOTP al rol admin; su enrolamiento es local por operador. Druid se actualiza mediante reconciliación diaria explícita. Jerarquía administrativa completa, segundo OIDC, HTTPS/cookies y aceptación física móvil conservan su estado pendiente en la documentación. El ML experimental heredado es opcional.
 
 ```text
 GreenAlert/                 # carpeta de trabajo actual: GreenAlert3.0
 ├── apps/
 │   ├── backend/            # API, modelos SQL, servicios, migraciones y pruebas originales
-│   └── frontend/           # SPA original, componentes, mapas, paneles y pruebas
+│   ├── frontend/           # SPA conservada y panel de análisis integrado
+│   ├── analytics/          # FastAPI y ejecuciones MongoDB
+│   ├── events/             # Spring, Cassandra y proyección Druid
+│   └── mobile/             # React Native y compilación Android local
 ├── docs/                   # auditoría, contratos, decisiones y migración
 ├── infra/                  # guía de infraestructura
 ├── scripts/                # ejecución, configuración e inventarios compartidos
 ├── .github/workflows/ci.yml # validación; no publica ni despliega
-└── docker-compose.yml      # MySQL local + API + SPA/Nginx
+├── compose.datos.yml        # cinco motores y auxiliares Druid
+├── compose.apps.yml         # tres APIs y SPA/Nginx
+└── docker-compose.yml       # stack anterior MySQL/API/SPA, conservado
 ```
 
 No se creó `packages/` porque todavía no existe código compartido estable que justifique un paquete. Los lockfiles e instalaciones siguen separados para conservar las resoluciones del frontend y evitar cambios de hoisting.

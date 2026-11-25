@@ -10,6 +10,8 @@ const backendDir = path.resolve(path.dirname(__filename), '../..');
 const resolveFrontendApiPath = async () => path.resolve(backendDir, '../frontend/src/services/api.js');
 
 const expectedFrontendContracts = [
+  { method: 'post', path: '/integracion/analisis/riesgo' },
+  { method: 'get', path: '/integracion/indicadores' },
   { method: 'get', path: '/health' },
   { method: 'post', path: '/auth/login' },
   { method: 'post', path: '/auth/register' },
@@ -123,6 +125,7 @@ test('contrato de frontend cubre modulos principales verificados por la suite', 
     'chatbot',
     'entidades',
     'health',
+    'integracion',
     'notificaciones',
     'reportes',
   ]);
@@ -133,6 +136,7 @@ test('cada endpoint literal del cliente real tiene una ruta Express del mismo me
   const modules = {
     health: 'health', auth: 'auth', reportes: 'reporte', categorias: 'categoria-riesgo',
     admin: 'admin', chatbot: 'chatbot', notificaciones: 'notificacion', entidades: 'entidad',
+    integracion: 'integracion',
   };
   const registered = [];
   for (const [prefix, file] of Object.entries(modules)) {

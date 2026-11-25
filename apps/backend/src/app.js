@@ -10,6 +10,9 @@ import adminRouter from '../routes/admin.routes.js';
 import chatbotRouter from '../routes/chatbot.routes.js';
 import notificacionRouter from '../routes/notificacion.routes.js';
 import entidadRouter from '../routes/entidad.routes.js';
+import integracionRouter from '../routes/integracion.routes.js';
+import { createAuditMiddleware } from '../middlewares/audit.middleware.js';
+import pool from './config/database.js';
 import { getCorsOptions, getHelmetOptions } from './config/security.config.js';
 import { getUploadDir } from './config/upload.config.js';
 import { getApiPrefix } from './config/api-prefix.config.js';
@@ -22,6 +25,7 @@ app.use(cors(getCorsOptions()));
 app.options('*', cors(getCorsOptions()));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+if (process.env.SECURITY_AUDIT_ENABLED === 'true') app.use(createAuditMiddleware({ pool }));
 
 // Archivos subidos por los usuarios
 app.use('/uploads', express.static(getUploadDir()));
@@ -35,6 +39,7 @@ app.use(`${apiPrefix}/admin`, adminRouter);
 app.use(`${apiPrefix}/chatbot`, chatbotRouter);
 app.use(`${apiPrefix}/notificaciones`, notificacionRouter);
 app.use(`${apiPrefix}/entidades`, entidadRouter);
+app.use(`${apiPrefix}/integracion`, integracionRouter);
 
  
 app.use(notFoundHandler);

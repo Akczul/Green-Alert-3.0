@@ -6,11 +6,20 @@ import { createSeguridad } from '../modules/identidad/application/seguridad.js';
 import { createMysqlSessionReader } from '../modules/identidad/adapters/outbound/mysql-session-reader.js';
 import { passwordBlocklist } from '../modules/identidad/adapters/outbound/passwords.js';
 import { createAuthMiddleware } from '../modules/identidad/adapters/inbound/auth-middleware.js';
+import { createSessionLimits } from '../modules/identidad/adapters/outbound/session-limits.js';
+export const sessionLimits = process.env.SESSION_LIMITS_ENABLED === 'true' ? createSessionLimits({
+  pool, idleSeconds: Number(process.env.SESSION_IDLE_SECONDS ?? 1800), maxSeconds: Number(process.env.SESSION_MAX_SECONDS ?? 604800),
+}) : null;
 const reader = createMysqlSessionReader({ pool });
 export const seguridad = createSeguridad({
   tokens: { verify: (token) => jwt.verify(token, process.env.JWT_SECRET, { algorithms: ['HS256'] }) },
   sesiones: {
-    findActive: reader.findActive, create: (data) => RefreshTokenModel.create(data),
+    findActive: async (sid, userId) => {
+      const state = await reader.findActive(sid, userId);
+      if (state && sessionLimits && !await sessionLimits.check(sid, userId)) return null;
+      return state;
+    },
+    create: (data) => RefreshTokenModel.create(data),
     revokeByHash: (hash) => RefreshTokenModel.revokeByHash(hash),
     revokeAllForUser: (id) => RefreshTokenModel.revokeAllForUser(id),
   },

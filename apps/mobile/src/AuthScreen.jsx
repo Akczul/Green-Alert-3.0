@@ -82,6 +82,9 @@ export function AuthScreen({ client, onUser }) {
         autoComplete={register ? "new-password" : "current-password"}
         editable={!action.busy}
       />
+      {!register && <Field label="Código del autenticador para administradores"
+        value={form.totp || ""} onChangeText={set("totp")} keyboardType="number-pad"
+        autoComplete="one-time-code" maxLength={6} editable={!action.busy} />}
       {register && (
         <>
           <Text style={styles.muted}>

@@ -43,8 +43,8 @@ export function AuthProvider({ children }) {
     return () => window.removeEventListener('ga:session-expired', handleExpired);
   }, [showToast]);
 
-  const login = async (email, password) => {
-    const res = await loginUser(email, password);
+  const login = async (email, password, totp) => {
+    const res = await loginUser(email, password, totp);
     const { token, refreshToken, user: userData } = res.data.data;
     localStorage.setItem('ga_token', token);
     if (refreshToken) localStorage.setItem('ga_refresh_token', refreshToken);

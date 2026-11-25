@@ -5,6 +5,9 @@ const api = axios.create({
   timeout: 8000,
 });
 
+export const analizarRiesgoAmbiental = () => api.post('/integracion/analisis/riesgo', { dias: 30 }, { timeout: 40000 });
+export const consultarIndicadoresAmbientales = () => api.get('/integracion/indicadores', { timeout: 40000 });
+
 // ── Decodifica expiración del JWT sin librería ─────────────────────────────
 const getTokenExp = (token) => {
   try {
@@ -151,7 +154,7 @@ export const logoutUser = (refreshToken, { allDevices = false } = {}) => {
   return axios.post(`${api.defaults.baseURL}/auth/logout`, { refreshToken, allDevices }, { timeout: 8000, headers: allDevices ? { Authorization: `Bearer ${localStorage.getItem('ga_token')}` } : {} }).then((response) => { delete api.defaults.headers.common.Authorization; return response; }).finally(() => { logoutInProgress = false; });
 };
 
-export const loginUser    = (email, password)                                   => api.post('/auth/login',    { email, password });
+export const loginUser    = (email, password, totp)                             => api.post('/auth/login',    { email, password, ...(totp ? { totp } : {}) });
 export const registerUser = (nombre, apellido, email, password, telefono)       => api.post('/auth/register', { nombre, apellido, email, password, telefono });
 export const oauthGoogle        = (access_token) => api.post('/auth/google',   { access_token });
 export const oauthFacebook      = (code)          => api.post('/auth/facebook', { code });

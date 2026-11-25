@@ -1,0 +1,17 @@
+flowchart LR
+  Usuario[Ciudadanía y personal autorizado] --> Web[React web]
+  Usuario --> Movil[React Native Android]
+  Web --> Proxy[Nginx]
+  Movil --> Proxy
+  Proxy --> Express[Express API y composition roots]
+  Express --> MySQL[(MySQL autoridad)]
+  Express --> Redis[(Redis agregados TTL)]
+  Express --> FastAPI[FastAPI cálculo de riesgo]
+  FastAPI --> Mongo[(MongoDB ejecuciones)]
+  MySQL --> Outbox[Outbox durable]
+  Outbox --> Spring[Spring eventos]
+  Express --> Spring
+  Spring --> Cassandra[(Cassandra hechos)]
+  Cassandra --> Reconciliacion[Snapshot diario explícito]
+  Reconciliacion --> Druid[(Druid indicadores)]
+  Spring --> Druid

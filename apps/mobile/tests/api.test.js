@@ -13,6 +13,27 @@ const fail = (status) => ({
   status,
   json: async () => ({ message: `Error ${status}` }),
 });
+
+test("revocación 403 del contrato final limpia SecureStore cuando refresh es rechazado", async () => {
+  const f = fixture();
+  f.fetcher.mockResolvedValueOnce(ok({ user }));
+  await f.client.restore();
+  f.fetcher.mockResolvedValueOnce({ ok: false, status: 403,
+    json: async () => ({ message: "token inválido o expirado." }) });
+  f.fetcher.mockResolvedValueOnce(fail(401));
+  await expect(f.client.request("/reportes/mis-reportes")).rejects.toMatchObject({ status: 401 });
+  expect(f.storage.clear).toHaveBeenCalled();
+});
+
+test("permiso 403 de un objeto conserva sesión y no intenta renovarla", async () => {
+  const f = fixture();
+  f.fetcher.mockResolvedValueOnce(ok({ user }));
+  await f.client.restore();
+  f.fetcher.mockResolvedValueOnce(fail(403));
+  await expect(f.client.request("/admin/usuarios")).rejects.toMatchObject({ status: 403 });
+  expect(f.fetcher).toHaveBeenCalledTimes(2);
+  expect(f.storage.clear).not.toHaveBeenCalled();
+});
 function fixture(saved = session, fetcher = jest.fn()) {
   const storage = {
     get: jest.fn(async () => saved),

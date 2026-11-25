@@ -1,4 +1,5 @@
-import { seguridad } from '../bootstrap/seguridad.js';
+import { seguridad, sessionLimits } from '../bootstrap/seguridad.js';
+import { adminMfa } from '../bootstrap/admin-mfa.js';
 import { hashPassword, verifyPassword } from '../modules/identidad/adapters/outbound/passwords.js';
 import { CredencialRechazada, PasswordPolicyError } from '../modules/identidad/domain/seguridad.js';
 import crypto from 'crypto';
@@ -53,6 +54,7 @@ import {
 } from '../utils/constantes-validacion.js';
 
 const forwardAuthError = (error, res, next) => {
+  if (error.code === 'ER_DUP_ENTRY') return errorResponse(res, 'El correo ya está registrado.', 409);
   if (error instanceof PasswordPolicyError) return errorResponse(res, error.message, 400);
   if (error instanceof CredencialRechazada) return errorResponse(res, error.message, 403);
   return next(error);
@@ -152,6 +154,7 @@ const createRefreshTokenForUser = async (user, req) => {
 };
 
 const buildAuthPayload = async (user, req) => {
+  if (adminMfa) await adminMfa.verify(user, req.body?.totp);
   const refresh = await createRefreshTokenForUser(user, req);
   const currentUser = { ...user, rol: refresh.session.rol, id_entidad: refresh.session.id_entidad };
   const accessToken = buildToken(currentUser, refresh.session);
@@ -461,6 +464,11 @@ export const refreshAccessToken = async (req, res, next) => {
 
     if (!current || !current.session_id || Number(current.session_auth_version) !== Number(current.auth_version)) {
       return errorResponse(res, 'Refresh token invalido o expirado.', 401);
+    }
+
+    if (sessionLimits && !await sessionLimits.check(current.session_id, current.id_usuario, false)) {
+      await seguridad.revocarSesion(currentHash);
+      return errorResponse(res, 'Sesion caducada por inactividad o duración máxima.', 401);
     }
 
     if (!current.activo) {

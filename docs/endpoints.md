@@ -122,7 +122,18 @@ Acceso expresa los middlewares declarados. Las comprobaciones de propiedad, esta
 | GET | `/entidades/mis-reportes/:id` | JWT; entidad | `obtenerMiReporteEntidad` |
 | PATCH | `/entidades/mis-reportes/:id/atencion` | JWT; entidad | `actualizarAtencionMiEntidad` |
 
-Total: **78 registros HTTP**, además de archivos estáticos en `/uploads` y Socket.IO en `/socket.io/`.
+## integracion
+
+| Método | Ruta sin prefijo | Acceso declarado | Controlador |
+| --- | --- | --- | --- |
+| POST | `/integracion/analisis/riesgo` | JWT; admin, moderador | `ver fuente` |
+| GET | `/integracion/reportes/:id/historial` | JWT | `ver fuente` |
+| GET | `/integracion/indicadores` | JWT; admin, moderador | `ver fuente` |
+| GET | `/integracion/cache/metricas` | JWT; admin | `ver fuente` |
+| POST | `/integracion/eventos/reenviar` | JWT; admin | `ver fuente` |
+| POST | `/integracion/eventos/reconciliar/:day` | JWT; admin | `ver fuente` |
+
+Total: **84 registros HTTP**, además de archivos estáticos en `/uploads` y Socket.IO en `/socket.io/`.
 
 Socket.IO: autenticación JWT en `handshake.auth.token` o Authorization Bearer; sala `entidad:<id>`; evento `reporte:critico_asignado`. El frontend actual consulta alertas mediante polling y no incluye un cliente Socket.IO.
 

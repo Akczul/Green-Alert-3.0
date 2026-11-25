@@ -16,3 +16,4 @@ repomix-output.*
 Frontend
 certs
 .env.*
+.local

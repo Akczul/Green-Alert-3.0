@@ -4,6 +4,9 @@ Generadas desde referencias literales en código; incluye variables exclusivas d
 
 ## backend
 
+- `ADMIN_MFA_REQUIRED`
+- `ANALYTICS_INTERNAL_TOKEN`
+- `ANALYTICS_URL`
 - `API_PREFIX`
 - `API_PUBLIC_URL`
 - `API_URL`
@@ -31,6 +34,9 @@ Generadas desde referencias literales en código; incluye variables exclusivas d
 - `EMAIL_TRANSPORT`
 - `EMAIL_USER`
 - `ENABLE_EXIF_IN_TESTS`
+- `EVENTS_RECONCILE_TOKEN`
+- `EVENTS_SERVICE_TOKEN`
+- `EVENTS_URL`
 - `EXIF_MAX_HORAS`
 - `FACEBOOK_APP_ID`
 - `FACEBOOK_APP_SECRET`
@@ -54,6 +60,7 @@ Generadas desde referencias literales en código; incluye variables exclusivas d
 - `JWT_EXPIRES_IN`
 - `JWT_SECRET`
 - `MAX_FILE_SIZE`
+- `MFA_ENCRYPTION_KEY`
 - `NODE_ENV`
 - `NODE_TEST_CONTEXT`
 - `OAUTH_CALLBACK_CODE_TTL_SECONDS`
@@ -62,7 +69,12 @@ Generadas desde referencias literales en código; incluye variables exclusivas d
 - `RATE_LIMIT_AUTH_MAX`
 - `RATE_LIMIT_LOGIN_MAX`
 - `RATE_LIMIT_PASSWORD_RESET_MAX`
+- `REDIS_URL`
 - `REFRESH_TOKEN_EXPIRES_DAYS`
+- `SECURITY_AUDIT_ENABLED`
+- `SESSION_IDLE_SECONDS`
+- `SESSION_LIMITS_ENABLED`
+- `SESSION_MAX_SECONDS`
 - `TEST_EMAIL`
 - `UPLOAD_DIR`
 

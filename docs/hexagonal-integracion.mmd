@@ -1,0 +1,12 @@
+flowchart TB
+  HTTP[Adaptadores HTTP Express] --> Casos[Casos de uso]
+  Casos --> Dominio[Dominio y reglas puras]
+  Casos --> Puertos[Puertos reader cache writer servicios internos]
+  MySQL[Adaptadores MySQL] -. implementan .-> Puertos
+  Redis[Adaptador Redis] -. implementa .-> Puertos
+  Servicios[Adaptadores HTTP FastAPI y Spring] -. implementan .-> Puertos
+  Bootstrap[Composition roots en src/bootstrap] --> HTTP
+  Bootstrap --> Casos
+  Bootstrap --> MySQL
+  Bootstrap --> Redis
+  Bootstrap --> Servicios

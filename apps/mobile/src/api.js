@@ -7,6 +7,8 @@ export class ApiError extends Error {
     this.status = status;
   }
 }
+const isSessionRejection = error => error.status === 401 ||
+  (error.status === 403 && /token inv[aá]lido o expirado/i.test(error.message));
 // Único punto de adaptación al contrato de seguridad. Nunca persiste contraseñas.
 export function createClient({
   baseUrl,
@@ -158,7 +160,7 @@ export function createClient({
         await wire(path, { ...options, token: session.accessToken }),
       );
     } catch (error) {
-      if (version !== generation || error.status !== 401) throw error;
+      if (version !== generation || !isSessionRejection(error)) throw error;
       await refresh();
       // No repetir escrituras: una respuesta perdida puede ocultar un alta persistida.
       if (options.method && options.method !== "GET")
@@ -171,7 +173,7 @@ export function createClient({
           await wire(path, { ...options, token: session.accessToken }),
         );
       } catch (retryError) {
-        if (version === generation && retryError.status === 401) await clear();
+        if (version === generation && isSessionRejection(retryError)) await clear();
         throw retryError;
       }
     }
@@ -184,6 +186,7 @@ export function createClient({
         body: {
           email: form.email.trim().toLowerCase(),
           password: form.password,
+          ...(!register && form.totp ? { totp: form.totp } : {}),
           ...(register
             ? { nombre: form.nombre.trim(), apellido: form.apellido.trim() }
             : {}),

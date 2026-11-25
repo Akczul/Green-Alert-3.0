@@ -6,6 +6,7 @@ import app from './app.js';
 import { testConnection } from './config/database.js';
 import { getEmailConfig } from './config/email.config.js';
 import { initializeSocket } from './config/socket.js';
+import { startOutbox } from './bootstrap/integracion.js';
 
 const PORT = process.env.PORT || 3000;
 
@@ -20,6 +21,7 @@ const startServer = async () => {
   }
 
   await testConnection();
+  startOutbox();
 
   const server = http.createServer(app);
   initializeSocket(server);

@@ -95,7 +95,8 @@ export const calcularAlertasPredictivas = async (params) => {
     lng: params.lng,
     radio_km: params.radio_km,
   });
-  const cached = getCached(key);
+  const revision = await prediccionCache.getRevision?.();
+  const cached = await getCached(key, revision);
   if (cached) return cached;
 
   const zonasPayload = await calcularZonasRiesgo({ ...params, min_score: params.min_score ?? 0 });
@@ -130,5 +131,5 @@ export const calcularAlertasPredictivas = async (params) => {
     alertas,
   };
 
-  return setCached(key, payload);
+  return setCached(key, payload, revision);
 };

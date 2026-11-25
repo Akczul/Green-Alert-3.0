@@ -364,6 +364,172 @@ components:
             status: error
             message: Error interno del servidor.
 paths:
+  /integracion/analisis/riesgo:
+    post:
+      operationId: analizarRiesgoAmbiental
+      summary: 'Snapshot MySQL autorizado a FastAPI y MongoDB; admin/moderador'
+      tags: [Analitica]
+      security: [{bearerAuth: []}]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                dias: {type: integer, minimum: 1, maximum: 180, default: 30}
+      responses:
+        '200':
+          description: Operación completada
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, message, data]
+                properties:
+                  status: {type: string, enum: [success]}
+                  message: {type: string}
+                  data: {}
+        '400': {description: Parámetros inválidos}
+        '401': {description: Falta token}
+        '403': {description: Sesión rechazada o rol no autorizado}
+        '404': {description: Objeto inexistente o fuera de ámbito}
+        '413': {description: Snapshot excede 20000 reportes}
+        '503': {description: Integración sin configurar o dependencia no disponible}
+        '504': {description: Timeout del servicio interno}
+  /integracion/reportes/{id}/historial:
+    get:
+      operationId: historialAmbiental
+      summary: 'Historial Cassandra; propietario, admin/moderador o entidad asignada'
+      tags: [Analitica]
+      security: [{bearerAuth: []}]
+      parameters:
+        - {name: id, in: path, required: true, schema: {type: integer, minimum: 1}}
+        - {name: from, in: query, schema: {type: string, format: date-time}}
+        - {name: to, in: query, schema: {type: string, format: date-time}}
+      responses:
+        '200':
+          description: Operación completada
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, message, data]
+                properties:
+                  status: {type: string, enum: [success]}
+                  message: {type: string}
+                  data: {}
+        '400': {description: Parámetros inválidos}
+        '401': {description: Falta token}
+        '403': {description: Sesión rechazada o rol no autorizado}
+        '404': {description: Objeto inexistente o fuera de ámbito}
+        '413': {description: Snapshot excede 20000 reportes}
+        '503': {description: Integración sin configurar o dependencia no disponible}
+        '504': {description: Timeout del servicio interno}
+  /integracion/indicadores:
+    get:
+      operationId: indicadoresAmbientales
+      summary: 'Indicadores Druid; admin/moderador; horas UTC completas'
+      tags: [Analitica]
+      security: [{bearerAuth: []}]
+      parameters:
+        - {name: from, in: query, schema: {type: string, format: date-time}}
+        - {name: to, in: query, schema: {type: string, format: date-time}}
+      responses:
+        '200':
+          description: Operación completada
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, message, data]
+                properties:
+                  status: {type: string, enum: [success]}
+                  message: {type: string}
+                  data: {}
+        '400': {description: Parámetros inválidos}
+        '401': {description: Falta token}
+        '403': {description: Sesión rechazada o rol no autorizado}
+        '404': {description: Objeto inexistente o fuera de ámbito}
+        '413': {description: Snapshot excede 20000 reportes}
+        '503': {description: Integración sin configurar o dependencia no disponible}
+        '504': {description: Timeout del servicio interno}
+  /integracion/cache/metricas:
+    get:
+      operationId: metricasCache
+      summary: 'Métricas Redis por proceso; admin'
+      tags: [Analitica]
+      security: [{bearerAuth: []}]
+      responses:
+        '200':
+          description: Operación completada
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, message, data]
+                properties:
+                  status: {type: string, enum: [success]}
+                  message: {type: string}
+                  data: {}
+        '400': {description: Parámetros inválidos}
+        '401': {description: Falta token}
+        '403': {description: Sesión rechazada o rol no autorizado}
+        '404': {description: Objeto inexistente o fuera de ámbito}
+        '413': {description: Snapshot excede 20000 reportes}
+        '503': {description: Integración sin configurar o dependencia no disponible}
+        '504': {description: Timeout del servicio interno}
+  /integracion/eventos/reenviar:
+    post:
+      operationId: reenviarOutbox
+      summary: 'Entregar pendientes durables; admin; conserva event_id'
+      tags: [Analitica]
+      security: [{bearerAuth: []}]
+      responses:
+        '200':
+          description: Operación completada
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, message, data]
+                properties:
+                  status: {type: string, enum: [success]}
+                  message: {type: string}
+                  data: {}
+        '400': {description: Parámetros inválidos}
+        '401': {description: Falta token}
+        '403': {description: Sesión rechazada o rol no autorizado}
+        '404': {description: Objeto inexistente o fuera de ámbito}
+        '413': {description: Snapshot excede 20000 reportes}
+        '503': {description: Integración sin configurar o dependencia no disponible}
+        '504': {description: Timeout del servicio interno}
+  /integracion/eventos/reconciliar/{day}:
+    post:
+      operationId: reconciliarEventos
+      summary: 'Reconstruye día UTC Druid desde Cassandra; admin'
+      tags: [Analitica]
+      security: [{bearerAuth: []}]
+      parameters:
+        - {name: day, in: path, required: true, schema: {type: string, format: date}}
+      responses:
+        '200':
+          description: Operación completada
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, message, data]
+                properties:
+                  status: {type: string, enum: [success]}
+                  message: {type: string}
+                  data: {}
+        '400': {description: Parámetros inválidos}
+        '401': {description: Falta token}
+        '403': {description: Sesión rechazada o rol no autorizado}
+        '404': {description: Objeto inexistente o fuera de ámbito}
+        '413': {description: Snapshot excede 20000 reportes}
+        '503': {description: Integración sin configurar o dependencia no disponible}
+        '504': {description: Timeout del servicio interno}
   /health:
     get:
       tags: [Salud]
