@@ -1,5 +1,5 @@
-import { createContext, useContext, useState, useEffect } from 'react';
-import { loginUser, registerUser, getPerfil, oauthGoogle, oauthFacebook } from '../services/api';
+import { createContext, useContext, useState, useEffect, useRef } from 'react';
+import { loginUser, registerUser, getPerfil, oauthGoogle, oauthFacebook, logoutUser } from '../services/api';
 import { useToast } from './ToastContext';
 
 const AuthContext = createContext(null);
@@ -8,6 +8,7 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const { showToast } = useToast();
+  const logoutPending = useRef(null);
 
   // Valida el token contra el backend al montar
   useEffect(() => {
@@ -90,12 +91,27 @@ export function AuthProvider({ children }) {
     return _saveSession(token, userData, refreshToken);
   };
 
-  const logout = () => {
-    localStorage.removeItem('ga_token');
-    localStorage.removeItem('ga_refresh_token');
-    localStorage.removeItem('ga_user');
-    setUser(null);
-    showToast('Sesión cerrada', 'info', 3500, { position: 'top-center', subtitle: 'Hasta pronto' });
+  const logout = ({ allDevices = false } = {}) => {
+    if (logoutPending.current) return logoutPending.current;
+    const currentRefresh = localStorage.getItem('ga_refresh_token');
+    logoutPending.current = (async () => {
+      try {
+        if (!currentRefresh) throw new Error('missing_refresh');
+        await logoutUser(currentRefresh, { allDevices });
+        // Una sesión nueva de otra pestaña no debe perder sus credenciales.
+        if (localStorage.getItem('ga_refresh_token') !== currentRefresh) return false;
+        localStorage.removeItem('ga_token');
+        localStorage.removeItem('ga_refresh_token');
+        localStorage.removeItem('ga_user');
+        setUser(null);
+        showToast('Sesión cerrada', 'info', 3500, { position: 'top-center', subtitle: 'Hasta pronto' });
+        return true;
+      } catch {
+        showToast('No se pudo invalidar la sesión en el servidor. Intenta cerrar sesión nuevamente.', 'error');
+        return false;
+      }
+    })().finally(() => { logoutPending.current = null; });
+    return logoutPending.current;
   };
 
   return (

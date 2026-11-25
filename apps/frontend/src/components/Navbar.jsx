@@ -80,8 +80,8 @@ export default function Navbar() {
       isActive ? 'text-green-400' : 'text-gray-300 hover:text-green-400'
     }`;
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    if (!await logout()) return;
     setUserMenuOpen(false);
     setOpen(false);
     navigate('/');

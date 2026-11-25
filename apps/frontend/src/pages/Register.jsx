@@ -65,10 +65,7 @@ export default function Register() {
   const validate = () => {
     if (form.nombre.trim().length < 2)          return 'El nombre debe tener al menos 2 caracteres.';
     if (form.apellido.trim().length < 2)         return 'El apellido debe tener al menos 2 caracteres.';
-    if (form.password.length < 8)                return 'La contraseña debe tener al menos 8 caracteres.';
-    if (!/[A-Z]/.test(form.password))            return 'La contraseña debe incluir al menos una letra mayúscula.';
-    if (!/[a-z]/.test(form.password))            return 'La contraseña debe incluir al menos una letra minúscula.';
-    if (!/\d/.test(form.password))               return 'La contraseña debe incluir al menos un número.';
+    if (form.password.length < 15)                return 'La contraseña debe tener al menos 15 caracteres.';
     if (form.password !== form.confirmar)         return 'Las contraseñas no coinciden.';
     return null;
   };
@@ -208,7 +205,7 @@ export default function Register() {
                     value={form.password} onChange={(e) => set('password', e.target.value)}
                     onFocus={() => setPasswordFocused(true)}
                     onBlur={() => setPasswordFocused(false)}
-                    placeholder="Mínimo 8 caracteres"
+                    placeholder="Mínimo 15 caracteres"
                     className="w-full bg-gray-800/80 border border-gray-700 text-gray-100 placeholder-gray-500 rounded-xl px-4 py-2.5 pr-11 text-sm focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500/40 transition"
                   />
                   <button type="button" onClick={() => setShowPassword((v) => !v)} tabIndex={-1}

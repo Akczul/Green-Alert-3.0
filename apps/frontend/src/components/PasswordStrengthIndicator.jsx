@@ -5,11 +5,11 @@
  *  focused  — boolean, muestra el popover con los requisitos (sin afectar el layout)
  */
 const checks = [
-  { label: 'Mínimo 8 caracteres',          test: (p) => p.length >= 8 },
-  { label: 'Al menos una mayúscula',        test: (p) => /[A-Z]/.test(p) },
-  { label: 'Al menos una minúscula',        test: (p) => /[a-z]/.test(p) },
-  { label: 'Al menos un número',            test: (p) => /\d/.test(p) },
-  { label: 'Al menos un carácter especial', test: (p) => /[^A-Za-z0-9]/.test(p) },
+  { label: 'Mínimo 15 caracteres',          test: (p) => p.length >= 15 },
+  { label: 'Sugerencia: combinar mayúsculas',        test: (p) => /[A-Z]/.test(p) },
+  { label: 'Sugerencia: usar varias palabras',        test: (p) => p.trim().split(/\s+/).length >= 3 },
+  { label: 'Sugerencia: añadir números',            test: (p) => /\d/.test(p) },
+  { label: 'Sugerencia: añadir separadores', test: (p) => /[^A-Za-z0-9]/.test(p) },
 ];
 
 function getStrength(password) {

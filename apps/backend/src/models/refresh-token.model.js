@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import pool from '../config/database.js';
 import { clearSchemaCompatCache, tableExists } from '../config/schema-compat.js';
 import { UsuarioModel } from './usuario.model.js';
@@ -65,6 +66,8 @@ export const RefreshTokenModel = {
   create: async ({
     id_usuario,
     token_hash,
+    session_id = randomUUID(),
+    auth_version = 0,
     expires_at,
     user_agent = null,
     ip_address = null,
@@ -75,6 +78,8 @@ export const RefreshTokenModel = {
         id_refresh_token,
         id_usuario,
         token_hash,
+        session_id,
+        auth_version,
         expires_at,
         revoked_at: null,
         user_agent,
@@ -86,9 +91,9 @@ export const RefreshTokenModel = {
     const [result] = await runRefreshTokenPersistence(() =>
       pool.execute(
         `INSERT INTO refresh_tokens
-           (id_usuario, token_hash, expires_at, user_agent, ip_address)
-         VALUES (?, ?, ?, ?, ?)`,
-        [id_usuario, token_hash, expires_at, user_agent, ip_address]
+           (id_usuario, token_hash, expires_at, user_agent, ip_address, session_id, auth_version)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [id_usuario, token_hash, expires_at, user_agent, ip_address, session_id, auth_version]
       )
     );
 
@@ -110,12 +115,15 @@ export const RefreshTokenModel = {
       return {
         ...token,
         ...user,
+        session_auth_version: token.auth_version,
+        auth_version: user.auth_version ?? 0,
       };
     }
 
     const [rows] = await runRefreshTokenPersistence(() =>
       pool.execute(
-        `SELECT rt.id_refresh_token, rt.id_usuario, rt.token_hash, rt.expires_at,
+        `SELECT rt.id_refresh_token, rt.id_usuario, rt.token_hash, rt.expires_at, rt.session_id,
+                rt.auth_version AS session_auth_version, u.auth_version, u.id_entidad,
                 u.uuid, u.nombre, u.apellido, u.email, u.rol, u.activo,
                 u.email_verificado, u.avatar_url, u.telefono, u.created_at
          FROM refresh_tokens rt
@@ -135,18 +143,21 @@ export const RefreshTokenModel = {
   revokeByHash: async (token_hash) => {
     if (await getRefreshTokenStorageMode() === 'memory') {
       const token = memoryTokens.get(token_hash);
-      if (!token || token.revoked_at) {
-        return false;
+      if (!token) return false;
+      let changed = false;
+      for (const entry of memoryTokens.values()) {
+        if (entry.session_id === token.session_id && !entry.revoked_at) { entry.revoked_at = new Date(); changed = true; }
       }
-      token.revoked_at = new Date();
-      return true;
+      return changed;
     }
 
     const [result] = await runRefreshTokenPersistence(() =>
       pool.execute(
-        `UPDATE refresh_tokens
-         SET revoked_at = NOW()
-         WHERE token_hash = ? AND revoked_at IS NULL`,
+        `UPDATE refresh_tokens AS target
+         INNER JOIN refresh_tokens AS source
+           ON target.session_id = source.session_id OR target.token_hash = source.token_hash
+         SET target.revoked_at = NOW()
+         WHERE source.token_hash = ? AND target.revoked_at IS NULL`,
         [token_hash]
       )
     );
@@ -173,6 +184,8 @@ export const RefreshTokenModel = {
         id_refresh_token,
         id_usuario: current.id_usuario,
         token_hash: next_hash,
+        session_id: current.session_id,
+        auth_version: current.auth_version,
         expires_at,
         revoked_at: null,
         user_agent,
@@ -182,6 +195,8 @@ export const RefreshTokenModel = {
       return {
         id_usuario: current.id_usuario,
         id_refresh_token,
+        session_id: current.session_id,
+        auth_version: current.auth_version,
       };
     }
 
@@ -192,11 +207,11 @@ export const RefreshTokenModel = {
       await connection.beginTransaction();
 
       const [rows] = await connection.execute(
-        `SELECT id_refresh_token, id_usuario
-         FROM refresh_tokens
-         WHERE token_hash = ?
-           AND revoked_at IS NULL
-           AND expires_at > NOW()
+        `SELECT rt.id_refresh_token, rt.id_usuario, rt.session_id, rt.auth_version
+         FROM refresh_tokens rt INNER JOIN usuarios u ON u.id_usuario = rt.id_usuario
+         WHERE rt.token_hash = ? AND rt.revoked_at IS NULL
+           AND rt.expires_at > NOW() AND rt.session_id IS NOT NULL
+           AND u.activo = 1 AND u.deleted_at IS NULL AND u.auth_version = rt.auth_version
          LIMIT 1
          FOR UPDATE`,
         [current_hash]
@@ -217,15 +232,17 @@ export const RefreshTokenModel = {
 
       const [insertResult] = await connection.execute(
         `INSERT INTO refresh_tokens
-           (id_usuario, token_hash, expires_at, user_agent, ip_address)
-         VALUES (?, ?, ?, ?, ?)`,
-        [current.id_usuario, next_hash, expires_at, user_agent, ip_address]
+           (id_usuario, token_hash, expires_at, user_agent, ip_address, session_id, auth_version)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [current.id_usuario, next_hash, expires_at, user_agent, ip_address, current.session_id, current.auth_version]
       );
 
       await connection.commit();
       return {
         id_usuario: current.id_usuario,
         id_refresh_token: insertResult.insertId,
+        session_id: current.session_id,
+        auth_version: current.auth_version,
       };
     } catch (error) {
       if (connection) {

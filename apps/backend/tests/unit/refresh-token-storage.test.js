@@ -176,8 +176,8 @@ test('rota refresh token usando transaccion y persistencia normal', async (t) =>
     release: t.mock.fn(() => {}),
     execute: t.mock.fn(async (sql) => {
       const query = String(sql);
-      if (query.includes('SELECT id_refresh_token, id_usuario')) {
-        return [[{ id_refresh_token: 11, id_usuario: 7 }]];
+      if (query.includes('SELECT rt.id_refresh_token, rt.id_usuario')) {
+        return [[{ id_refresh_token: 11, id_usuario: 7, session_id: 'session-test', auth_version: 0 }]];
       }
       if (query.includes('UPDATE refresh_tokens')) {
         return [{ affectedRows: 1 }];
@@ -199,6 +199,8 @@ test('rota refresh token usando transaccion y persistencia normal', async (t) =>
   assert.deepEqual(result, {
     id_usuario: 7,
     id_refresh_token: 12,
+    session_id: 'session-test',
+    auth_version: 0,
   });
   assert.equal(connection.beginTransaction.mock.callCount(), 1);
   assert.equal(connection.commit.mock.callCount(), 1);
