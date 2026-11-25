@@ -1,6 +1,6 @@
 # Arquitectura objetivo: evolución incremental
 
-Ya están implementados [el piloto de zonas de riesgo](piloto-hexagonal-zonas-riesgo.md) y [las cuatro lecturas de reportes](hexagonal-reportes-lectura.md). Este documento conserva la propuesta general para los demás módulos y escrituras; no significa que hayan sido migrados.
+Ya están implementados [el piloto de zonas de riesgo](piloto-hexagonal-zonas-riesgo.md), [las cuatro lecturas de reportes](hexagonal-reportes-lectura.md) y [la creación de reportes](hexagonal-reportes-creacion.md). Este documento conserva la propuesta general para los demás módulos y escrituras; no significa que hayan sido migrados.
 
 **Propuesta, todavía no implementada.** La primera extracción debe funcionar con Express y MySQL existentes. Adoptar NestJS no es requisito de arquitectura hexagonal y añadirlo ahora mezclaría migración de framework con cambio de dependencias.
 

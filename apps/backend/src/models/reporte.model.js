@@ -1,3 +1,4 @@
+import { createMysqlReporteWriter } from '../modules/reportes-creacion/adapters/outbound/mysql-reporte-writer.js';
 import { createMysqlReportesReader } from '../modules/reportes-lectura/adapters/outbound/mysql-reportes-reader.js';
 import { normalizeReporteIA, normalizeReporteEstado } from '../modules/reportes-lectura/domain/reportes.js';
 export { normalizeReporteIA, normalizeReporteEstado };
@@ -7,10 +8,11 @@ import { tableExists } from '../config/schema-compat.js';
 import { CATEGORIAS_FALLBACK } from './categoria-riesgo.model.js';
 import { randomUUID } from 'crypto';
 
+const reporteWriter = createMysqlReporteWriter({ pool, randomUUID });
 const reportesReadAdapter = createMysqlReportesReader({ pool });
 const reporteAnaliticaReader = createMysqlReporteReader({ pool });
 
-export const ESTADO_INICIAL_REPORTE = 'pendiente';
+export { ESTADO_INICIAL_REPORTE } from '../modules/reportes-creacion/domain/validaciones.js';
 export const ESTADOS_REPORTE_PERMITIDOS = [
   'pendiente',
   'en_proceso',
@@ -23,12 +25,7 @@ export const ESTADOS_REPORTE_LABELS = [
   'resuelto',
   'rechazado',
 ];
-export const NIVELES_SEVERIDAD_PERMITIDOS = [
-  'bajo',
-  'medio',
-  'alto',
-  'critico',
-];
+export { NIVELES_SEVERIDAD_PERMITIDOS } from '../modules/reportes-creacion/domain/validaciones.js';
 
 export const ReporteModel = {
   
@@ -110,60 +107,8 @@ export const ReporteModel = {
   
     // Crea un nuevo reporte, genera punto_geo automáticamente a partir de lat/lon
     
-  create: async ({
-    id_usuario,
-    tipo_contaminacion,
-    subcategoria = null,
-    nivel_severidad = 'medio',
-    titulo,
-    descripcion = null,
-    latitud,
-    longitud,
-    direccion = null,
-    municipio = null,
-    departamento = null,
-    confianza_evidencia = null,
-  }) => {
-    const uuid = randomUUID();
-    // Orden base esperado: tipo_contaminacion, estado, nivel_severidad.
-    const hasCoords = latitud !== null && latitud !== undefined &&
-                      longitud !== null && longitud !== undefined;
-
-    if (hasCoords) {
-      const [result] = await pool.execute(
-        `INSERT INTO reportes
-           (uuid, id_usuario, tipo_contaminacion, subcategoria, estado, nivel_severidad, titulo, descripcion,
-            confianza_evidencia,
-            latitud, longitud, direccion, municipio, departamento, punto_geo)
-         VALUES
-           (?, ?, ?, ?, ?, ?, ?, ?,
-            ?,
-            ?, ?, ?, ?, ?,
-            ST_GeomFromText(CONCAT('POINT(', ?, ' ', ?, ')'), 4326, 'axis-order=long-lat'))`,
-        [
-          uuid,
-          id_usuario, tipo_contaminacion, subcategoria, ESTADO_INICIAL_REPORTE, nivel_severidad, titulo, descripcion,
-          confianza_evidencia,
-          latitud, longitud, direccion, municipio, departamento,
-          longitud, latitud,
-        ]
-      );
-      return result.insertId;
-    } else {
-      const [result] = await pool.execute(
-        `INSERT INTO reportes
-           (uuid, id_usuario, tipo_contaminacion, subcategoria, estado, nivel_severidad, titulo, descripcion,
-            confianza_evidencia,
-            latitud, longitud, direccion, municipio, departamento)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [uuid,
-         id_usuario, tipo_contaminacion, subcategoria, ESTADO_INICIAL_REPORTE, nivel_severidad, titulo, descripcion,
-         confianza_evidencia,
-         null, null, direccion, municipio, departamento]
-      );
-      return result.insertId;
-    }
-  },
+  // Puente para consumidores heredados; SQL en el adaptador de creación.
+  create: async (data) => reporteWriter.create(data),
 
   
     //Actualiza campos permitidos de un reporte
@@ -195,21 +140,7 @@ export const ReporteModel = {
     return result.affectedRows > 0;
   },
 
-  updateIaAnalysis: async (id_reporte, { etiquetas, confianza, procesado = true }) => {
-    const [result] = await pool.execute(
-      `UPDATE reportes
-       SET ia_etiquetas = ?, ia_confianza = ?, ia_procesado = ?, updated_at = NOW()
-       WHERE id_reporte = ? AND deleted_at IS NULL`,
-      [
-        JSON.stringify(etiquetas ?? []),
-        confianza,
-        procesado ? 1 : 0,
-        id_reporte,
-      ]
-    );
-
-    return result.affectedRows > 0;
-  },
+  updateIaAnalysis: async (...args) => reporteWriter.updateIaAnalysis(...args),
 
   updateConfianzaEvidencia: async (id_reporte, confianza_evidencia) => {
     const [result] = await pool.execute(

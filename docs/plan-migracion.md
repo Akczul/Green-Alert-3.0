@@ -1,6 +1,6 @@
 # Plan de migración por fases
 
-Estado actualizado después del [piloto de consulta de zonas](piloto-hexagonal-zonas-riesgo.md) y de la [Fase 4 autorizada: lectura de reportes](hexagonal-reportes-lectura.md). Se completaron consolidación, [validación SQL/stack](validacion-mysql.md) y ambas extracciones acotadas. Mantener siempre rutas, estados, multipart, JSON, roles, pantallas y funcionalidades. Las demás migraciones no se inician automáticamente. La numeración de la tarea actual no implica que se hayan completado las fases generales intermedias.
+Estado actualizado después del [piloto de consulta de zonas](piloto-hexagonal-zonas-riesgo.md), la [lectura de reportes](hexagonal-reportes-lectura.md) y la [creación de reportes](hexagonal-reportes-creacion.md). Se completaron consolidación, [validación SQL/stack](validacion-mysql.md) y tres extracciones acotadas. Mantener siempre rutas, estados, multipart, JSON, roles, pantallas y funcionalidades. Las demás migraciones no se inician automáticamente. La numeración de las tareas no implica que se hayan completado las fases generales intermedias.
 
 | Etapa | Estado |
 | --- | --- |
@@ -10,7 +10,8 @@ Estado actualizado después del [piloto de consulta de zonas](piloto-hexagonal-z
 | Fase 2: consulta de zonas | Completada: dominio, caso, puertos, reader MySQL, caché, adaptador HTTP y composición |
 | Alertas como caso independiente | Pendiente; conserva lógica heredada y reutiliza el caso de zonas |
 | Fase 4 de la tarea: lecturas de reportes | Completada: listado, propios, detalle y tendencias; 33 contratos equivalentes y 315 pruebas |
-| Fases generales 3–7, incluidas escrituras | No iniciadas; requieren revisión y nueva tarea |
+| Creación de reportes | Completada: POST /reportes, puertos, writer, storage y bootstrap; 38 contratos y 347 pruebas |
+| Otras escrituras, instituciones y fases generales restantes | Pendientes; requieren revisión y nueva tarea |
 
 ## Fase 0 — Consolidar y medir la base
 
@@ -57,7 +58,11 @@ Verificación: 315 pruebas backend/frontend, 33 contratos reales, 57 comprobacio
 
 Salida: tests de reglas sin SQL/Express, contratos SQL de asignación, pruebas negativas entre entidades y prueba de entrega/persistencia sin duplicados. Reversión por ensamblaje, sin borrar tablas ni campos.
 
-## Fase 4 del plan general — Escrituras de reportes y evidencias (pendiente)
+## Fase 4 del plan general — Escrituras de reportes y evidencias (solo creación completada)
+
+Se entregó `CrearReporte` para POST /reportes: reglas puras, puertos inyectados, writer MySQL con SQL original, storage compartido, adaptador Express y bootstrap. Contrato previo contra `2a4946b`, 38 comparaciones reales antes/después, 347 pruebas completas, 33 contratos de lectura, 57 comprobaciones MySQL Docker y 8 del stack, build/lint/smoke correctos. No se cambió frontend ni esquema.
+
+Se conservan autocommit, compensación por borrado lógico y limpieza remota best effort; no había transacción global. Asignación/notificaciones y caché se conectan por puertos sin migrar sus módulos. Los riesgos de compensación fallida y asignación parcial están documentados en [hexagonal-reportes-creacion.md](hexagonal-reportes-creacion.md). No se inició actualización, eliminación, moderación ni gestión independiente de evidencias. Lo que sigue describe trabajo **pendiente** para tareas posteriores, no entregado en esta fase.
 
 Definir invariantes, políticas de moderación y autorización. Crear `CrearReporte`, `ActualizarReporte`, `ModerarReporte` y gestión de evidencia como operaciones separadas. Encapsular almacenamiento, análisis y score. Introducir UnitOfWork SQL solo para las operaciones que deban ser atómicas dentro de MySQL.
 

@@ -36,4 +36,5 @@ jobs:
       - run: npm run setup
       - run: npm run test:mysql:docker
       - run: npm run test:reportes:lectura
+      - run: npm run test:reportes:creacion
       - run: npm run test:stack

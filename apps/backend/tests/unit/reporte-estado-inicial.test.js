@@ -22,10 +22,10 @@ test('schema define pendiente como estado inicial de reportes', () => {
 });
 
 test('modelo crea reportes nuevos con estado pendiente explicito', () => {
-  const model = readBackendFile('src/models/reporte.model.js');
+  const model = readBackendFile('src/modules/reportes-creacion/adapters/outbound/mysql-reporte-writer.js');
 
   const createStart = model.indexOf('create: async');
-  const updateStart = model.indexOf('update: async', createStart);
+  const updateStart = model.indexOf('updateIaAnalysis: async', createStart);
   const createSection = model.slice(createStart, updateStart);
 
   assert.match(createSection, /tipo_contaminacion, estado, nivel_severidad/);

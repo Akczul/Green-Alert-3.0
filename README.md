@@ -1,6 +1,6 @@
 # GreenAlert
 
-Monorepositorio de la plataforma ambiental existente. Conserva la SPA **React 18 + Vite 5** y la API **Express 4 + MySQL**. La consulta de zonas de riesgo tiene un [piloto hexagonal implementado](docs/piloto-hexagonal-zonas-riesgo.md), extendido a [cuatro lecturas de reportes](docs/hexagonal-reportes-lectura.md); los demás módulos y escrituras continúan por capas. No usa NestJS ni microservicios. Las nuevas bases de datos y ML siguen pendientes de decisión.
+Monorepositorio de la plataforma ambiental existente. Conserva la SPA **React 18 + Vite 5** y la API **Express 4 + MySQL**. La consulta de zonas de riesgo tiene un [piloto hexagonal implementado](docs/piloto-hexagonal-zonas-riesgo.md), extendido a [cuatro lecturas](docs/hexagonal-reportes-lectura.md) y a [creación de reportes](docs/hexagonal-reportes-creacion.md); los demás módulos y escrituras continúan por capas. No usa NestJS ni microservicios. Las nuevas bases de datos y ML siguen pendientes de decisión.
 
 ```text
 GreenAlert/                 # carpeta de trabajo actual: GreenAlert3.0
@@ -106,4 +106,4 @@ Las variables Vite se incorporan al construir la imagen. Para Google/Firebase en
 - [Validación posterior de MySQL y stack completo](docs/validacion-mysql.md).
 - [Piloto hexagonal de zonas: estructura, puertos, archivos y pruebas](docs/piloto-hexagonal-zonas-riesgo.md).
 
-La consulta de zonas y las [lecturas hexagonales de reportes](docs/hexagonal-reportes-lectura.md) están verificadas: **315 pruebas**, **33 contratos HTTP/MySQL equivalentes al código anterior**, **57 comprobaciones MySQL Docker** y **8 del stack completo**. Ejecutar `npm run test:reportes:lectura` con Docker iniciado para comparar los reportes con sus capturas previas. Se conservan contratos, geografía y caché; relaciones y vistas mantienen adaptadores heredados. La entrega se detiene en las lecturas; las escrituras y los demás módulos requieren revisar los resultados y una nueva tarea.
+Zonas, lecturas y [creación hexagonal de reportes](docs/hexagonal-reportes-creacion.md) están verificadas: **347 pruebas**, **33 contratos de lectura**, **38 contratos de creación HTTP/MySQL equivalentes al código anterior**, **57 comprobaciones MySQL Docker** y **8 del stack completo**. Con Docker iniciado, ejecutar `npm run test:reportes:lectura` y `npm run test:reportes:creacion` para comparar con las capturas previas. Se conservan contratos, geografía, caché y compensaciones best effort; no hay atomicidad global con Cloudinary. La entrega se detiene en creación; las otras escrituras y módulos requieren revisar resultados y una nueva tarea.

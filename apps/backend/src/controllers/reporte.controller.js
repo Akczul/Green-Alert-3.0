@@ -1,3 +1,5 @@
+export { createReporte } from '../bootstrap/reportes-creacion.js';
+import { evidenceStorage } from '../bootstrap/reportes-creacion.js';
 export { getReportes, getMisReportes, getReporteById, getTrendingReportes } from '../bootstrap/reportes-lectura.js';
 import {
   ESTADO_INICIAL_REPORTE,
@@ -9,46 +11,21 @@ import {
 } from '../models/reporte.model.js';
 import ExcelJS from 'exceljs';
 import fs from 'node:fs/promises';
-import { CategoriaRiesgoModel } from '../models/categoria-riesgo.model.js';
 import { UsuarioModel }   from '../models/usuario.model.js';
 import { EvidenciaModel } from '../models/evidencia.model.js';
 import { EntidadModel } from '../models/entidad.model.js';
 import { LikeModel } from '../models/like.model.js';
 import { ReporteEntidadModel } from '../models/reporte-entidad.model.js';
-import { analyzeReporte } from '../services/ia.service.js';
 import { clasificarImagen, sugerirContenidoDesdeImagen } from '../services/clasificacion.service.js';
 import { calcularScoreEvidencias } from '../services/evidencia-score.service.js';
-import { deleteFileByPublicId, uploadFileBuffer } from '../services/cloudinary.service.js';
+import { deleteFileByPublicId } from '../services/cloudinary.service.js';
 import { invalidatePrediccionCache } from '../services/prediccion.service.js';
-import { AsignacionEntidadesService } from '../services/asignacion-entidades.service.js';
 import { crearAlertaDesdeAsignacionReporte } from '../services/alerta-entidad.service.js';
 import { notificarReporteCriticoAsignado } from '../config/socket.js';
 import { errorResponse, successResponse } from '../utils/response.js';
 import { crearNotificacion } from './notificacion.controller.js';
 import { validateUploadedFilesContent } from '../../middlewares/upload.middleware.js';
 
-
-const parseCoordinate = (value, { field, min, max }) => {
-  if (value === undefined || value === null || value === '') {
-    return { value: null };
-  }
-
-  const parsed = Number(value);
-
-  if (!Number.isFinite(parsed)) {
-    return {
-      error: `${field} debe ser un numero valido.`,
-    };
-  }
-
-  if (parsed < min || parsed > max) {
-    return {
-      error: `${field} debe estar entre ${min} y ${max}.`,
-    };
-  }
-
-  return { value: parsed };
-};
 
 const normalizeEnumValue = (value) => (
   typeof value === 'string' ? value.trim().toLowerCase() : ''
@@ -176,83 +153,8 @@ export const sugerirContenidoReporte = async (req, res, next) => {
   }
 };
 
-const getEvidenceTypeFromFile = (file) => (
-  file.mimetype?.startsWith('video/') ? 'video' : 'imagen'
-);
-
-const getCloudinaryResourceType = (file, uploadResult) => (
-  uploadResult.resource_type || (file.mimetype?.startsWith('video/') ? 'video' : 'image')
-);
-
-const buildCloudinaryMetadata = (uploadResult) => ({
-  asset_id: uploadResult.asset_id ?? null,
-  public_id: uploadResult.public_id ?? null,
-  resource_type: uploadResult.resource_type ?? null,
-  format: uploadResult.format ?? null,
-  bytes: uploadResult.bytes ?? null,
-  width: uploadResult.width ?? null,
-  height: uploadResult.height ?? null,
-  duration: uploadResult.duration ?? null,
-  version: uploadResult.version ?? null,
-  created_at: uploadResult.created_at ?? null,
-});
-
-const uploadEvidenceToCloudinary = async (file, {
-  idReporte,
-  idUsuario,
-  orden,
-  hashSha256 = null,
-}) => {
-  const uploadResult = await uploadFileBuffer({
-    buffer: file.buffer,
-    originalname: file.originalname,
-    mimetype: file.mimetype,
-    size: file.size,
-  });
-
-  return {
-    uploadResult,
-    evidencia: {
-      id_reporte: idReporte,
-      id_usuario: idUsuario,
-      tipo_archivo: getEvidenceTypeFromFile(file),
-      url_archivo: uploadResult.secure_url,
-      nombre_original: file.originalname,
-      mime_type: file.mimetype,
-      tamano_bytes: file.size,
-      hash_sha256: hashSha256,
-      storage_provider: 'cloudinary',
-      cloudinary_public_id: uploadResult.public_id,
-      cloudinary_asset_id: uploadResult.asset_id ?? null,
-      cloudinary_resource_type: getCloudinaryResourceType(file, uploadResult),
-      cloudinary_metadata: buildCloudinaryMetadata(uploadResult),
-      orden,
-    },
-  };
-};
-
-const cleanupCloudinaryUploads = async (uploads) => {
-  await Promise.allSettled(
-    uploads
-      .filter((upload) => upload?.public_id)
-      .map((upload) => deleteFileByPublicId(upload.public_id, {
-        resourceType: upload.resource_type || 'image',
-      }))
-  );
-};
-
-const rollbackCreatedReporte = async (idReporte, cloudinaryUploads = []) => {
-  const results = await Promise.allSettled([
-    cleanupCloudinaryUploads(cloudinaryUploads),
-    idReporte ? ReporteModel.remove(idReporte) : Promise.resolve(),
-  ]);
-
-  results
-    .filter((result) => result.status === 'rejected')
-    .forEach((result) => {
-      console.error('[reportes] rollback parcial fallido:', result.reason?.message || result.reason);
-    });
-};
+const uploadEvidenceToCloudinary = evidenceStorage.upload;
+const cleanupCloudinaryUploads = evidenceStorage.cleanup;
 
 const shouldDeleteFromCloudinary = (evidencia) => (
   evidencia?.storage_provider === 'cloudinary' &&
@@ -269,201 +171,6 @@ const deleteEvidenceCloudinaryAsset = async (evidencia) => {
     (evidencia.tipo_archivo === 'video' ? 'video' : 'image');
 
   await deleteFileByPublicId(evidencia.cloudinary_public_id, { resourceType });
-};
-
-const parseBooleanLike = (value) => (
-  value === true || value === 1 || value === '1' || String(value).toLowerCase() === 'true'
-);
-
-const parseAcceptedIaPayload = ({ ia_etiquetas, ia_confianza, ia_procesado }) => {
-  if (!parseBooleanLike(ia_procesado)) {
-    return { procesado: false };
-  }
-
-  let etiquetas = [];
-  if (typeof ia_etiquetas === 'string') {
-    try {
-      etiquetas = JSON.parse(ia_etiquetas);
-    } catch {
-      return { error: 'ia_etiquetas debe ser un arreglo JSON valido.' };
-    }
-  } else {
-    etiquetas = ia_etiquetas ?? [];
-  }
-
-  if (!Array.isArray(etiquetas)) {
-    return { error: 'ia_etiquetas debe ser un arreglo.' };
-  }
-
-  const confianza = Number(ia_confianza);
-  if (!Number.isFinite(confianza) || confianza < 0 || confianza > 100) {
-    return { error: 'ia_confianza debe ser un numero entre 0 y 100.' };
-  }
-
-  return {
-    procesado: true,
-    analysis: {
-      etiquetas,
-      confianza,
-      procesado: true,
-    },
-  };
-};
-
-export const createReporte = async (req, res, next) => {
-  try {
-    const {
-      tipo_contaminacion,
-      nivel_severidad,
-      subcategoria,
-      titulo,
-      descripcion,
-      direccion,
-      municipio,
-      departamento,
-      ia_etiquetas,
-      ia_confianza,
-      ia_procesado,
-      latitud,
-      longitud,
-    } = req.body ?? {};
-
-    if (!tipo_contaminacion?.trim()) {
-      return errorResponse(res, 'El tipo de contaminación es requerido.', 400);
-    }
-    if (!nivel_severidad?.trim()) {
-      return errorResponse(res, 'El nivel de severidad es requerido.', 400);
-    }
-    if (!titulo?.trim() || titulo.trim().length < 5) {
-      return errorResponse(res, 'El título debe tener al menos 5 caracteres.', 400);
-    }
-    if (!direccion?.trim() || direccion.trim().length < 3) {
-      return errorResponse(res, 'La dirección es requerida.', 400);
-    }
-
-    const tipoContaminacion = tipo_contaminacion.trim().toLowerCase();
-    const nivelSeveridad = normalizeEnumValue(nivel_severidad);
-    const uploadedFiles = getUploadedFiles(req);
-    const evidenceError = validateReporteEvidenceFiles(uploadedFiles);
-    const iaPayload = parseAcceptedIaPayload({ ia_etiquetas, ia_confianza, ia_procesado });
-
-    if (evidenceError) {
-      return errorResponse(res, evidenceError, 400);
-    }
-
-    if (iaPayload.error) {
-      return errorResponse(res, iaPayload.error, 400);
-    }
-
-    if (!NIVELES_SEVERIDAD_PERMITIDOS.includes(nivelSeveridad)) {
-      return errorResponse(
-        res,
-        buildAllowedValuesMessage('El nivel de severidad', NIVELES_SEVERIDAD_PERMITIDOS),
-        400
-      );
-    }
-
-    const categoriaValida = await CategoriaRiesgoModel.esValido(tipoContaminacion);
-
-    if (!categoriaValida) {
-      return errorResponse(res, 'La categoría de contaminación no existe o está inactiva.', 400);
-    }
-
-    const parsedLatitud = parseCoordinate(latitud, {
-      field: 'La latitud',
-      min: -90,
-      max: 90,
-    });
-
-    if (parsedLatitud.error) {
-      return errorResponse(res, parsedLatitud.error, 400);
-    }
-
-    const parsedLongitud = parseCoordinate(longitud, {
-      field: 'La longitud',
-      min: -180,
-      max: 180,
-    });
-
-    if (parsedLongitud.error) {
-      return errorResponse(res, parsedLongitud.error, 400);
-    }
-
-    const scoreEvidencias = await calcularScoreEvidencias(uploadedFiles, nivelSeveridad);
-    const hashesEvidencias = new Map(
-      scoreEvidencias.evidencias.map((item, index) => [index, item.hash_sha256])
-    );
-
-    const cloudinaryUploads = [];
-    let idReporte = null;
-    let reporte = null;
-
-    try {
-      idReporte = await ReporteModel.create({
-        id_usuario:       req.user.sub,
-        tipo_contaminacion: tipoContaminacion,
-        subcategoria:        subcategoria?.trim() || null,
-        nivel_severidad:    nivelSeveridad,
-        titulo:             titulo.trim(),
-        descripcion:        descripcion?.trim() || null,
-        direccion:          direccion.trim(),
-        municipio:          municipio?.trim() || null,
-        departamento:       departamento?.trim() || null,
-        latitud:            parsedLatitud.value,
-        longitud:           parsedLongitud.value,
-        confianza_evidencia: scoreEvidencias.score,
-      });
-
-      reporte = await ReporteModel.findById(idReporte);
-
-      let iaAnalysis;
-      if (iaPayload.procesado) {
-        iaAnalysis = iaPayload.analysis;
-      } else {
-        iaAnalysis = analyzeReporte({
-          ...reporte,
-          tipo_contaminacion: tipoContaminacion,
-          nivel_severidad: nivelSeveridad,
-          titulo: titulo.trim(),
-          descripcion: descripcion?.trim() || null,
-          direccion: direccion.trim(),
-          municipio: municipio?.trim() || null,
-          departamento: departamento?.trim() || null,
-          latitud: parsedLatitud.value,
-          longitud: parsedLongitud.value,
-        });
-      }
-
-      await ReporteModel.updateIaAnalysis(idReporte, iaAnalysis);
-      reporte = await ReporteModel.findById(idReporte);
-
-      for (const [index, file] of uploadedFiles.entries()) {
-        const { uploadResult, evidencia } = await uploadEvidenceToCloudinary(file, {
-          idReporte,
-          idUsuario: req.user.sub,
-          hashSha256: hashesEvidencias.get(index) ?? null,
-          orden: index,
-        });
-
-        cloudinaryUploads.push(uploadResult);
-        await EvidenciaModel.create(evidencia);
-      }
-    } catch (error) {
-      await rollbackCreatedReporte(idReporte, cloudinaryUploads);
-      throw error;
-    }
-
-    try {
-      await AsignacionEntidadesService.asignarEntidadesAReporte(reporte);
-    } catch (error) {
-      console.error('[asignacion-entidades] no se pudo asignar reporte:', error.message);
-    }
-
-    invalidatePrediccionCache();
-    return successResponse(res, { reporte }, 'Reporte creado correctamente.', 201);
-  } catch (error) {
-    return next(error);
-  }
 };
 
 export const exportReportes = async (req, res, next) => {

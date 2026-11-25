@@ -20,20 +20,23 @@ test('middleware de reportes acepta file y files con limite de 10 archivos', () 
 });
 
 test('creacion de reportes guarda una evidencia por cada archivo recibido', () => {
-  const controller = readProjectFile('src/controllers/reporte.controller.js');
+  const controller = readProjectFile('src/modules/reportes-creacion/application/crear-reporte.js') +
+    readProjectFile('src/modules/reportes-creacion/adapters/outbound/cloudinary-evidence-storage.js') +
+    readProjectFile('src/modules/reportes-creacion/adapters/inbound/express-controller.js');
 
-  assert.match(controller, /const uploadedFiles = getUploadedFiles\(req\);/);
+  assert.match(controller, /const uploadedFiles = files;/);
+  assert.match(controller, /Array\.isArray\(req\.files\?\.files\)/);
   assert.match(controller, /for \(const \[index, file\] of uploadedFiles\.entries\(\)\)/);
   assert.match(controller, /url_archivo:\s+uploadResult\.secure_url/);
-  assert.match(controller, /await EvidenciaModel\.create\(evidencia\)/);
+  assert.match(controller, /await evidencias\.create\(evidencia\)/);
   assert.match(controller, /orden:\s+index/);
 });
 
 test('reportes soporta subcategoria en esquema, migracion, creacion y consultas', () => {
   const schema = readProjectFile('DATABASE_SCHEMA_COMPLETE.sql');
   const migration = readProjectFile('migrations/014_create_entidades_and_reporte_entidades.sql');
-  const controller = readProjectFile('src/controllers/reporte.controller.js');
-  const model = readProjectFile('src/models/reporte.model.js');
+  const controller = readProjectFile('src/modules/reportes-creacion/application/crear-reporte.js');
+  const model = readProjectFile('src/modules/reportes-creacion/adapters/outbound/mysql-reporte-writer.js');
   const reader = readProjectFile('src/modules/reportes-lectura/adapters/outbound/mysql-reportes-reader.js');
 
   assert.match(schema, /subcategoria VARCHAR\(100\) NULL/);

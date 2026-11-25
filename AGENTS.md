@@ -5,7 +5,7 @@
 - Este repositorio consolida Green-Alert/Backend y Green-Alert/Frontend. Los SHA de origen están en `docs/procedencia.md`; ambos historiales son ancestros de `main`.
 - Backend: JavaScript ESM, Express 4, `mysql2/promise`, SQL explícito. Rutas en `apps/backend/routes`, middleware en `middlewares`, controladores/modelos/servicios en `src`.
 - Frontend: React 18 JSX, Vite 5, React Router 6, Tailwind 3, Axios, Leaflet, Firebase. Mantener las pantallas y los componentes originales.
-- No hay NestJS, gateway distribuido ni microservicios. Consulta de zonas y las cuatro lecturas de reportes tienen módulos hexagonales; el resto sigue por capas. Ver `docs/piloto-hexagonal-zonas-riesgo.md`, `docs/hexagonal-reportes-lectura.md` y la propuesta restante en `docs/arquitectura-objetivo.md`.
+- No hay NestJS, gateway distribuido ni microservicios. Consulta de zonas, las cuatro lecturas y creación de reportes tienen módulos hexagonales; el resto sigue por capas. Ver `docs/piloto-hexagonal-zonas-riesgo.md`, `docs/hexagonal-reportes-lectura.md`, `docs/hexagonal-reportes-creacion.md` y la propuesta restante en `docs/arquitectura-objetivo.md`.
 - Instalaciones independientes por aplicación. No introducir workspaces, hoisting ni otro gestor sin justificar cómo se preservan los lockfiles y contratos.
 
 ## Contratos y convenciones
@@ -32,6 +32,7 @@ npm run test:mysql         # mysqld nativo separado, datos sintéticos y MySQL r
 npm run test:mysql:docker  # MySQL 8.4.11 temporal y la misma suite de integración
 npm run test:stack         # Compose real aislado + override; retira solo sus recursos
 npm run test:reportes:lectura # 33 contratos originales contra Express/MySQL Docker aislado
+npm run test:reportes:creacion # 38 contratos previos y efectos persistidos, con Cloudinary simulado
 npm run infra:config       # validar Compose sin exponer variables
 npm run docs:inventory     # regenerar endpoints/dependencias/nombres de variables
 ```
@@ -62,4 +63,6 @@ Node de referencia: 24. Ver `docs/verificacion.md` antes de afirmar qué entorno
 - Los ocho fixtures de `tests/fixtures/zonas-riesgo/contrato.json` provienen de a79b6ba antes del refactor. No regenerarlos desde el código nuevo para ocultar regresiones; un cambio de contrato exige revisión explícita.
 - La lectura de reportes se ensambla en `src/bootstrap/reportes-lectura.js`; casos y dominio solo dependen de puertos/funciones internos. Los puentes del modelo y adaptadores heredados conservan consumidores y efectos de vistas.
 - Los 33 fixtures de reportes provienen de `6e6f5d1` antes del refactor. No regenerarlos desde el código nuevo para ocultar regresiones.
-- Esta fase termina en listado, propios, detalle y tendencias de reportes. No extraer escrituras, moderación, asignaciones, evidencias, alertas u otros módulos sin nueva tarea.
+- La creación se ensambla en `src/bootstrap/reportes-creacion.js`. El writer recibe pool/UUID; la aplicación solo recibe puertos. El storage compartido conserva un solo payload para el alta y la gestión heredada de evidencias.
+- Los 38 fixtures de creación provienen de `2a4946b`. No regenerarlos desde el refactor. El flujo conserva autocommit y compensación lógica/remota best effort; no afirmar rollback atómico global ni limpieza garantizada.
+- Esta fase termina en creación de reportes. No extraer actualización, eliminación, moderación, asignaciones, gestión de evidencias, alertas u otros módulos sin nueva tarea.

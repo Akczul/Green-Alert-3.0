@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { fileFilter } from '../../middlewares/upload.middleware.js';
-import { createReporte } from '../../src/controllers/reporte.controller.js';
+import { createReporte } from '../helpers/reporte-creacion-controller.js';
 import { CategoriaRiesgoModel } from '../../src/models/categoria-riesgo.model.js';
 import { EvidenciaModel } from '../../src/models/evidencia.model.js';
 import { ReporteModel } from '../../src/models/reporte.model.js';
