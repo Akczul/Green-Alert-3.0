@@ -43,8 +43,8 @@ test('changePassword revoca refresh tokens del usuario', async (t) => {
     user: { sub: 7, email: 'user@example.com' },
     body: {
       currentPassword: 'Current123',
-      newPassword: 'NewPassword123',
-      confirmPassword: 'NewPassword123',
+      newPassword: 'NewPassword123 nueva frase',
+      confirmPassword: 'NewPassword123 nueva frase',
     },
   };
   const res = createResponse();

@@ -366,7 +366,7 @@ export default function Profile() {
   const validatePw = () => {
     const errs = {};
     if (!pwForm.actual)            errs.actual    = 'Ingresa tu contraseña actual.';
-    if (pwForm.nueva.length < 8)   errs.nueva     = 'Mínimo 8 caracteres.';
+    if (pwForm.nueva.length < 15)   errs.nueva     = 'Mínimo 15 caracteres.';
     if (pwForm.nueva !== pwForm.confirmar) errs.confirmar = 'Las contraseñas no coinciden.';
     return errs;
   };

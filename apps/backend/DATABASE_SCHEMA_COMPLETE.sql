@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
   apellido VARCHAR(100) NOT NULL,
   email VARCHAR(100) NOT NULL UNIQUE,
   password_hash VARCHAR(255) NULL,
+  auth_version INT UNSIGNED NOT NULL DEFAULT 0,
   rol ENUM('ciudadano', 'moderador', 'admin', 'entidad') DEFAULT 'ciudadano',
   id_entidad INT NULL,
   activo BOOLEAN DEFAULT TRUE,
@@ -275,6 +276,8 @@ CREATE TABLE IF NOT EXISTS refresh_tokens (
   id_refresh_token BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   id_usuario BIGINT UNSIGNED NOT NULL,
   token_hash VARCHAR(64) NOT NULL UNIQUE,
+  session_id CHAR(36) NULL,
+  auth_version INT UNSIGNED NOT NULL DEFAULT 0,
   expires_at DATETIME NOT NULL,
   revoked_at DATETIME NULL,
   user_agent VARCHAR(255) NULL,
@@ -284,6 +287,7 @@ CREATE TABLE IF NOT EXISTS refresh_tokens (
   CONSTRAINT fk_refresh_tokens_usuario FOREIGN KEY (id_usuario)
     REFERENCES usuarios(id_usuario) ON DELETE CASCADE ON UPDATE CASCADE,
 
+  INDEX idx_refresh_session (session_id, revoked_at),
   INDEX idx_refresh_token_hash (token_hash),
   INDEX idx_refresh_usuario (id_usuario),
   INDEX idx_refresh_expires_at (expires_at),

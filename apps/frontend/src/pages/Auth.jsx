@@ -197,10 +197,7 @@ export default function Auth() {
   const validateReg = () => {
     if (regForm.nombre.trim().length < 2)       return 'El nombre debe tener al menos 2 caracteres.';
     if (regForm.apellido.trim().length < 2)      return 'El apellido debe tener al menos 2 caracteres.';
-    if (regForm.password.length < 8)             return 'La contraseña debe tener al menos 8 caracteres.';
-    if (!/[A-Z]/.test(regForm.password))         return 'La contraseña debe incluir al menos una mayúscula.';
-    if (!/[a-z]/.test(regForm.password))         return 'La contraseña debe incluir al menos una minúscula.';
-    if (!/\d/.test(regForm.password))            return 'La contraseña debe incluir al menos un número.';
+    if (regForm.password.length < 15)             return 'La contraseña debe tener al menos 15 caracteres.';
     if (regForm.password !== regForm.confirmar)  return 'Las contraseñas no coinciden.';
     return null;
   };
@@ -453,7 +450,7 @@ export default function Auth() {
                           type={showRegPw ? 'text' : 'password'} required autoComplete="new-password"
                           value={regForm.password} onChange={(e) => setReg('password', e.target.value)}
                           onFocus={() => setPwFocused(true)} onBlur={() => setPwFocused(false)}
-                          placeholder="Mínimo 8 caracteres"
+                          placeholder="Mínimo 15 caracteres"
                           className="w-full bg-gray-800/80 border border-gray-700 text-gray-100 placeholder-gray-500 rounded-xl px-4 py-2.5 pr-11 text-sm focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500/40 transition"
                         />
                         <button

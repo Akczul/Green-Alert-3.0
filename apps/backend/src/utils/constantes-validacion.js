@@ -1,3 +1,5 @@
+import { validarLongitudPassword } from '../modules/identidad/domain/seguridad.js';
+
 /**
  * VALIDACIONES USADAS EN PERFIL Y SEGURIDAD.
  */
@@ -50,22 +52,15 @@ export const validarTelefono = (telefono) => {
  * Valida password para cambio de clave.
  * Reglas:
  * - Debe ser string no vacio (null, undefined y solo espacios -> false)
- * - Minimo 8 caracteres
- * - Al menos una letra y un numero
+ * - Minimo 15 caracteres, sin imponer composición a frases largas.
+ * Solo comprueba formato; alta/cambio/reset usan seguridad.validarNuevaPassword
+ * y la lista local de contraseñas comunes.
  *
  * @param {string} password
  * @returns {boolean}
  */
 export const validarPassword = (password) => {
-  if (typeof password !== 'string') return false;
-
-  const valor = password.trim();
-  if (!valor) return false;
-  if (valor.length < 8) return false;
-
-  const tieneLetra = /[A-Za-z]/.test(valor);
-  const tieneNumero = /[0-9]/.test(valor);
-
-  return tieneLetra && tieneNumero;
+  try { validarLongitudPassword(password); return true; }
+  catch { return false; }
 };
 

@@ -122,9 +122,9 @@ export default function Settings() {
     showToast('Preferencias guardadas.', 'success');
   };
 
-  const handleLogoutAll = () => {
+  const handleLogoutAll = async () => {
     setModal(null);
-    logout();
+    if (!await logout({ allDevices: true })) return;
     navigate('/login');
     showToast('Sesión cerrada en todos los dispositivos.', 'info');
   };

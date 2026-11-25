@@ -1,3 +1,4 @@
+import { mockAuthContract } from '../helpers/auth-contract.js';
 import test, { afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import jwt from 'jsonwebtoken';
@@ -31,13 +32,11 @@ const createMockIo = () => {
   return {
     emissions,
     io: {
-      to(room) {
-        return {
-          emit(event, payload) {
-            emissions.push({ room, event, payload });
-          },
-        };
-      },
+      in(room) { return { fetchSockets: async () => [{
+        data: { accessToken: signToken({ sub: 7, rol: 'entidad', id_entidad: Number(room.split(':')[1]) }) },
+        emit(event, payload) { emissions.push({ room, event, payload }); },
+        disconnect() {},
+      }] }; },
     },
   };
 };
@@ -46,6 +45,8 @@ afterEach(() => {
   setSocketServerForTests(null);
   process.env.JWT_SECRET = JWT_SECRET;
 });
+
+test.beforeEach(mockAuthContract);
 
 test('socket rechaza conexion sin token', async () => {
   process.env.JWT_SECRET = JWT_SECRET;
@@ -108,7 +109,7 @@ test('socket rechaza usuario entidad sin entidad asociada', async () => {
   assert.equal(error.message, 'usuario entidad sin entidad asociada');
 });
 
-test('emision critica a Bomberos notifica solo la sala de Bomberos', () => {
+test('emision critica a Bomberos notifica solo la sala de Bomberos', async () => {
   const { io, emissions } = createMockIo();
   setSocketServerForTests(io);
 
@@ -116,12 +117,13 @@ test('emision critica a Bomberos notifica solo la sala de Bomberos', () => {
     reporte: { id_reporte: 10, titulo: 'Incendio activo' },
   });
 
+  await new Promise(setImmediate);
   assert.equal(sent, true);
   assert.deepEqual(emissions.map((item) => item.room), [getEntidadRoom(1)]);
   assert.equal(emissions[0].event, SOCKET_EVENTS.REPORTE_CRITICO_ASIGNADO);
 });
 
-test('reporte critico con entidad principal y de apoyo notifica ambas salas', () => {
+test('reporte critico con entidad principal y de apoyo notifica ambas salas', async () => {
   const { io, emissions } = createMockIo();
   setSocketServerForTests(io);
 
@@ -154,6 +156,7 @@ test('reporte critico con entidad principal y de apoyo notifica ambas salas', ()
     ],
   });
 
+  await new Promise(setImmediate);
   assert.equal(total, 2);
   assert.deepEqual(
     emissions.map((item) => item.room),

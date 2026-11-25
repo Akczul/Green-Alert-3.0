@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import { seguridad } from '../bootstrap/seguridad.js';
 import { Server } from 'socket.io';
 import { getCorsOptions } from './security.config.js';
 
@@ -27,14 +27,14 @@ const getSocketToken = (socket) => {
   return scheme?.toLowerCase() === 'bearer' && token ? token : null;
 };
 
-export const authenticateSocket = (socket, next) => {
+export const authenticateSocket = async (socket, next) => {
   const token = getSocketToken(socket);
   if (!token) {
     return next(new Error('token requerido'));
   }
 
   try {
-    const user = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await seguridad.verificarAcceso(token);
     const idEntidad = getEntidadIdFromUser(user);
 
     if (user?.rol === 'entidad' && (!Number.isInteger(idEntidad) || idEntidad <= 0)) {
@@ -42,6 +42,7 @@ export const authenticateSocket = (socket, next) => {
     }
 
     socket.user = user;
+    socket.data = { ...socket.data, accessToken: token };
     return next();
   } catch {
     return next(new Error('token invalido'));
@@ -109,9 +110,15 @@ export const notificarReporteCriticoAEntidad = (idEntidad, payload) => {
   const id = Number(idEntidad);
   if (!ioInstance || !Number.isInteger(id) || id <= 0) return false;
 
-  ioInstance
-    .to(getEntidadRoom(id))
-    .emit(SOCKET_EVENTS.REPORTE_CRITICO_ASIGNADO, payload);
+  // Revalidar antes de cada entrega privada, también en conexiones ya abiertas.
+  void ioInstance.in(getEntidadRoom(id)).fetchSockets().then(async (sockets) => {
+    await Promise.all(sockets.map(async (socket) => {
+      try {
+        await seguridad.verificarAcceso(socket.data?.accessToken);
+        socket.emit(SOCKET_EVENTS.REPORTE_CRITICO_ASIGNADO, payload);
+      } catch { socket.disconnect(true); }
+    }));
+  }).catch(() => console.error('[socket] No fue posible validar las sesiones de entrega.'));
 
   return true;
 };

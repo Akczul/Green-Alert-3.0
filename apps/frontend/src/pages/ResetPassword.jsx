@@ -53,9 +53,7 @@ export default function ResetPassword() {
 
   const validate = () => {
     const errs = {};
-    if (newPassword.length < 8)               errs.newPassword     = 'Mínimo 8 caracteres.';
-    else if (!/[A-Za-z]/.test(newPassword))   errs.newPassword     = 'Debe incluir al menos una letra.';
-    else if (!/[0-9]/.test(newPassword))      errs.newPassword     = 'Debe incluir al menos un número.';
+    if (newPassword.length < 15)               errs.newPassword     = 'Mínimo 15 caracteres.';
     if (newPassword !== confirmPassword)       errs.confirmPassword = 'Las contraseñas no coinciden.';
     return errs;
   };
@@ -147,7 +145,7 @@ export default function ResetPassword() {
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-white mb-1">Nueva contraseña</h1>
             <p className="text-sm text-gray-400">
-              Elige una contraseña segura de al menos 8 caracteres.
+              Elige una contraseña segura de al menos 15 caracteres.
             </p>
           </div>
 

@@ -23,6 +23,7 @@
     "test:mysql:docker": "node scripts/validate-mysql.mjs --docker",
     "test:stack": "node scripts/validate-stack.mjs",
     "test:reportes:lectura": "node scripts/validate-reportes-read.mjs",
+    "test:seguridad": "node scripts/validate-security.mjs",
     "test:reportes:creacion": "node scripts/validate-reportes-create.mjs",
     "infra:validation:config": "node scripts/validate-mysql.mjs --docker-config",
     "lint": "npm --prefix apps/frontend run lint",

@@ -52,7 +52,7 @@ En PowerShell, usar `npm.cmd` en lugar de `npm` si la política de ejecución bl
 
 No ejecutar `infra:db` si se va a usar un MySQL propio. Configurar `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` y SSL en `apps/backend/.env`, después ejecutar `npm run dev`. No se importaron ni modificaron datos existentes durante esta consolidación.
 
-El esquema completo es para inicializar un volumen vacío. No es un migrador idempotente: contiene semillas, actualizaciones y procedimientos. Se conservan las 18 migraciones históricas y se añade `019`, que incorpora los códigos actuales del catálogo sin renombrar ni eliminar los anteriores. Se ejecutaron las 19 sobre una base sintética; revisar qué versiones ya están aplicadas antes de usar una base existente. No ejecutar la cadena histórica sobre el esquema completo. [Validación real de MySQL](docs/validacion-mysql.md).
+El esquema completo es para inicializar un volumen vacío. No es un migrador idempotente: contiene semillas, actualizaciones y procedimientos. Se conservan las 18 migraciones históricas y se añade `019`, que incorpora los códigos actuales del catálogo sin renombrar ni eliminar los anteriores. Se añade además `020` para sesiones revocables (sid/auth_version), sin borrar hashes ni usuarios. Se ejecutaron las 20 sobre una base sintética; revisar qué versiones ya están aplicadas antes de usar una base existente. No ejecutar la cadena histórica sobre el esquema completo. [Validación real de MySQL](docs/validacion-mysql.md).
 
 ### Servicios opcionales
 
@@ -67,6 +67,7 @@ npm run build
 npm run lint
 npm test
 npm run test:smoke
+npm run test:seguridad
 npm run infra:config
 ```
 
@@ -107,3 +108,9 @@ Las variables Vite se incorporan al construir la imagen. Para Google/Firebase en
 - [Piloto hexagonal de zonas: estructura, puertos, archivos y pruebas](docs/piloto-hexagonal-zonas-riesgo.md).
 
 Zonas, lecturas y [creación hexagonal de reportes](docs/hexagonal-reportes-creacion.md) están verificadas: **347 pruebas**, **33 contratos de lectura**, **38 contratos de creación HTTP/MySQL equivalentes al código anterior**, **57 comprobaciones MySQL Docker** y **8 del stack completo**. Con Docker iniciado, ejecutar `npm run test:reportes:lectura` y `npm run test:reportes:creacion` para comparar con las capturas previas. Se conservan contratos, geografía, caché y compensaciones best effort; no hay atomicidad global con Cloudinary. La entrega se detiene en creación; las otras escrituras y módulos requieren revisar resultados y una nueva tarea.
+
+## Seguridad crítica en feat/security
+
+[Contrato para integrar clientes](docs/contrato-autenticacion-seguridad.md) e [informe de cambios y worktrees](docs/seguridad-critica.md). Nueva contraseña: 15 caracteres y lista local; hashes históricos compatibles. JWT con sid/ver, revocación por sesión y consulta del estado actual de usuario. Requiere migración aditiva 020 antes de desplegar sobre un clon de una base anterior y reautenticación de sesiones legacy. No se aplicó a datos existentes.
+
+Verificado en esta rama: **367 pruebas**, **22 comprobaciones SQL de seguridad**, **58 de regresión MySQL**, **33 equivalencias de lectura**, **37 equivalencias de creación y un rechazo anticipado de seguridad**, **8 del stack**, build/lint/smoke. No se implementan MFA, otro OIDC, nuevos servicios/motores o móvil. Sin merge ni push.

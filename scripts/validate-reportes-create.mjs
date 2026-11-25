@@ -1,3 +1,4 @@
+import { seedSessionClaims } from './test-session-fixtures.mjs';
 import assert from 'node:assert/strict';
 import { fork, execFileSync } from 'node:child_process';
 import { once } from 'node:events';
@@ -76,7 +77,7 @@ try {
     const [[previous]] = await admin.query('SELECT COALESCE(MAX(id_reporte), 0) AS id FROM reportes');
     await ask({type:'reset',mode:scenario.mode});
     const subject = Object.hasOwn(scenario,'subject')?scenario.subject:1;
-    const token=subject==='invalid'?'invalid':subject?jwt.sign({sub:subject,rol:({2:'admin',3:'moderador',4:'entidad'})[subject]||'ciudadano',exp:Date.parse('2026-11-18T13:00:00Z')/1000},secret,{noTimestamp:true}):null;
+    const token=subject==='invalid'?'invalid':subject?jwt.sign({...await seedSessionClaims(admin,{sub:subject,rol:({2:'admin',3:'moderador',4:'entidad'})[subject]||'ciudadano'}),exp:Date.parse('2026-11-18T13:00:00Z')/1000},secret,{noTimestamp:true}):null;
     const headers=token?{Authorization:`Bearer ${token}`}:{}, data={...base,...scenario.body};
     let body;
     if(scenario.files){
@@ -106,13 +107,23 @@ try {
       assert.ok(Math.abs(Number(created[0].geo_longitude) - (-120.25)) < 1e-10);
       assert.ok(Math.abs(Number(created[0].geo_latitude) - 1.15) < 1e-10);
     }
-    if(!capture)assert.deepEqual(entry,expected.cases.find(item=>item.name===scenario.name),scenario.name);
+    if(!capture){
+      const old = expected.cases.find(item=>item.name===scenario.name);
+      // Cambio de seguridad deliberado: autor inexistente se rechaza en autenticación antes de INSERT.
+      const contract = scenario.name==='missing-author' ? { ...old, status:403, body:{status:'error',message:'token inválido o expirado.'} } : old;
+      assert.deepEqual(entry,contract,scenario.name);
+    }
+    if(scenario.name==='missing-author'){
+      // Preservar solo la numeración histórica sintética: el INSERT fallido antiguo reservaba un ID.
+      assert.ok(Number.isSafeInteger(Number(previous.id)));
+      await admin.query('ALTER TABLE reportes AUTO_INCREMENT = '+(Number(previous.id)+2));
+    }
     cases.push(entry);console.log(`OK: ${scenario.name}`);
   }
   if(capture){await mkdir(path.dirname(fixtureFile),{recursive:true});await writeFile(fixtureFile,JSON.stringify({reference:'2a4946b',cases},null,2)+'\n',{flag:'wx'});}
   await mkdir(path.join(root,'.local/mysql-validation'),{recursive:true});
   await writeFile(path.join(root,'.local/mysql-validation/reportes-creacion.json'),JSON.stringify({capture,passed:cases.length,reference:'2a4946b'},null,2)+'\n');
-  console.log(`${cases.length} contratos de creación ${capture?'capturados antes del refactor':'equivalentes al original'}.`);
+  console.log(`${cases.length} contratos de creación: ${capture?'capturados antes del refactor':'37 equivalentes y 1 rechazo anticipado documentado por seguridad'}.`);
 }finally{
   if(child?.connected){child.send({type:'stop'});await once(child,'exit');}
   await sandbox.stop();

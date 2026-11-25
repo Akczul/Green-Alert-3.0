@@ -3,11 +3,15 @@ info:
   title: Green Alert Backend API
   version: 0.1.0
   description: |
-    Especificacion OpenAPI inicial del backend de Green Alert.
+    Especificacion OpenAPI del backend de Green Alert.
+    Seguridad critica: nuevas contrasenas de al menos 15 caracteres y lista local;
+    JWT con sid/ver y validacion de sesion activa en MySQL. JWT legacy requieren login.
+    Tokens/sesiones invalidos devuelven 403; store no disponible, 503.
+    Contrato detallado: docs/contrato-autenticacion-seguridad.md.
 
     Las rutas se montan con `API_PREFIX`. Por defecto `API_PREFIX` esta vacio,
     por lo que las rutas reales son `/auth`, `/reportes`, `/categorias`, etc.
-    En desarrollo el frontend puede usar `/api` si Vite reescribe ese prefijo.
+    En desarrollo el frontend puede usar `/api` si Vite conserva ese prefijo; configurar API_PREFIX=/api.
 servers:
   - url: http://localhost:3000
     description: Backend local sin API_PREFIX
@@ -32,6 +36,7 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+      description: JWT con sid y ver; firma valida no basta sin sesion/usuario actuales.
   parameters:
     IdParam:
       in: path
@@ -393,7 +398,9 @@ paths:
                 password:
                   type: string
                   format: password
-                  example: Password123
+                  minLength: 15
+                  description: Admite frases largas; rechaza contrasenas comunes de la lista local.
+                  example: Una frase de acceso segura 2026
                 telefono:
                   type: string
                   example: "+573001112233"
@@ -496,7 +503,9 @@ paths:
     post:
       tags: [Autenticacion]
       summary: Cierra sesion individual o global.
-      description: Logout global requiere JWT cuando `allDevices` es true.
+      description: |
+        Logout individual revoca la familia del refresh, incluyendo JWT y refresh posteriores de esa sesion.
+        No afecta otras sesiones. Logout global requiere JWT activo cuando `allDevices` es true.
       security:
         - bearerAuth: []
         - {}

@@ -1,3 +1,4 @@
+import { mockAuthContract } from '../helpers/auth-contract.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import http from 'node:http';
@@ -41,12 +42,14 @@ const request = async (server, path, options = {}) => {
   return fetch(`http://127.0.0.1:${port}${path}`, options);
 };
 
-test('optionalAuth permite continuar sin token como anonimo', () => {
+test.beforeEach(mockAuthContract);
+
+test('optionalAuth permite continuar sin token como anonimo', async () => {
   const req = { headers: {} };
   const res = createResponse();
   let nextCalled = false;
 
-  optionalAuth(req, res, () => {
+  await optionalAuth(req, res, async () => {
     nextCalled = true;
   });
 
@@ -55,7 +58,7 @@ test('optionalAuth permite continuar sin token como anonimo', () => {
   assert.equal(res.statusCode, null);
 });
 
-test('optionalAuth llena req.user con token valido', () => {
+test('optionalAuth llena req.user con token valido', async () => {
   const token = jwt.sign(
     { sub: 21, email: 'user@example.com', rol: 'ciudadano' },
     process.env.JWT_SECRET
@@ -68,7 +71,7 @@ test('optionalAuth llena req.user con token valido', () => {
   const res = createResponse();
   let nextCalled = false;
 
-  optionalAuth(req, res, () => {
+  await optionalAuth(req, res, async () => {
     nextCalled = true;
   });
 
@@ -77,7 +80,7 @@ test('optionalAuth llena req.user con token valido', () => {
   assert.equal(res.statusCode, null);
 });
 
-test('optionalAuth ignora token invalido y continua como anonimo', () => {
+test('optionalAuth ignora token invalido y continua como anonimo', async () => {
   const req = {
     headers: {
       authorization: 'Bearer token-invalido',
@@ -87,7 +90,7 @@ test('optionalAuth ignora token invalido y continua como anonimo', () => {
   const res = createResponse();
   let nextCalled = false;
 
-  optionalAuth(req, res, () => {
+  await optionalAuth(req, res, async () => {
     nextCalled = true;
   });
 

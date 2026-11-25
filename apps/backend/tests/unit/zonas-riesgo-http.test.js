@@ -1,3 +1,4 @@
+import { mockAuthContract } from '../helpers/auth-contract.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import http from 'node:http';
@@ -40,6 +41,8 @@ for (const prefix of ['/api', '']) {
     }
   });
 }
+
+test.beforeEach(mockAuthContract);
 
 test('contrato HTTP deniega sin JWT, JWT inválido, ciudadano y entidad antes de consultar', async (t) => {
   let reads = 0;

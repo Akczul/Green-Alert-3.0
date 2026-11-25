@@ -25,6 +25,9 @@ const clearSession = () => {
 };
 
 // ── Estado compartido de refresh ──────────────────────────────────────────
+let authGeneration = 0;
+let logoutInProgress = false;
+let refreshFlight = null;
 let isRefreshing = false;
 let proactiveRefreshPromise = null;
 let failedQueue = [];
@@ -39,18 +42,23 @@ const processQueue = (error, token = null) => {
 
 // Lógica de refresh reutilizada por ambos interceptores
 const doRefresh = () => {
+  if (logoutInProgress) return Promise.reject(new Error('session_changed'));
+  if (refreshFlight) return refreshFlight;
+  const generation = authGeneration;
   const refreshToken = localStorage.getItem('ga_refresh_token');
   if (!refreshToken) return Promise.reject(new Error('no_refresh_token'));
-  return axios
+  refreshFlight = axios
     .post(`${api.defaults.baseURL}/auth/refresh`, { refreshToken }, { timeout: 8000 })
     .then(({ data }) => {
       const newAccess = data.data.accessToken || data.data.token;
       const newRefresh = data.data.refreshToken;
+      if (generation !== authGeneration || localStorage.getItem('ga_refresh_token') !== refreshToken) throw new Error('session_changed');
       localStorage.setItem('ga_token', newAccess);
       if (newRefresh) localStorage.setItem('ga_refresh_token', newRefresh);
       api.defaults.headers.common.Authorization = `Bearer ${newAccess}`;
       return newAccess;
-    });
+    }).finally(() => { refreshFlight = null; });
+  return refreshFlight;
 };
 
 // ── Request interceptor: refresco PROACTIVO ───────────────────────────────
@@ -93,7 +101,7 @@ api.interceptors.response.use(
     const originalRequest = err.config;
 
     if (
-      err.response?.status === 401 &&
+      (err.response?.status === 401 || (err.response?.status === 403 && err.response?.data?.message === 'token inválido o expirado.')) &&
       !originalRequest._retry &&
       !originalRequest.url?.includes('/auth/refresh') &&
       !originalRequest.url?.includes('/auth/login')
@@ -123,7 +131,7 @@ api.interceptors.response.use(
         return api(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError, null);
-        clearSession();
+        if (refreshError.message !== 'session_changed') clearSession();
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
@@ -137,6 +145,12 @@ api.interceptors.response.use(
 export const checkHealth = () => api.get('/health');
 
 // ── Auth ──
+export const logoutUser = (refreshToken, { allDevices = false } = {}) => {
+  logoutInProgress = true;
+  authGeneration++; // Impide que un refresh en vuelo restaure credenciales tras logout.
+  return axios.post(`${api.defaults.baseURL}/auth/logout`, { refreshToken, allDevices }, { timeout: 8000, headers: allDevices ? { Authorization: `Bearer ${localStorage.getItem('ga_token')}` } : {} }).then((response) => { delete api.defaults.headers.common.Authorization; return response; }).finally(() => { logoutInProgress = false; });
+};
+
 export const loginUser    = (email, password)                                   => api.post('/auth/login',    { email, password });
 export const registerUser = (nombre, apellido, email, password, telefono)       => api.post('/auth/register', { nombre, apellido, email, password, telefono });
 export const oauthGoogle        = (access_token) => api.post('/auth/google',   { access_token });
