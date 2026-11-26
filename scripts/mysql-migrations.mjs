@@ -59,7 +59,7 @@ export async function validateMigrations({ admin, root, database, result }) {
   assert.deepEqual(repeated, snapshot);
   result.checks.push({ name: 'Migraciones conservan filas anteriores y 003/004/019 admiten repetición', status: 'passed' });
   const [keys] = await admin.query('SELECT constraint_name FROM information_schema.referential_constraints WHERE constraint_schema=?', [legacy]);
-  assert.equal(keys.length, 17);
-  result.checks.push({ name: '17 relaciones instaladas por las migraciones', status: 'passed' });
+  assert.equal(keys.length, 19);
+  result.checks.push({ name: '19 relaciones instaladas por las migraciones', status: 'passed' });
   await admin.changeUser({ database });
 }
