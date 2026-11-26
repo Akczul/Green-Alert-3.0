@@ -1,5 +1,13 @@
 # Verificación móvil
 
+## Cierre Android del 25 de noviembre de 2026
+
+La misión 01 compiló la APK release en Linux/Docker (567 tareas), verificó firma V2, paquete, ABI arm64 y bundle integrado, y la instaló con `adb install -r` en Samsung SM-A055M, Android 15/API 35. Lint, configuración JS, dependencias Expo, bundle, prebuild y 58 pruebas móviles pasaron; se conserva el timeout de la primera ejecución y su repetición exacta correcta. La primera finalización del manifiesto falló por el nuevo texto `V2 Signer` de Build Tools 37; se corrigió el lector y se reexportó usando la caché, sin recompilar fuentes nativas.
+
+Estado, hash, commits de compilación/validación y resultados físicos: [misión 01](../../../docs/cierre-definitivo/01-sincronizacion-android.md) y [manifiesto vigente](../../../docs/evidencias-integracion/apk.json). Los apartados siguientes conservan el historial de `feat/mobile`; su afirmación de ausencia de APK fue sustituida por esta evidencia.
+
+## Registro histórico de feat/mobile
+
 Fecha de trabajo: 24 de noviembre de 2026, America/Bogota. Rama `feat/mobile`, worktree exclusivo `D:\Juan Diego\7. Septimo Semestre\GreenAlert3.0-mobile`. Base inspeccionada: `9a463db`. No se han modificado fuentes backend/frontend ni archivos compartidos.
 
 ## Entorno
