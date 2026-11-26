@@ -440,6 +440,39 @@ CREATE TABLE IF NOT EXISTS admin_mfa (
 ) ENGINE=InnoDB;
 ```
 
+Origen: apps/backend/migrations/024_admin_hierarchy.sql
+
+```sql
+CREATE TABLE IF NOT EXISTS admin_audit (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  occurred_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  actor_id BIGINT UNSIGNED NULL,
+  action VARCHAR(40) NOT NULL,
+  target_id BIGINT UNSIGNED NULL,
+  before_state JSON NULL,
+  after_state JSON NULL,
+  correlation_id CHAR(36) NULL,
+  INDEX admin_audit_actor (actor_id, occurred_at),
+  INDEX admin_audit_target (target_id, occurred_at)
+) ENGINE=InnoDB;
+```
+
+Origen: apps/backend/migrations/025_federated_identities.sql
+
+```sql
+CREATE TABLE IF NOT EXISTS federated_identities (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  provider VARCHAR(40) NOT NULL,
+  subject VARCHAR(255) NOT NULL,
+  id_usuario BIGINT UNSIGNED NOT NULL,
+  email VARCHAR(100) NOT NULL,
+  created_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  UNIQUE KEY uq_federated_provider_subject (provider, subject),
+  UNIQUE KEY uq_federated_provider_user (provider, id_usuario),
+  CONSTRAINT fk_federated_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+```
+
 ## MongoDB
 
 Colección analytics_runs. Campos requeridos: run_id string UUID, schema_version entero, scope string, kind enum risk/training/forecast, algorithm_version string, period objeto, parameters objeto, results objeto, executed_at date e input_hash string. source_revision/source_kind relacionan el snapshot MySQL o sintético. run_id UNIQUE; índices scope/kind/executed_at/run_id y scope/source_revision. La validación efectiva está en repository.py y schemas.py. Ejemplo sintético: kind=risk, scope=user:7, source_kind=mysql; no se persiste el lote de información personal.

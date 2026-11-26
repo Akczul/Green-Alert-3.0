@@ -33,6 +33,9 @@ RUN curl -fsSLo /tmp/clt.zip "https://dl.google.com/android/repository/commandli
 RUN yes | sdkmanager --licenses > /dev/null \
  && sdkmanager 'platform-tools' 'platforms;android-37.0' 'build-tools;37.0.0' 'ndk;27.1.12297006' 'cmake;3.22.1' > /dev/null
 
+# Build-Tools 36 lo exige el plugin Android de React Native; preinstalado para no descargarlo en pleno Gradle.
+RUN sdkmanager 'build-tools;36.0.0' > /dev/null
+
 WORKDIR /src
 COPY package.json package-lock.json ./
 RUN --mount=type=cache,target=/root/.npm npm ci --no-audit --no-fund
