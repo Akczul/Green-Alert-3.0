@@ -5,7 +5,7 @@ import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { assertCleanMobile, gitAt, mobileTree, validateApk } from './apk-provenance.mjs';
+import { assertCleanMobile, gitAt, mobileTree, signingCertificateSha256, validateApk } from './apk-provenance.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 assertCleanMobile(root);
@@ -43,7 +43,7 @@ const evidence = {
   exists: true, path: `${dest}/greenalert.apk`, sha256, commit, mobileSourcesDirty: false,
   mobileSourceTree: sourceTree,
   bytes: readFileSync(apk).length, nativeAbis,
-  certificateSha256: signature.match(/Signer #1 certificate SHA-256 digest: (\w+)/)?.[1],
+  certificateSha256: signingCertificateSha256(signature),
   abis, initialApiUrl: api, allowHttp: allowHttp === 'true', builtAt: new Date().toISOString(),
   signing: 'debug (evaluación, no publicar)', builder: 'apps/mobile/docker/apk.Dockerfile (Linux)',
 };

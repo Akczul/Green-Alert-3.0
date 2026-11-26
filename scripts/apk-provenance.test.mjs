@@ -22,7 +22,7 @@ test('Entrega rechaza APK alterada, fuentes distintas, cambios locales y procede
     write('.local/apk/greenalert.apk', 'artefacto sintético para probar procedencia, no una APK real');
     const sha256 = createHash('sha256').update('artefacto sintético para probar procedencia, no una APK real').digest('hex');
     write('.local/apk/greenalert.apk.sha256', `${sha256}  /out/greenalert.apk\n`);
-    write('.local/apk/firma.txt', 'Signer #1 certificate SHA-256 digest: prueba\n');
+    write('.local/apk/firma.txt', `V2 Signer: certificate SHA-256 digest: ${'a'.repeat(64)}\n`);
     write('.local/apk/contenido.txt', "package: name='co.greenalert.mobile'\nassets/index.android.bundle\n");
     const manifest = { exists: true, path: '.local/apk/greenalert.apk', sha256,
       commit: git('rev-parse', 'HEAD'), mobileSourcesDirty: false, mobileSourceTree: mobileTree(root) };
@@ -34,6 +34,8 @@ test('Entrega rechaza APK alterada, fuentes distintas, cambios locales y procede
     assert.throws(() => readApkManifest(root), /contradicen/);
     write('.local/integracion/apk.json', JSON.stringify(manifest));
     assert.deepEqual(readApkManifest(root), manifest);
+    assert.equal(validateApk(root, manifest).sha256, sha256);
+    write('.local/apk/firma.txt', `Signer #1 certificate SHA-256 digest: ${'a'.repeat(64)}\n`);
     assert.equal(validateApk(root, manifest).sha256, sha256);
     write('continuidad.md', 'Commit exclusivamente documental'); commit();
     assert.equal(validateApk(root, manifest).sha256, sha256);
@@ -49,7 +51,7 @@ test('Entrega rechaza APK alterada, fuentes distintas, cambios locales y procede
     const current = { ...manifest, commit: git('rev-parse', 'HEAD'), mobileSourceTree: mobileTree(root) };
     write('.local/apk/firma.txt', '');
     assert.throws(() => validateApk(root, current), /Falta evidencia/);
-    write('.local/apk/firma.txt', 'Signer #1 certificate SHA-256 digest: prueba\n');
+    write('.local/apk/firma.txt', `V2 Signer: certificate SHA-256 digest: ${'a'.repeat(64)}\n`);
     write('.local/apk/contenido.txt', "package: name='co.greenalert.mobile'\n");
     assert.throws(() => validateApk(root, current), /Falta evidencia/);
     write('.local/apk/contenido.txt', "package: name='co.greenalert.mobile'\nassets/index.android.bundle\n");

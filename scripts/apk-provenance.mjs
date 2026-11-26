@@ -23,6 +23,11 @@ export function mobileTree(root, ref = 'HEAD') {
   return gitAt(root, ['rev-parse', `${ref}:apps/mobile`]);
 }
 
+export function signingCertificateSha256(signature) {
+  // Build Tools 37 usa «V2 Signer»; versiones previas imprimen «Signer #1».
+  return signature.match(/(?:Signer #\d+|V\d(?:\.\d)? Signer):? certificate SHA-256 digest: ([a-f0-9]{64})/i)?.[1];
+}
+
 export function assertCleanMobile(root) {
   if (gitAt(root, ['status', '--porcelain', '--untracked-files=all', '--', 'apps/mobile']))
     throw new Error('Confirma las fuentes móviles antes de compilar o empaquetar.');
@@ -53,7 +58,7 @@ export function validateApk(root, manifest) {
     throw new Error('La APK cambió después de validarse.');
   const signature = readFileSync(path.join(root, '.local/apk/firma.txt'), 'utf8');
   const inspection = readFileSync(path.join(root, '.local/apk/contenido.txt'), 'utf8');
-  if (!signature.includes('Signer #1 certificate SHA-256 digest:') ||
+  if (!signingCertificateSha256(signature) ||
       !inspection.includes('assets/index.android.bundle') || !inspection.includes("package: name='co.greenalert.mobile'"))
     throw new Error('Falta evidencia de firma, paquete Android o bundle integrado.');
   return { source, bytes: bytes.length, sha256 };
