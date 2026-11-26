@@ -22,6 +22,13 @@ try {
     const sql = await readFile(path.join(root,'apps/backend/migrations/020_add_revocable_sessions.sql'),'utf8');
     await executeSqlFile(admin, sql); await executeSqlFile(admin, sql);
   });
+  await check('Migraciones 022-024 aditivas: auditoría y jerarquía administrativa', async () => {
+    for (const file of ['022_session_activity_audit.sql','024_admin_hierarchy.sql']) {
+      await executeSqlFile(admin, await readFile(path.join(root,'apps/backend/migrations',file),'utf8'));
+    }
+    const [[row]]=await admin.query("SELECT COUNT(*) AS n FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='usuarios' AND COLUMN_NAME IN ('nivel_admin','ambito_entidad')");
+    assert.equal(row.n,2);
+  });
   const password = randomBytes(24).toString('hex'), secret = randomBytes(32).toString('hex');
   await admin.query("CREATE USER 'ga_security'@'%' IDENTIFIED BY ?", [password]);
   await admin.query(`GRANT ALL PRIVILEGES ON \`${database}\`.* TO 'ga_security'@'%'`);
@@ -119,8 +126,19 @@ try {
   });
   const rootUser=await api('POST','/auth/register',account('admin@example.test'),null,201);
   const target=await api('POST','/auth/register',account('target@example.test'),null,201);
-  await admin.query("UPDATE usuarios SET rol='admin' WHERE email IN ('admin@example.test','target@example.test')");
-  const rootSession=await api('POST','/auth/login',{email:'admin@example.test',password:valid});
+  await admin.query("UPDATE usuarios SET rol='admin', nivel_admin='ambito' WHERE email IN ('admin@example.test','target@example.test')");
+  await check('Primer superadministrador solo por inicialización controlada y una sola vez', async () => {
+    const run = (email) => new Promise((resolve) => {
+      const cli = fork(path.join(root,'apps/backend/scripts/crear-superadmin.mjs'), [email], { cwd:path.join(root,'apps/backend'), stdio:'pipe', env:{
+        ...process.env, DB_HOST:'127.0.0.1', DB_PORT:String(sandbox.config.port), DB_NAME:database, DB_USER:'ga_security', DB_PASSWORD:password, DB_SSL:'false' } });
+      cli.stdout.resume(); cli.stderr.resume(); cli.on('exit', resolve);
+    });
+    assert.equal(await run('admin@example.test'), 0);
+    assert.notEqual(await run('target@example.test'), 0);
+    const [[row]]=await admin.query("SELECT COUNT(*) AS n FROM usuarios WHERE nivel_admin='global'");assert.equal(row.n,1);
+    const [[audit]]=await admin.query("SELECT COUNT(*) AS n FROM admin_audit WHERE action='inicializar_superadmin'");assert.equal(audit.n,1);
+  });
+  let rootSession=await api('POST','/auth/login',{email:'admin@example.test',password:valid});
   const targetSession=await api('POST','/auth/login',{email:'target@example.test',password:valid});
   let downgradedSession;
   await check('Administrador degradado por API pierde privilegios inmediatamente',async()=>{
@@ -144,6 +162,48 @@ try {
   await check('Guardar rol sin cambios conserva sesión legítima',async()=>{
     await api('PATCH',`/admin/usuarios/${rootUser.user.id_usuario}/rol`,{rol:'admin'},rootSession.token);
     await api('GET','/admin/usuarios',null,rootSession.token);
+  });
+  await check('Administrador de ámbito no se eleva, no toca administradores ni otro ámbito',async()=>{
+    const scoped=await api('POST','/auth/register',account('scoped@example.test'),null,201);
+    const org=await api('POST','/auth/register',account('org@example.test'),null,201);
+    const member=await api('POST','/auth/register',account('member@example.test'),null,201);
+    await api('PATCH',`/admin/usuarios/${scoped.user.id_usuario}/rol`,{rol:'admin',nivel_admin:'ambito'},rootSession.token);
+    await api('PATCH',`/admin/usuarios/${org.user.id_usuario}/rol`,{rol:'admin',nivel_admin:'ambito',ambito_entidad:1},rootSession.token);
+    await api('PATCH',`/admin/usuarios/${member.user.id_usuario}/rol`,{rol:'entidad',id_entidad:2},rootSession.token);
+    const s=await api('POST','/auth/login',{email:'scoped@example.test',password:valid});
+    const o=await api('POST','/auth/login',{email:'org@example.test',password:valid});
+    await api('PATCH',`/admin/usuarios/${scoped.user.id_usuario}/rol`,{rol:'admin',nivel_admin:'global'},s.token,403);
+    await api('PATCH',`/admin/usuarios/${outsider.user.id_usuario}/rol`,{rol:'admin'},s.token,403);
+    await api('PATCH',`/admin/usuarios/${rootUser.user.id_usuario}/estado`,{activo:false},s.token,403);
+    await api('PATCH',`/admin/usuarios/${member.user.id_usuario}/rol`,{rol:'entidad',id_entidad:1},o.token,403);
+    await api('GET',`/admin/usuarios/${member.user.id_usuario}`,null,o.token,404);
+    await api('GET','/admin/auditoria',null,s.token,403);
+    await api('POST','/integracion/eventos/reenviar',null,s.token,403);
+    const listed=await api('GET','/admin/usuarios?limit=100',null,o.token);
+    assert.ok(listed.usuarios.every(u=>u.rol==='entidad'&&Number(u.id_entidad)===1));
+    await api('PATCH',`/admin/usuarios/${outsider.user.id_usuario}/rol`,{rol:'moderador'},s.token);
+    const [[row]]=await admin.query("SELECT rol,nivel_admin FROM usuarios WHERE id_usuario=?",[scoped.user.id_usuario]);assert.deepEqual({...row},{rol:'admin',nivel_admin:'ambito'});
+  });
+  await check('Superadministrador consulta auditoría con autor; nadie la borra ni modifica',async()=>{
+    const audit=await api('GET','/admin/auditoria?limit=100',null,rootSession.token);
+    assert.ok(audit.items.some(i=>i.action==='cambiar_rol'&&Number(i.actor_id)===rootUser.user.id_usuario));
+    await assert.rejects(admin.query('DELETE FROM admin_audit'),/solo anexado/);
+    await assert.rejects(admin.query('UPDATE admin_audit SET actor_id=NULL'),/solo anexado/);
+    await admin.query("INSERT INTO security_audit (actor_id,method,resource,status_code,correlation_id) VALUES (NULL,'GET','/x',200,UUID())");
+    await assert.rejects(admin.query('DELETE FROM security_audit'),/solo anexado/);
+  });
+  await check('El último superadministrador no puede degradarse ni con solicitudes simultáneas',async()=>{
+    const second=await api('POST','/auth/register',account('super2@example.test'),null,201);
+    await api('PATCH',`/admin/usuarios/${second.user.id_usuario}/rol`,{rol:'admin',nivel_admin:'global'},rootSession.token);
+    const s2=await api('POST','/auth/login',{email:'super2@example.test',password:valid});
+    const call=(token,id)=>fetch(`http://127.0.0.1:${ready.port}/api/admin/usuarios/${id}/rol`,{method:'PATCH',signal:AbortSignal.timeout(15000),
+      headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({rol:'admin',nivel_admin:'ambito'})});
+    const statuses=(await Promise.all([call(rootSession.token,second.user.id_usuario),call(s2.token,rootUser.user.id_usuario)])).map(r=>r.status);
+    const [[row]]=await admin.query("SELECT COUNT(*) AS n FROM usuarios WHERE nivel_admin='global' AND activo=1 AND deleted_at IS NULL");
+    assert.ok(row.n>=1,`quedaron ${row.n} superadministradores (${statuses})`);
+    assert.ok(statuses.every(code=>[200,403,409].includes(code)),String(statuses));
+    // Una degradación aceptada invalida la sesión afectada; el operador vuelve a autenticarse.
+    rootSession=await api('POST','/auth/login',{email:'admin@example.test',password:valid});
   });
   await check('Logout global revoca solo las sesiones del titular',async()=>{
     const another=await api('POST','/auth/login',{email:'first@example.test',password:changed});

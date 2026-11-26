@@ -222,7 +222,9 @@ export const verificarEmailOtp     = (codigo)                                   
 export const getAdminStats        = ()                  => api.get('/admin/usuarios/stats');
 export const getAdminUsuarios     = (params)            => api.get('/admin/usuarios', { params });
 export const getAdminUsuario      = (id)                => api.get(`/admin/usuarios/${id}`);
-export const cambiarRolUsuario    = (id, rol)           => api.patch(`/admin/usuarios/${id}/rol`, { rol });
+export const cambiarRolUsuario    = (id, rol, extra = {}) => api.patch(`/admin/usuarios/${id}/rol`, { rol, ...extra });
+// Solo superadministrador: bitácora de cambios administrativos (solo lectura).
+export const getAdminAuditoria    = (params)            => api.get('/admin/auditoria', { params });
 export const cambiarEstadoUsuario = (id, activo)        => api.patch(`/admin/usuarios/${id}/estado`, { activo });
 export const eliminarUsuarioAdmin = (id)                => api.delete(`/admin/usuarios/${id}`);
 

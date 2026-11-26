@@ -1,4 +1,6 @@
-# Cinco motores del producto; los volúmenes pertenecen al proyecto Compose elegido.
+# Proyecto Compose de datos: cinco motores (MySQL, MongoDB, Redis, Cassandra, Druid) y sus auxiliares.
+# Se inicia PRIMERO y de forma independiente; compose.apps.yml se une por la red externa declarada.
+# Los volúmenes pertenecen a este proyecto (COMPOSE_PROJECT_NAME, por defecto greenalert-final).
 x-druid: &druid
   build:
     context: ./apps/events/infra
@@ -60,6 +62,7 @@ services:
       - ./apps/backend/migrations/021_integration_outbox_cache.sql:/docker-entrypoint-initdb.d/021-integration.sql:ro
       - ./apps/backend/migrations/022_session_activity_audit.sql:/docker-entrypoint-initdb.d/022-sessions.sql:ro
       - ./apps/backend/migrations/023_admin_mfa.sql:/docker-entrypoint-initdb.d/023-mfa.sql:ro
+      - ./apps/backend/migrations/024_admin_hierarchy.sql:/docker-entrypoint-initdb.d/024-admin.sql:ro
     networks: [shared]
     healthcheck:
       test: [CMD-SHELL, 'MYSQL_PWD="$MYSQL_PASSWORD" mysql -u greenalert greenalert -e "SELECT 1 FROM integration_outbox LIMIT 1" >/dev/null 2>&1']

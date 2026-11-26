@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { verifyToken, requireRoles } from '../middlewares/auth.middleware.js';
+import { adminHttp } from '../src/bootstrap/administracion.js';
 import { operaciones, outbox, reconcile } from '../src/bootstrap/integracion.js';
 import { prediccionCache } from '../src/bootstrap/zonas-riesgo.js';
 
@@ -25,9 +26,9 @@ router.get('/reportes/:id/historial', wrap(req => {
   return operaciones.history(req.user, req.params.id, { ...range(req.query), limit: 100 });
 }));
 router.get('/indicadores', requireRoles('admin', 'moderador'), wrap(req => operaciones.indicators(req.user, range(req.query, true))));
-router.get('/cache/metricas', requireRoles('admin'), wrap(() => prediccionCache.metrics?.() ?? { mode: 'memory' }));
-router.post('/eventos/reenviar', requireRoles('admin'), wrap(() => outbox.drain()));
-router.post('/eventos/reconciliar/:day', requireRoles('admin'), wrap(req => {
+router.get('/cache/metricas', requireRoles('admin'), adminHttp.requireSuperadmin, wrap(() => prediccionCache.metrics?.() ?? { mode: 'memory' }));
+router.post('/eventos/reenviar', requireRoles('admin'), adminHttp.requireSuperadmin, wrap(() => outbox.drain()));
+router.post('/eventos/reconciliar/:day', requireRoles('admin'), adminHttp.requireSuperadmin, wrap(req => {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(req.params.day) || !Number.isFinite(Date.parse(req.params.day))) {
     throw Object.assign(new Error('Día UTC inválido.'), { statusCode: 400 });
   }

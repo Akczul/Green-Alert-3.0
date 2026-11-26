@@ -10,7 +10,7 @@ import { AppState, Text } from "react-native";
 import NetInfo from "@react-native-community/netinfo";
 import { useFonts } from "expo-font";
 import { createClient } from "./api";
-import { secureSession } from "./storage";
+import { secureSession, serverPreference } from "./storage";
 import { Button, Loading, Notice, Page, styles } from "./ui";
 const Context = createContext(null);
 export const useSession = () => useContext(Context);
@@ -39,8 +39,18 @@ export function SessionProvider({ children }) {
   );
   const recover = useCallback(
     () =>
-      client
-        .restore()
+      serverPreference
+        .get()
+        .then((saved) => {
+          // Una preferencia corrupta no bloquea el arranque: se conserva la URL de compilación.
+          try {
+            if (saved) client.useServer(saved);
+          } catch {
+            /* URL guardada no válida */
+          }
+        })
+        .catch(() => {})
+        .then(() => client.restore())
         .then(setUser)
         .catch((e) => setBootError(e.message))
         .finally(() => setBooting(false)),

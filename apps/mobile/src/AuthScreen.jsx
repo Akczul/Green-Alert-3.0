@@ -2,8 +2,12 @@ import React, { useState } from "react";
 import { Image, Text } from "react-native";
 import { Button, Field, Loading, Notice, Page, styles, useAction } from "./ui";
 import { validateAuth } from "./domain";
+import { serverPreference } from "./storage";
 export function AuthScreen({ client, onUser }) {
   const [register, setRegister] = useState(false);
+  const [editServer, setEditServer] = useState(false);
+  const [server, setServer] = useState(client.server?.() || "");
+  const [serverNotice, setServerNotice] = useState("");
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -125,6 +129,39 @@ export function AuthScreen({ client, onUser }) {
           })
         }
       />
+      {editServer ? (
+        <>
+          <Field
+            label="URL del servidor (API)"
+            value={server}
+            onChangeText={setServer}
+            autoCapitalize="none"
+            keyboardType="url"
+            editable={!action.busy}
+          />
+          <Button
+            title="Guardar servidor"
+            disabled={action.busy}
+            onPress={() =>
+              action.run(async () => {
+                const next = client.useServer(server);
+                await serverPreference.set(next);
+                setServer(next);
+                setServerNotice(`Servidor: ${next}`);
+                setEditServer(false);
+              })
+            }
+          />
+        </>
+      ) : (
+        <Button
+          secondary
+          title="Cambiar servidor"
+          disabled={action.busy}
+          onPress={() => setEditServer(true)}
+        />
+      )}
+      <Notice text={serverNotice} />
       <Button
         secondary
         title={register ? "Ya tengo una cuenta" : "Crear una cuenta"}

@@ -1,3 +1,5 @@
+# Proyecto Compose de aplicaciones: 3 backends + web. Se inicia DESPUÉS de compose.datos.yml
+# (ver docs/integracion-final.md, «Orden de inicio»). Se une a los motores solo por la red externa.
 services:
   events:
     restart: unless-stopped
@@ -12,17 +14,8 @@ services:
       EVENTS_WORKERS: ${EVENTS_WORKERS:-4}
       EVENTS_QUEUE_CAPACITY: ${EVENTS_QUEUE_CAPACITY:-128}
       DRUID_TASK_TIMEOUT_SECONDS: ${DRUID_TASK_TIMEOUT_SECONDS:-180}
-    depends_on:
-      schema:
-        condition: service_completed_successfully
-      broker:
-        condition: service_healthy
-      coordinator:
-        condition: service_healthy
-      historical:
-        condition: service_healthy
-      middlemanager:
-        condition: service_healthy
+    # Sin depends_on hacia compose.datos.yml: son proyectos distintos unidos por la red externa.
+    # Si Cassandra/Druid aún no responden, el contenedor reinicia hasta que estén sanos.
     networks: [shared]
     stop_grace_period: 40s
     healthcheck:
@@ -67,9 +60,6 @@ services:
       FRONTEND_URL: http://localhost:${FRONTEND_PORT:-8080}
       CORS_ORIGIN: http://localhost:${FRONTEND_PORT:-8080},http://localhost:5173
       API_PUBLIC_URL: http://localhost:${FRONTEND_PORT:-8080}
-    depends_on:
-      mysql:
-        condition: service_healthy
     volumes:
       - backend_uploads:/app/uploads
     healthcheck:
@@ -97,6 +87,12 @@ services:
     depends_on:
       backend-prod:
         condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: [CMD-SHELL, 'wget -q -O /dev/null http://127.0.0.1:8080/ || exit 1']
+      interval: 15s
+      timeout: 5s
+      retries: 5
   analytics:
     restart: unless-stopped
     build: ./apps/analytics
@@ -108,9 +104,6 @@ services:
     init: true
     mem_limit: 1536m
     networks: [shared]
-    depends_on:
-      mongo:
-        condition: service_healthy
     healthcheck:
       test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/live', timeout=2)"]
       interval: 5s
@@ -118,6 +111,8 @@ services:
       retries: 40
 volumes:
   backend_uploads:
+    # Nombre fijo: conserva el volumen creado cuando ambos archivos se levantaban como un solo proyecto.
+    name: ${GREENALERT_DATA_PROJECT:-greenalert-final}_backend_uploads
 networks:
   shared:
     external: true

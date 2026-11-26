@@ -44,8 +44,11 @@ export const UsuarioModel = {
     const googleId = await UsuarioModel._optionalColumnSelect('google_id');
     const facebookId = await UsuarioModel._optionalColumnSelect('facebook_id');
     const idEntidad = await UsuarioModel._optionalColumnSelect('id_entidad');
+    // Jerarquía administrativa (migración 024). Sin ella, un admin conserva el control global previo.
+    const nivelAdmin = await UsuarioModel._optionalColumnSelect('nivel_admin', "IF(rol = 'admin', 'global', NULL)");
+    const ambitoEntidad = await UsuarioModel._optionalColumnSelect('ambito_entidad');
 
-    return `${UsuarioModel._publicUserFields}, ${idEntidad}, ${notificationPreferences}, ${googleId}, ${facebookId}`;
+    return `${UsuarioModel._publicUserFields}, ${idEntidad}, ${notificationPreferences}, ${googleId}, ${facebookId}, ${nivelAdmin}, ${ambitoEntidad}`;
   },
   
     // Busca un usuario por su email 

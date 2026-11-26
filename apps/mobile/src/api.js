@@ -21,7 +21,9 @@ export function createClient({
 }) {
   let session = null,
     refreshing = null,
-    generation = 0;
+    generation = 0,
+    // Servidor activo: el de compilación o el elegido en el dispositivo (sin sesión abierta).
+    server = baseUrl;
   let writes = Promise.resolve();
   const persist = (value) => {
     writes = writes
@@ -48,7 +50,7 @@ export function createClient({
       timeoutMs = timeout,
     } = {},
   ) {
-    const url = validateApiUrl(baseUrl, allowHttp);
+    const url = validateApiUrl(server, allowHttp);
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
     try {
@@ -180,6 +182,14 @@ export function createClient({
   }
   return {
     request,
+    server: () => server,
+    // Cambiar de servidor invalida cualquier sesión en curso para no mezclar credenciales.
+    useServer(input) {
+      if (session) throw new ApiError("Cierra sesión antes de cambiar de servidor.");
+      server = validateApiUrl(String(input || "").trim().replace(/\/+$/, ""), allowHttp);
+      generation++;
+      return server;
+    },
     async authenticate(form, register) {
       const data = await wire(register ? "/auth/register" : "/auth/login", {
         method: "POST",

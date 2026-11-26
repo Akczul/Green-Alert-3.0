@@ -35,9 +35,13 @@
     "infra:db": "docker compose up -d mysql",
     "infra:down": "docker compose down",
     "setup:integracion": "node scripts/setup-integracion.mjs",
-    "infra:final:config": "docker compose --env-file .env.integracion -f compose.datos.yml -f compose.apps.yml config --quiet",
+    "infra:final:config": "docker compose -p greenalert-final --env-file .env.integracion -f compose.datos.yml config --quiet && docker compose -p greenalert-final-apps --env-file .env.integracion -f compose.apps.yml config --quiet",
     "infra:final:up": "node scripts/infra-final.mjs up",
     "infra:final:down": "node scripts/infra-final.mjs down",
-    "test:integracion": "node scripts/validate-integration.mjs"
+    "test:integracion": "node scripts/validate-integration.mjs",
+    "infra:final:status": "node scripts/infra-final.mjs status",
+    "infra:final:migrar-024": "node scripts/infra-final.mjs migrar-024",
+    "infra:final:superadmin": "docker compose -p greenalert-final-apps --env-file .env.integracion -f compose.apps.yml exec backend-prod node scripts/crear-superadmin.mjs",
+    "apk:docker": "node scripts/build-apk-docker.mjs"
   }
 }

@@ -176,6 +176,9 @@ const toPublicUser = (user) => ({
   email: user.email,
   rol: user.rol,
   id_entidad: user.id_entidad ?? null,
+  // Jerarquía administrativa (024): 'global' = superadministrador, 'ambito' = segundo nivel.
+  nivel_admin: user.rol === 'admin' ? (user.nivel_admin ?? null) : null,
+  ambito_entidad: user.rol === 'admin' ? (user.ambito_entidad ?? null) : null,
   activo: user.activo,
   email_verificado: user.email_verificado,
   avatar_url: user.avatar_url,

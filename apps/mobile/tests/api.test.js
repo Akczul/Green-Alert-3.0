@@ -34,6 +34,16 @@ test("permiso 403 de un objeto conserva sesión y no intenta renovarla", async (
   expect(f.fetcher).toHaveBeenCalledTimes(2);
   expect(f.storage.clear).not.toHaveBeenCalled();
 });
+test("el servidor elegido en el dispositivo se valida y no cambia con sesión abierta", async () => {
+  const f = fixture();
+  expect(() => f.client.useServer("http://localhost:8080/api")).toThrow();
+  expect(() => f.client.useServer("http://192.168.1.20:8080/api")).toThrow(/HTTPS/);
+  expect(f.client.useServer("https://lab.example.org/api/")).toBe("https://lab.example.org/api");
+  f.fetcher.mockResolvedValueOnce(ok({ user }));
+  await f.client.restore();
+  expect(f.fetcher.mock.calls[0][0]).toBe("https://lab.example.org/api/auth/perfil");
+  expect(() => f.client.useServer("https://otro.example.org/api")).toThrow(/Cierra sesión/);
+});
 function fixture(saved = session, fetcher = jest.fn()) {
   const storage = {
     get: jest.fn(async () => saved),

@@ -20,7 +20,10 @@ const mockClient = {
   profile: jest.fn(),
 };
 jest.mock("../src/api", () => ({ createClient: () => mockClient }));
-jest.mock("../src/storage", () => ({ secureSession: {} }));
+jest.mock("../src/storage", () => ({
+  secureSession: {},
+  serverPreference: { get: async () => null, set: async () => {} },
+}));
 jest.mock("expo-font", () => ({
   ...jest.requireActual("expo-font"),
   useFonts: () => [true, null],
