@@ -30,11 +30,20 @@ if (result.status !== 0) process.exit(result.status ?? 1);
 const apk = new URL(`../${dest}/greenalert.apk`, import.meta.url);
 if (!existsSync(apk)) throw new Error('La compilación terminó sin APK.');
 const sha256 = createHash('sha256').update(readFileSync(apk)).digest('hex');
+// Sidecar relativo para que sha256sum -c funcione también en la carpeta de entrega.
+writeFileSync(new URL(`../${dest}/greenalert.apk.sha256`, import.meta.url), `${sha256}  greenalert.apk\n`);
+const inspection = readFileSync(new URL(`../${dest}/contenido.txt`, import.meta.url), 'utf8');
+const nativeAbis = [...(inspection.match(/^native-code: (.+)$/m)?.[1] || '').matchAll(/'([^']+)'/g)].map(x => x[1]);
+if (nativeAbis.sort().join(',') !== abis.split(',').sort().join(','))
+  throw new Error('Las ABI de la APK no coinciden con las solicitadas.');
+const signature = readFileSync(new URL(`../${dest}/firma.txt`, import.meta.url), 'utf8');
 assertCleanMobile(root);
 if (mobileTree(root) !== sourceTree) throw new Error('Las fuentes cambiaron durante la compilación.');
 const evidence = {
   exists: true, path: `${dest}/greenalert.apk`, sha256, commit, mobileSourcesDirty: false,
   mobileSourceTree: sourceTree,
+  bytes: readFileSync(apk).length, nativeAbis,
+  certificateSha256: signature.match(/Signer #1 certificate SHA-256 digest: (\w+)/)?.[1],
   abis, initialApiUrl: api, allowHttp: allowHttp === 'true', builtAt: new Date().toISOString(),
   signing: 'debug (evaluación, no publicar)', builder: 'apps/mobile/docker/apk.Dockerfile (Linux)',
 };
