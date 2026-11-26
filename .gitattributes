@@ -9,3 +9,5 @@
 *.ico binary
 *.jpg binary
 *.pdf binary
+# Los bloqueos temporales de Office no forman parte del código entregable.
+/docs/entrega/~$* export-ignore
