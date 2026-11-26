@@ -5,8 +5,12 @@ import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { assertCleanMobile, gitAt, mobileTree, validateApk } from './apk-provenance.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
+assertCleanMobile(root);
+const sourceTree = mobileTree(root);
+const commit = gitAt(root, ['rev-parse', 'HEAD']);
 const api = process.env.EXPO_PUBLIC_API_URL;
 if (!api) throw new Error('Define EXPO_PUBLIC_API_URL (URL accesible desde el teléfono).');
 const allowHttp = process.env.EXPO_PUBLIC_ALLOW_HTTP === 'true' ? 'true' : 'false';
@@ -26,13 +30,16 @@ if (result.status !== 0) process.exit(result.status ?? 1);
 const apk = new URL(`../${dest}/greenalert.apk`, import.meta.url);
 if (!existsSync(apk)) throw new Error('La compilación terminó sin APK.');
 const sha256 = createHash('sha256').update(readFileSync(apk)).digest('hex');
-const commit = spawnSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).stdout.trim();
-const dirty = spawnSync('git', ['status', '--porcelain', 'apps/mobile'], { cwd: root, encoding: 'utf8' }).stdout.trim() !== '';
-const manifest = JSON.stringify({
-  exists: true, path: `${dest}/greenalert.apk`, sha256, commit, mobileSourcesDirty: dirty,
+assertCleanMobile(root);
+if (mobileTree(root) !== sourceTree) throw new Error('Las fuentes cambiaron durante la compilación.');
+const evidence = {
+  exists: true, path: `${dest}/greenalert.apk`, sha256, commit, mobileSourcesDirty: false,
+  mobileSourceTree: sourceTree,
   abis, initialApiUrl: api, allowHttp: allowHttp === 'true', builtAt: new Date().toISOString(),
   signing: 'debug (evaluación, no publicar)', builder: 'apps/mobile/docker/apk.Dockerfile (Linux)',
-}, null, 2) + '\n';
+};
+validateApk(root, evidence);
+const manifest = JSON.stringify(evidence, null, 2) + '\n';
 writeFileSync(new URL(`../${dest}/apk.json`, import.meta.url), manifest);
 // Manifiesto que consumen build-academic.mjs y package-delivery.mjs (verifican el hash antes de copiar).
 mkdirSync(new URL('../.local/integracion/', import.meta.url), { recursive: true });
