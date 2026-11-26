@@ -10,7 +10,7 @@ Se comprobaron físicamente apertura sin Metro, guardado de servidor LAN, regist
 
 El envío de imagen de la APK entregada falló antes de alcanzar el proxy. Se identificó en el código instalado de Expo 58 que su serializador requiere File/Blob, y se corrigió el adaptador de creación para suministrar File sin cambiar el campo multipart `files`. La fuente corregida pasó lint, configuración JS, compatibilidad Expo y **60/60 pruebas**. Esa corrección **no está incluida en la APK entregada**: se detuvo la recompilación por prioridad expresa de entrega. La APK y el código final tienen, por tanto, distinta revisión móvil; los manifiestos lo declaran y no se utiliza el empaquetador estricto para ocultar esa diferencia. Cloudinary tampoco tiene credenciales locales configuradas.
 
-La integración adicional conserva su resultado 15/16 y el fallo de reconexión Spring/Cassandra documentado abajo. Los apartados posteriores son la bitácora previa; para el estado final prevalece este apartado. El informe PDF previo se conserva; el DOCX de origen resultó ilegible como ZIP y se recupera a partir de las páginas del PDF, con limitación de edición del cuerpo. Se excluye el bloqueo temporal de Office del ZIP. La portada no tiene integrantes confirmados: no se inventan nombres ni códigos.
+La integración adicional conserva su resultado 15/16 y el fallo de reconexión Spring/Cassandra documentado abajo. Los apartados posteriores son la bitácora previa; para el estado final prevalece este apartado. El informe PDF previo se conserva; el DOCX de origen resultó ilegible como ZIP y se recupera a partir de las páginas del PDF, con limitación de edición del cuerpo. Se excluye el bloqueo temporal de Office del ZIP. La portada fue actualizada con los nombres confirmados por el usuario: Juan Delgado, Alexander Ardila, David Ortega y Daniel Yanguatin; no se inventaron códigos.
 
 ## Sincronización y preservación
 
@@ -89,3 +89,9 @@ La APK, los sidecars y `.env.integracion` permanecen fuera de Git. No se regener
 ## Continuidad
 
 Continuar desde `feat/cierre-definitivo`, conservando este worktree y sus artefactos ignorados. Consultar el resultado Android y la verificación de API añadidos al cierre de esta misión. La próxima sesión debe priorizar el recorrido real en Android autorizado y actualizar únicamente sus evidencias; después podrá abordar el informe académico y la revisión docente pendientes. OIDC externo y hardware siguen necesitando aceptación independiente.
+
+## Paquete definitivo de Moodle
+
+Carpeta solicitada: D:\ENTREGA-GREENALERT. Incluye PDF actualizado de 23 páginas, DOCX recuperado válido de 23 páginas visuales, APK instalada, ZIP exacto del commit publicado, VERSION.txt y MANIFIESTO.json con SHA-256. El PDF conserva los once apartados, diagramas y referencias existentes; se añadieron nombres y una nota mínima de cierre. El DOCX binario está protegido por .gitattributes para conservar sus bytes. La versión original ilegible y el PDF previo permanecen en .local/entrega-original, fuera de la entrega.
+
+La creación del paquete se hace directamente con git archive y copias verificadas por instrucción urgente del usuario. El empaquetador habitual sigue rechazando APK cuyas fuentes móviles difieran; no se debilitó ese control. La excepción de esta entrega está declarada en el manifiesto: código con corrección multipart probada y APK previa con el envío de fotografía pendiente. No se realizaron más desarrollos ni pruebas prolongadas después de la consolidación.

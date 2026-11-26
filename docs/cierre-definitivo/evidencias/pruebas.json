@@ -32,5 +32,23 @@
   {
     "command": "node --test scripts/apk-provenance.test.mjs",
     "exitCode": 0
+  },
+  {
+    "command": "npm --prefix apps/mobile run lint (corrección multipart)",
+    "exitCode": 0
+  },
+  {
+    "command": "npm --prefix apps/mobile run typecheck (corrección multipart)",
+    "exitCode": 0
+  },
+  {
+    "command": "npm --prefix apps/mobile test (corrección multipart)",
+    "exitCode": 0,
+    "passed": 60,
+    "failed": 0
+  },
+  {
+    "command": "npm --prefix apps/mobile run check (corrección multipart)",
+    "exitCode": 0
   }
 ]

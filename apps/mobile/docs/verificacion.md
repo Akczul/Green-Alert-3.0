@@ -49,3 +49,5 @@ npm informa deprecaciones en herramientas y avisos de scripts opcionales de `@pa
 El intento directo de Gradle no llegó a compilar la aplicación y el runner final se detiene al comprobar la ausencia del SDK. No se inició una build EAS, no hubo login externo, subida de fuentes, push ni publicación. La alternativa EAS y la compilación local están documentadas; ambas necesitan terminar la configuración de su entorno.
 
 No se probaron API desplegada, MySQL real, SMTP, proveedores OIDC/MFA, autorización por objeto en servidor, GPS/cámara de dispositivo, Android Keystore en hardware, render de pantalla Android ni instalación física. Los tests de esos adaptadores utilizan dobles y no sustituyen el recorrido de `aceptacion.md`. El cumplimiento integral del instructivo y la aceptación final quedan pendientes de esa evidencia.
+
+Entrega inmediata: el código corregido pasó 60/60 pruebas y conserva el contrato files; esa corrección aún no está incluida en la APK instalada. El binario previo se conserva por prioridad expresa de Moodle. Véase la misión 01 para los resultados físicos y las diferencias de revisiones.
