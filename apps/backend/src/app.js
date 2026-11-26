@@ -16,6 +16,7 @@ import pool from './config/database.js';
 import { getCorsOptions, getHelmetOptions } from './config/security.config.js';
 import { getUploadDir } from './config/upload.config.js';
 import { getApiPrefix } from './config/api-prefix.config.js';
+import { webSession } from './bootstrap/seguridad.js';
 
 const app = express();
 const apiPrefix = getApiPrefix();
@@ -25,6 +26,8 @@ app.use(cors(getCorsOptions()));
 app.options('*', cors(getCorsOptions()));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+// Web: cookies HttpOnly/Secure/SameSite y CSRF de doble envío. Móvil y clientes Bearer: sin cambios.
+app.use(webSession.middleware);
 if (process.env.SECURITY_AUDIT_ENABLED === 'true') app.use(createAuditMiddleware({ pool }));
 
 // Archivos subidos por los usuarios

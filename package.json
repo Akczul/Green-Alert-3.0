@@ -42,6 +42,7 @@
     "infra:final:status": "node scripts/infra-final.mjs status",
     "infra:final:migrar-024": "node scripts/infra-final.mjs migrar-024",
     "infra:final:superadmin": "docker compose -p greenalert-final-apps --env-file .env.integracion -f compose.apps.yml exec backend-prod node scripts/crear-superadmin.mjs",
-    "apk:docker": "node scripts/build-apk-docker.mjs"
+    "apk:docker": "node scripts/build-apk-docker.mjs",
+    "test:cumplimiento": "node scripts/validate-cumplimiento.mjs"
   }
 }

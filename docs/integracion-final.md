@@ -15,7 +15,26 @@ npm.cmd run infra:final:config
 npm.cmd run infra:final:up
 ```
 
-Abrir http://localhost:8080. Solo Nginx publica un puerto, ligado a loopback por defecto. Los servicios internos y las bases se comunican por la red externa indicada en GREENALERT_NETWORK. El script crea esa red si falta. El inicio puede tardar varios minutos por Cassandra y Druid.
+Abrir https://localhost:8443 (certificado autofirmado de laboratorio generado por setup:integracion en .local/tls; aceptar la advertencia del navegador). http://localhost:8080 redirige la web a HTTPS y solo conserva /api para la APK de laboratorio. Solo Nginx publica puertos, ligados a loopback por defecto. El inicio puede tardar varios minutos por Cassandra y Druid.
+
+### Orden de inicio: dos proyectos Compose unidos por una red externa
+
+| Paso | Proyecto | Archivo | Contenido | Espera |
+|---|---|---|---|---|
+| 0 | — | — | Red externa GREENALERT_NETWORK (la crea el script si falta) | — |
+| 1 | greenalert-final | compose.datos.yml | MySQL, MongoDB, Redis, Cassandra (+schema), Druid (+ZooKeeper y metadatos) | healthchecks sanos (--wait) |
+| 2 | greenalert-final-apps | compose.apps.yml | Express, FastAPI, Spring Boot y web Nginx | healthchecks sanos (--wait) |
+
+compose.apps.yml no declara depends_on hacia servicios del otro proyecto: cada backend reinicia (restart: unless-stopped) hasta alcanzar sus motores por nombre de servicio en la red compartida. También pueden levantarse a mano, en el mismo orden:
+
+```powershell
+docker network create greenalert-final
+docker compose -p greenalert-final --env-file .env.integracion -f compose.datos.yml up -d --wait
+docker compose -p greenalert-final-apps --env-file .env.integracion -f compose.apps.yml up --build -d --wait
+npm.cmd run infra:final:status
+```
+
+Para detener se invierte el orden (apps y luego datos); infra:final:down lo hace sin borrar volúmenes. Los volúmenes de datos pertenecen al proyecto greenalert-final, el mismo nombre que usaba la versión de un solo proyecto, y backend_uploads conserva su nombre explícito, por lo que una instalación previa recupera su estado.
 
 ```powershell
 # Detener aplicaciones y motores conservando todos los volúmenes
@@ -26,7 +45,7 @@ npm.cmd run infra:final:up
 
 No usar down --volumes sobre una instalación con información que se quiera conservar. Los Compose de cada servicio y los runners anteriores se mantienen independientes. Los scripts finales no utilizan la base del .env del usuario ni el servicio MySQL80.
 
-El esquema completo solo inicializa un volumen MySQL nuevo. Las migraciones 021, 022 y 023 se montan individualmente después del bootstrap, que ya contiene la 020. En una base anterior: hacer respaldo, revisar su versión y aplicar únicamente las migraciones faltantes con una conexión al esquema correcto. Los triggers requieren privilegios de creación de triggers; con binary logging puede requerirse un operador con privilegios apropiados. No ejecutar toda la cadena histórica. Las migraciones no contienen USE de una base fija.
+El esquema completo solo inicializa un volumen MySQL nuevo. Las migraciones 021 a 025 se montan individualmente después del bootstrap, que ya contiene la 020. Para un volumen creado antes de la jerarquía administrativa: npm.cmd run infra:final:migrar-024 (comprueba antes de aplicar) y aplicar 025 de la misma forma controlada. En una base anterior: hacer respaldo, revisar su versión y aplicar únicamente las migraciones faltantes con una conexión al esquema correcto. Los triggers requieren privilegios de creación de triggers; con binary logging puede requerirse un operador con privilegios apropiados. No ejecutar toda la cadena histórica. Las migraciones no contienen USE de una base fija.
 
 ## Operaciones integradas
 
@@ -76,17 +95,37 @@ La MFA TOTP es obligatoria para rol admin en el Compose final. Usa 6 dígitos, v
 El enrolamiento lo realiza el operador local sobre un administrador activo:
 
 ```powershell
-docker compose --env-file .env.integracion -f compose.datos.yml -f compose.apps.yml exec backend-prod node scripts/provision-admin-mfa.mjs ID_NUMERICO
-docker compose --env-file .env.integracion -f compose.datos.yml -f compose.apps.yml cp backend-prod:/app/.local/mfa/ID_NUMERICO.json .local/
+docker compose -p greenalert-final-apps --env-file .env.integracion -f compose.apps.yml exec backend-prod node scripts/provision-admin-mfa.mjs ID_NUMERICO
+docker compose -p greenalert-final-apps --env-file .env.integracion -f compose.apps.yml cp backend-prod:/app/.local/mfa/ID_NUMERICO.json .local/
 ```
+
+### Jerarquía administrativa (migración 024, módulo hexagonal administracion)
+
+| Rol del instructivo | Representación | Panel | Puede | No puede |
+|---|---|---|---|---|
+| Superadministrador | rol admin, nivel_admin=global | Control global (/admin) + auditoría | Asignar administradores, niveles y ámbitos; parámetros (categorías); operaciones de eventos/caché; consultar auditoría | Borrar o modificar auditoría (triggers); cambiar su propio rol; dejar el sistema sin superadministrador |
+| Administrador de segundo nivel | rol admin, nivel_admin=ambito; ambito_entidad NULL = comunidad, N = organización N | /admin filtrado por ámbito | Gestionar ciudadanos/moderadores (comunidad) o usuarios entidad de N (organización) | Elevarse o elevar a admin; ver o modificar otro ámbito (responde 403 o 404) |
+| Usuario común | ciudadano, moderador, entidad | Cuenta personal y paneles operativos existentes | Recursos propios según permisos | /admin, auditoría y acciones ajenas (403 en API) |
+
+El primer superadministrador se crea por inicialización controlada, nunca por registro: registrar la cuenta normalmente y ejecutar `npm.cmd run infra:final:superadmin -- correo@dominio`; luego enrolar su MFA. El script se niega si ya existe un superadministrador. Cada cambio de rol, nivel, ámbito, estado o eliminación incrementa auth_version (revoca sesiones del afectado) y se registra en admin_audit con autor, estado anterior y posterior en la misma transacción. La degradación del último superadministrador se bloquea con SELECT … FOR UPDATE, también ante solicitudes simultáneas.
 
 El archivo privado contiene el secreto y la URI para el autenticador; no subirlo, adjuntarlo al informe ni conservarlo en el paquete. Importarlo por un canal local y custodiarlo con el administrador. No existe endpoint público para reemplazar factores. El script no sobrescribe un factor existente; recuperar un factor perdido requiere un procedimiento de operador y no está automatizado. Preservar MFA_ENCRYPTION_KEY fuera del repositorio junto al respaldo cifrado de la base.
 
-El registro público siempre crea ciudadanos. Promover una cuenta a admin exige intervención controlada del operador y enrolamiento; no se proporciona una contraseña administrativa universal. Al habilitar MFA en una instalación anterior, revocar explícitamente las familias administrativas previas antes de abrirla a usuarios. En esta versión la MFA administrativa exige acceso local con contraseña; el callback OAuth de un administrador se rechaza si no incorpora el segundo factor. El flujo de challenge federado con segundo factor queda pendiente.
+El registro público siempre crea ciudadanos. Promover una cuenta a admin exige un superadministrador (o la inicialización controlada) y enrolamiento; no se proporciona una contraseña administrativa universal. Al habilitar MFA en una instalación anterior, revocar explícitamente las familias administrativas previas antes de abrirla a usuarios.
+
+### Inicio federado OpenID Connect y MFA
+
+Proveedores externos: Google (id_token verificado con google-auth-library) y Microsoft Entra ID (módulo hexagonal identidad-federada: cliente OIDC genérico con descubrimiento, Authorization Code + PKCE S256, state y nonce de un solo uso, verificación RS256 con JWKS, iss, aud, exp y nonce). El rol nunca proviene del proveedor: una cuenta nueva es ciudadano. Un correo ya registrado solo se vincula si el proveedor afirma email_verified; en otro caso responde 409. El vínculo (provider, subject) es UNIQUE en federated_identities (migración 025).
+
+Si la cuenta federada es administradora y la MFA es obligatoria, el callback no emite sesión: entrega un código temporal pendiente y la web solicita el TOTP; POST /auth/oauth/exchange con code y totp emite la sesión (máximo 5 intentos por código). Configuración de Microsoft: registrar la aplicación en Entra ID con URI de redirección web MICROSOFT_REDIRECT_URI y definir MICROSOFT_CLIENT_ID, MICROSOFT_CLIENT_SECRET y MICROSOFT_TENANT en .env.integracion. Sin esas variables el botón responde 503 y el resto del sistema no cambia.
+
+### Sesión web por cookies y CSRF
+
+Con la cabecera X-GreenAlert-Client: web, el backend mueve los tokens del cuerpo a cookies __Host-ga_at (acceso) y __Host-ga_rt (refresh), ambas HttpOnly, Secure, SameSite=Strict y Path=/, y emite __Host-ga_csrf (legible) para el doble envío: toda escritura autenticada por cookie exige X-CSRF-Token igual a esa cookie o responde 403. JavaScript ya no lee ni guarda tokens; solo conserva el perfil y la expiración no secreta para la renovación proactiva. El cierre de sesión borra las cookies. La app móvil conserva el contrato de tokens en el cuerpo y SecureStore. La web se sirve por HTTPS (TLS 1.2+, HSTS) en Nginx.
 
 security_audit conserva autor, método, ruta sin query, código y correlación para escrituras autenticadas y lecturas del panel admin. Una respuesta crítica se confirma después de escribir la auditoría; si la auditoría falla devuelve 503 y exige consultar el estado antes de reintentar. La mutación previa y su registro HTTP no comparten transacción: un crash entre ambos sigue siendo un límite. La outbox durable conserva adicionalmente los hechos de reportes. No se registran cuerpos ni credenciales.
 
-Pendientes obligatorios: jerarquía superadministrador/administrador de ámbito general, segundo proveedor OIDC real, HTTPS/cookies Secure HttpOnly SameSite y evaluación CSRF asociada. Se mantiene el almacenamiento web heredado en localStorage: no se declara resuelto el requisito de cookies. Google/Facebook/SMTP/Cloudinary/FCM reales requieren configuración y aceptación externas; la prueba usa correo JSON y no prueba esos proveedores. Los secretos internos nunca son variables VITE_ o EXPO_PUBLIC_.
+Límites: Microsoft y Google reales requieren registrar las aplicaciones y aceptar el flujo con cuentas reales; las pruebas automatizadas usan un proveedor OIDC simulado con claves RSA reales. El certificado TLS incluido es autofirmado para laboratorio. Facebook Login es OAuth 2.0, no OIDC, y no se cuenta como proveedor OIDC. SMTP/Cloudinary/FCM reales requieren configuración y aceptación externas; la prueba usa correo JSON y no prueba esos proveedores. Los secretos internos nunca son variables VITE_ o EXPO_PUBLIC_.
 
 ## Android
 
@@ -105,7 +144,7 @@ npm.cmd run apk
 
 SDK 58 utiliza la versión React Native fijada en su lockfile. build-android.ps1 comprueba Java, Android SDK y URL; genera Android por CNG y ejecuta assembleRelease con firma debug local para evaluación. Esa firma no sirve como identidad de una publicación productiva. No se publica en Expo ni Play Store.
 
-Para un emulador Android del mismo host puede usarse http://10.0.2.2:8080/api y EXPO_PUBLIC_ALLOW_HTTP=true. Para teléfono físico usar una IP LAN alcanzable, publicar Nginx con WEB_BIND=0.0.0.0 en una red de laboratorio controlada y recompilar con esa URL. No usar localhost. La compilación no sustituye la instalación y las pruebas físicas de GPS, cámara y SecureStore.
+La APK se compila en Linux dentro de Docker (npm.cmd run apk:docker; ver docs/compilacion-android-local.md), lo que evita el límite Win32 de rutas que bloqueó Ninja. La URL de compilación es solo el valor inicial: en la pantalla de acceso, «Cambiar servidor» permite fijar la URL de la API (validada, guardada en SecureStore y bloqueada con sesión abierta), de modo que la misma APK sirve en la red de la sustentación. Para un emulador del mismo host: http://10.0.2.2:8080/api. Para teléfono físico: http://IP_LAN_DEL_HOST:8080/api con WEB_BIND=0.0.0.0 en una red de laboratorio controlada. No usar localhost. La compilación no sustituye la instalación y las pruebas físicas de GPS, cámara y SecureStore.
 
 ## Verificación y entrega
 

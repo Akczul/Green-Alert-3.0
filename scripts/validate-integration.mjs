@@ -21,7 +21,9 @@ if (reuse) {
 }
 const id = 'ga-final-test-' + randomBytes(5).toString('hex');
 const env = { ...process.env, ...config,
-  ...(reuse ? {} : { COMPOSE_PROJECT_NAME: id, GREENALERT_NETWORK: id, FRONTEND_PORT: String(await freePort()) }) };
+  ...(reuse ? {} : { COMPOSE_PROJECT_NAME: id, GREENALERT_NETWORK: id, FRONTEND_PORT: String(await freePort()), FRONTEND_TLS_PORT: String(await freePort()) }) };
+// Certificado autofirmado de laboratorio (.local/tls): solo este proceso de prueba omite su verificación.
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 const baseArgs = ['compose','--env-file','.env.integracion','-f','compose.datos.yml','-f','compose.apps.yml'];
 const checks = [];
 async function docker(args, compose = true) {
@@ -47,7 +49,8 @@ async function eventually(fn, timeoutMs = 120000) {
   } while (Date.now() < until);
   throw failure;
 }
-const origin = 'http://127.0.0.1:'+env.FRONTEND_PORT;
+const origin = 'http://127.0.0.1:'+env.FRONTEND_PORT; // /api HTTP de laboratorio (cliente Bearer, como la APK)
+const webOrigin = 'https://127.0.0.1:'+(env.FRONTEND_TLS_PORT || '8443');
 async function api(method, route, body, token, expected=200) {
   const response = await fetch(origin+'/api'+route, { method,
     headers: { ...(body ? {'Content-Type':'application/json'} : {}), ...(token ? { Authorization:'Bearer '+token } : {}) },
@@ -69,8 +72,11 @@ try {
   // Cada repetición del sandbox comienza con un proceso limpio, igual que un proyecto nuevo.
   // Evita sumar los intentos del runner anterior al rate limit productivo, que sigue en 5.
   if(reuse) { await docker(['restart','backend-prod']); await eventually(()=>api('GET','/health')); }
-  await check('React compilado y proxy HTTP hacia Express/MySQL', async () => {
-    assert.match(await (await fetch(origin)).text(), /id="root"/);
+  await check('React por HTTPS (HSTS), HTTP redirige y proxy hacia Express/MySQL', async () => {
+    const page = await fetch(webOrigin);
+    assert.match(await page.text(), /id="root"/);
+    assert.match(page.headers.get('strict-transport-security') ?? '', /max-age=/);
+    assert.equal((await fetch(origin+'/dashboard', { redirect: 'manual' })).status, 308);
     assert.equal((await api('GET','/health')).database,'conectada');
   });
   await check('Registro único ante dos altas simultáneas y sesión revocable', async () => {
@@ -87,7 +93,8 @@ try {
       titulo:'Integración '+suffix,direccion:'Laboratorio sintético',latitud:1.15,longitud:-76.65},citizen.token,201)).reporte;
     const rows=await sql('SELECT event_id FROM integration_outbox WHERE report_uuid=?',[report.uuid]);
     assert.equal(rows.length,1);
-    await sql('UPDATE usuarios SET rol=? WHERE email=?',['admin',profile.email]);
+    // Inicialización controlada equivalente a crear-superadmin.mjs (sandbox sintético).
+    await sql("UPDATE usuarios SET rol='admin', nivel_admin='global', auth_version=auth_version+1 WHERE email=?",[profile.email]);
     await api('POST','/auth/login',profile,null,403);
     const adminId=(await sql('SELECT id_usuario FROM usuarios WHERE email=?',[profile.email]))[0].id_usuario;
     const code=(await docker(['exec','-T','backend-prod','node','--input-type=module','-e',

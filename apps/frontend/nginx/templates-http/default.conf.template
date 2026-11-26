@@ -1,0 +1,13 @@
+# Sin certificado montado en /etc/nginx/tls: servicio HTTP en 8080 (compatibilidad con
+# docker-compose.yml heredado y test:stack). El despliegue final (compose.apps.yml) monta TLS.
+server {
+    listen 8080;
+    server_name localhost;
+    root /usr/share/nginx/html;
+    index index.html;
+    resolver 127.0.0.11 valid=10s ipv6=off;
+    set $api_upstream http://backend-prod:3000;
+    client_max_body_size 110m;
+    location = /healthz { access_log off; default_type text/plain; return 200 "ok"; }
+    include /etc/nginx/greenalert-common.conf;
+}

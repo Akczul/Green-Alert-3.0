@@ -85,20 +85,24 @@ RUN npm run build
 # ── Stage 4: Producción Ejecutable (Nginx sin privilegios de root) ────────
 # Usamos nginx-unprivileged para cumplir con el estándar de mínima autorización (Non-Root User).
 # Por defecto escucha en el puerto 8080.
-FROM nginxinc/nginx-unprivileged:1.27-alpine AS production
+FROM nginxinc/nginx-unprivileged:1.27.5-alpine AS production
 
-# Copiar la configuración optimizada y segura de Nginx
-COPY nginx/default.conf /etc/nginx/conf.d/default.conf
+# Configuración de Nginx: plantillas HTTPS/HTTP elegidas al arrancar según exista /etc/nginx/tls.
+# El certificado y la clave se montan en tiempo de ejecución; nunca se copian a la imagen.
+COPY nginx/greenalert-common.conf nginx/greenalert-api.conf /etc/nginx/
+COPY nginx/templates-tls /etc/nginx/templates-tls
+COPY nginx/templates-http /etc/nginx/templates-http
+COPY --chmod=0755 nginx/05-greenalert-tls.envsh /docker-entrypoint.d/05-greenalert-tls.envsh
 
 # Copiar los assets estáticos generados en la fase de builder
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Exponer el puerto 8080
-EXPOSE 8080
+# 8443: HTTPS (web). 8080: redirección a HTTPS y /api para la APK de laboratorio.
+EXPOSE 8080 8443
 
 # Health check: verifica que nginx sirve el index.html correctamente
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD wget -q -O /dev/null http://127.0.0.1:8080/ || exit 1
+    CMD wget -q -O /dev/null http://127.0.0.1:8080/healthz || exit 1
 
 # Comando para arrancar Nginx en primer plano
 CMD ["nginx", "-g", "daemon off;"]

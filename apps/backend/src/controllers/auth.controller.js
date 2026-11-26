@@ -25,7 +25,10 @@ import {
 import {
   consumeOAuthCallbackCode,
   createOAuthCallbackCode,
+  peekOAuthCallbackCode,
+  recordOAuthCallbackFailure,
 } from '../services/oauth-callback-code.service.js';
+import { inicioFederado } from '../bootstrap/identidad-federada.js';
 import { consumeOAuthState } from '../services/oauth-state.service.js';
 import { getApiPrefix } from '../config/api-prefix.config.js';
 import { getCloudinaryConfig } from '../config/cloudinary.config.js';
@@ -210,6 +213,15 @@ const redirectToFrontendAuthCallback = (res, authPayload) => {
   });
 
   return res.redirect(303, buildFrontendAuthCallbackUrl(authPayload));
+};
+
+// Inicio federado (Google/Microsoft): si la cuenta es administradora y la MFA es obligatoria, la sesión
+// no se emite en el callback; el código de un solo uso queda pendiente hasta validar el TOTP.
+const completeFederatedLogin = async (res, user, req) => {
+  if (adminMfa && user.rol === 'admin') {
+    return redirectToFrontendAuthCallback(res, { mfaPendingUserId: user.id_usuario });
+  }
+  return redirectToFrontendAuthCallback(res, await buildAuthPayload(user, req));
 };
 
 const errorResponseWithDevelopmentDetails = (
@@ -513,6 +525,24 @@ export const refreshAccessToken = async (req, res, next) => {
 export const exchangeOAuthCallbackCode = async (req, res, next) => {
   try {
     const { code } = req.body ?? {};
+    const pending = peekOAuthCallbackCode(code);
+
+    if (pending?.mfaPendingUserId) {
+      const user = await UsuarioModel.findById(pending.mfaPendingUserId);
+      if (!user || !user.activo) {
+        consumeOAuthCallbackCode(code);
+        return errorResponse(res, 'Cuenta desactivada. Contacta al administrador.', 403);
+      }
+      let payload;
+      try { payload = await buildAuthPayload(user, req); }
+      catch (error) {
+        if (error.statusCode === 403) recordOAuthCallbackFailure(code);
+        throw error;
+      }
+      consumeOAuthCallbackCode(code);
+      return successResponse(res, payload, 'Autenticacion OAuth completada.', 200);
+    }
+
     const authPayload = consumeOAuthCallbackCode(code);
 
     if (!authPayload) {
@@ -1334,10 +1364,8 @@ export const googleCallback = async (req, res, next) => {
       return errorResponse(res, 'No fue posible crear la cuenta con este correo.', 400);
     }
 
-    // Generar JWT
-    const authPayload = await buildAuthPayload(user, req);
-
-    return redirectToFrontendAuthCallback(res, authPayload);
+    // Generar sesión (con paso MFA si es administrador)
+    return await completeFederatedLogin(res, user, req);
   } catch (error) {
     return forwardAuthError(error, res, next);
   }
@@ -1563,6 +1591,30 @@ export const facebookCallback = async (req, res, next) => {
       user: publicUser,
     });
   } catch (error) {
+    return forwardAuthError(error, res, next);
+  }
+};
+
+// ── OpenID Connect: Microsoft Entra ID (segundo proveedor externo) ─────────────────────────
+// El usuario autoriza en Microsoft; GreenAlert verifica el id_token (firma JWKS, iss, aud, nonce)
+// y asigna el rol internamente (nuevas cuentas: ciudadano).
+export const getMicrosoftAuthUrl = async (req, res, next) => {
+  try {
+    const { url } = await inicioFederado.iniciar('microsoft');
+    return successResponse(res, { url }, 'URL de autenticacion de Microsoft generada.', 200);
+  } catch (error) {
+    if (error.statusCode) return errorResponse(res, error.message, error.statusCode);
+    return next(error);
+  }
+};
+
+export const microsoftCallback = async (req, res, next) => {
+  try {
+    if (req.query?.error) return errorResponse(res, 'Microsoft canceló o rechazó la autorización.', 400);
+    const user = await inicioFederado.completar('microsoft', { code: req.query?.code, state: req.query?.state });
+    return await completeFederatedLogin(res, user, req);
+  } catch (error) {
+    if (error.statusCode) return errorResponse(res, error.message, error.statusCode);
     return forwardAuthError(error, res, next);
   }
 };

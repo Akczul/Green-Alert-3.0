@@ -7,6 +7,7 @@ import { createMysqlSessionReader } from '../modules/identidad/adapters/outbound
 import { passwordBlocklist } from '../modules/identidad/adapters/outbound/passwords.js';
 import { createAuthMiddleware } from '../modules/identidad/adapters/inbound/auth-middleware.js';
 import { createSessionLimits } from '../modules/identidad/adapters/outbound/session-limits.js';
+import { createWebSession } from '../modules/identidad/adapters/inbound/web-session.js';
 export const sessionLimits = process.env.SESSION_LIMITS_ENABLED === 'true' ? createSessionLimits({
   pool, idleSeconds: Number(process.env.SESSION_IDLE_SECONDS ?? 1800), maxSeconds: Number(process.env.SESSION_MAX_SECONDS ?? 604800),
 }) : null;
@@ -26,3 +27,4 @@ export const seguridad = createSeguridad({
   usuarios: reader, identificadores: { next: randomUUID }, passwords: passwordBlocklist,
 });
 export const { verifyToken, optionalAuth } = createAuthMiddleware({ verificarAcceso: (token) => seguridad.verificarAcceso(token) });
+export const webSession = createWebSession({ refreshSeconds: Number(process.env.SESSION_MAX_SECONDS ?? 604800) });

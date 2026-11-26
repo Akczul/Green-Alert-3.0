@@ -1,30 +1,43 @@
 import axios from 'axios';
 
+// Sesión web por cookies HttpOnly/Secure/SameSite=Strict emitidas por el backend: JavaScript nunca
+// lee ni guarda tokens. Solo se conservan datos no secretos: perfil (pista de sesión) y expiración.
+const WEB_CLIENT = { 'X-GreenAlert-Client': 'web' };
 const api = axios.create({
   baseURL: '/api',
   timeout: 8000,
+  withCredentials: true,
+  headers: WEB_CLIENT,
 });
 
 export const analizarRiesgoAmbiental = () => api.post('/integracion/analisis/riesgo', { dias: 30 }, { timeout: 40000 });
 export const consultarIndicadoresAmbientales = () => api.get('/integracion/indicadores', { timeout: 40000 });
 export const consultarHistorialAmbiental = id => api.get(`/integracion/reportes/${id}/historial`, { timeout: 40000 });
 
-// ── Decodifica expiración del JWT sin librería ─────────────────────────────
-const getTokenExp = (token) => {
-  try {
-    // atob es API de browser, siempre disponible en este contexto
-    const payload = JSON.parse(window.atob(token.split('.')[1]));
-    return payload.exp ?? null;
-  } catch {
-    return null;
-  }
+const SESSION_HINT = 'ga_user';
+const ACCESS_EXP = 'ga_access_exp';
+const UNSAFE = new Set(['post', 'put', 'patch', 'delete']);
+
+// Token anti-CSRF de doble envío: la cookie __Host-ga_csrf es legible a propósito; las de sesión no.
+export const csrfHeader = () => {
+  const cookie = typeof document === 'undefined' ? '' : document.cookie;
+  const raw = cookie.split('; ').find((c) => c.startsWith('__Host-ga_csrf='))?.slice('__Host-ga_csrf='.length);
+  return raw ? { 'X-CSRF-Token': decodeURIComponent(raw) } : {};
+};
+
+export const rememberSession = (user, accessTokenExpiresAt) => {
+  localStorage.setItem(SESSION_HINT, JSON.stringify(user));
+  if (accessTokenExpiresAt) localStorage.setItem(ACCESS_EXP, accessTokenExpiresAt);
+};
+export const hasSessionHint = () => Boolean(localStorage.getItem(SESSION_HINT));
+export const forgetSession = () => {
+  // Incluye claves de versiones anteriores que guardaban tokens en localStorage.
+  for (const key of [SESSION_HINT, ACCESS_EXP, 'ga_token', 'ga_refresh_token']) localStorage.removeItem(key);
 };
 
 // ── Limpia sesión y notifica a la app ─────────────────────────────────────
 const clearSession = () => {
-  localStorage.removeItem('ga_token');
-  localStorage.removeItem('ga_refresh_token');
-  localStorage.removeItem('ga_user');
+  forgetSession();
   window.dispatchEvent(new Event('ga:session-expired'));
 };
 
@@ -36,65 +49,50 @@ let isRefreshing = false;
 let proactiveRefreshPromise = null;
 let failedQueue = [];
 
-const processQueue = (error, token = null) => {
+const processQueue = (error) => {
   failedQueue.forEach(({ resolve, reject }) => {
     if (error) reject(error);
-    else resolve(token);
+    else resolve();
   });
   failedQueue = [];
 };
 
-// Lógica de refresh reutilizada por ambos interceptores
+// Lógica de refresh reutilizada por ambos interceptores. El refresh viaja en su cookie HttpOnly.
 const doRefresh = () => {
   if (logoutInProgress) return Promise.reject(new Error('session_changed'));
   if (refreshFlight) return refreshFlight;
+  if (!hasSessionHint()) return Promise.reject(new Error('no_refresh_token'));
   const generation = authGeneration;
-  const refreshToken = localStorage.getItem('ga_refresh_token');
-  if (!refreshToken) return Promise.reject(new Error('no_refresh_token'));
   refreshFlight = axios
-    .post(`${api.defaults.baseURL}/auth/refresh`, { refreshToken }, { timeout: 8000 })
+    .post(`${api.defaults.baseURL}/auth/refresh`, {}, { timeout: 8000, withCredentials: true, headers: { ...WEB_CLIENT, ...csrfHeader() } })
     .then(({ data }) => {
-      const newAccess = data.data.accessToken || data.data.token;
-      const newRefresh = data.data.refreshToken;
-      if (generation !== authGeneration || localStorage.getItem('ga_refresh_token') !== refreshToken) throw new Error('session_changed');
-      localStorage.setItem('ga_token', newAccess);
-      if (newRefresh) localStorage.setItem('ga_refresh_token', newRefresh);
-      api.defaults.headers.common.Authorization = `Bearer ${newAccess}`;
-      return newAccess;
+      if (generation !== authGeneration || !hasSessionHint()) throw new Error('session_changed');
+      if (data?.data?.accessTokenExpiresAt) localStorage.setItem(ACCESS_EXP, data.data.accessTokenExpiresAt);
+      return true;
     }).finally(() => { refreshFlight = null; });
   return refreshFlight;
 };
 
-// ── Request interceptor: refresco PROACTIVO ───────────────────────────────
-// Si el token expira en < 2 min, se renueva ANTES de enviar la petición.
+// ── Request interceptor: CSRF y refresco PROACTIVO ────────────────────────
+// Si el acceso expira en < 2 min, se renueva ANTES de enviar la petición.
 // Esto evita fallos en uploads multipart que no se pueden reintentar.
 api.interceptors.request.use(async (config) => {
-  if (config.url?.includes('/auth/refresh') || config.url?.includes('/auth/login')) {
-    return config;
-  }
-
-  const token = localStorage.getItem('ga_token');
-  if (!token) return config;
-
-  const exp = getTokenExp(token);
-  const now = Math.floor(Date.now() / 1000);
-
-  if (exp && exp - now < 120) {
+  const isAuthFlow = config.url?.includes('/auth/refresh') || config.url?.includes('/auth/login');
+  const expiresAt = Date.parse(localStorage.getItem(ACCESS_EXP) ?? '');
+  if (!isAuthFlow && hasSessionHint() && Number.isFinite(expiresAt) && expiresAt - Date.now() < 120000) {
     try {
       if (!proactiveRefreshPromise) {
         proactiveRefreshPromise = doRefresh().finally(() => {
           proactiveRefreshPromise = null;
         });
       }
-      const freshToken = await proactiveRefreshPromise;
-      config.headers.Authorization = `Bearer ${freshToken}`;
-      return config;
+      await proactiveRefreshPromise;
     } catch {
       // Si falla el refresh proactivo, el response interceptor lo manejará
     }
   }
-
-  config.headers.Authorization = `Bearer ${token}`;
+  // Se calcula en cada envío: la cookie CSRF rota con cada renovación.
+  if (UNSAFE.has(String(config.method).toLowerCase())) Object.assign(config.headers, csrfHeader());
   return config;
 });
 
@@ -110,7 +108,7 @@ api.interceptors.response.use(
       !originalRequest.url?.includes('/auth/refresh') &&
       !originalRequest.url?.includes('/auth/login')
     ) {
-      if (!localStorage.getItem('ga_refresh_token')) {
+      if (!hasSessionHint()) {
         clearSession();
         return Promise.reject(err);
       }
@@ -118,8 +116,7 @@ api.interceptors.response.use(
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
-        }).then((token) => {
-          originalRequest.headers.Authorization = `Bearer ${token}`;
+        }).then(() => {
           originalRequest._retry = true;
           return api(originalRequest);
         }).catch((e) => Promise.reject(e));
@@ -129,12 +126,11 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const newToken = await doRefresh();
-        originalRequest.headers.Authorization = `Bearer ${newToken}`;
-        processQueue(null, newToken);
+        await doRefresh();
+        processQueue(null);
         return api(originalRequest);
       } catch (refreshError) {
-        processQueue(refreshError, null);
+        processQueue(refreshError);
         if (refreshError.message !== 'session_changed') clearSession();
         return Promise.reject(refreshError);
       } finally {
@@ -149,11 +145,15 @@ api.interceptors.response.use(
 export const checkHealth = () => api.get('/health');
 
 // ── Auth ──
-export const logoutUser = (refreshToken, { allDevices = false } = {}) => {
+// El refresh viaja en la cookie HttpOnly; allDevices usa la cookie de acceso. Ambos con CSRF.
+export const logoutUser = ({ allDevices = false } = {}) => {
   logoutInProgress = true;
   authGeneration++; // Impide que un refresh en vuelo restaure credenciales tras logout.
-  return axios.post(`${api.defaults.baseURL}/auth/logout`, { refreshToken, allDevices }, { timeout: 8000, headers: allDevices ? { Authorization: `Bearer ${localStorage.getItem('ga_token')}` } : {} }).then((response) => { delete api.defaults.headers.common.Authorization; return response; }).finally(() => { logoutInProgress = false; });
+  return axios.post(`${api.defaults.baseURL}/auth/logout`, { allDevices }, { timeout: 8000, withCredentials: true, headers: { ...WEB_CLIENT, ...csrfHeader() } })
+    .finally(() => { logoutInProgress = false; });
 };
+// totp: segundo factor de cuentas administradoras en inicio federado.
+export const exchangeOAuthCode = (code, totp) => api.post('/auth/oauth/exchange', { code, ...(totp ? { totp } : {}) });
 
 export const loginUser    = (email, password, totp)                             => api.post('/auth/login',    { email, password, ...(totp ? { totp } : {}) });
 export const registerUser = (nombre, apellido, email, password, telefono)       => api.post('/auth/register', { nombre, apellido, email, password, telefono });
@@ -161,6 +161,7 @@ export const oauthGoogle        = (access_token) => api.post('/auth/google',   {
 export const oauthFacebook      = (code)          => api.post('/auth/facebook', { code });
 export const getGoogleAuthUrl   = ()              => api.get('/auth/google/url');
 export const getFacebookAuthUrl = ()              => api.get('/auth/facebook/url');
+export const getMicrosoftAuthUrl = ()             => api.get('/auth/microsoft/url');
 
 // ── Categorías ──
 export const getCategorias         = ()       => api.get('/categorias');

@@ -3,7 +3,7 @@
 // La URL es solo el valor inicial: la app permite cambiar el servidor antes de iniciar sesión.
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -28,9 +28,13 @@ if (!existsSync(apk)) throw new Error('La compilación terminó sin APK.');
 const sha256 = createHash('sha256').update(readFileSync(apk)).digest('hex');
 const commit = spawnSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).stdout.trim();
 const dirty = spawnSync('git', ['status', '--porcelain', 'apps/mobile'], { cwd: root, encoding: 'utf8' }).stdout.trim() !== '';
-writeFileSync(new URL(`../${dest}/apk.json`, import.meta.url), JSON.stringify({
+const manifest = JSON.stringify({
   exists: true, path: `${dest}/greenalert.apk`, sha256, commit, mobileSourcesDirty: dirty,
   abis, initialApiUrl: api, allowHttp: allowHttp === 'true', builtAt: new Date().toISOString(),
-  signing: 'debug (evaluación, no publicar)',
-}, null, 2));
+  signing: 'debug (evaluación, no publicar)', builder: 'apps/mobile/docker/apk.Dockerfile (Linux)',
+}, null, 2) + '\n';
+writeFileSync(new URL(`../${dest}/apk.json`, import.meta.url), manifest);
+// Manifiesto que consumen build-academic.mjs y package-delivery.mjs (verifican el hash antes de copiar).
+mkdirSync(new URL('../.local/integracion/', import.meta.url), { recursive: true });
+writeFileSync(new URL('../.local/integracion/apk.json', import.meta.url), manifest);
 console.log(`APK: ${dest}/greenalert.apk\nSHA-256: ${sha256}`);

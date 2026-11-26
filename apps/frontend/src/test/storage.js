@@ -6,5 +6,6 @@ export const createTestStorage = () => {
     setItem: (key, value) => values.set(String(key), String(value)),
     removeItem: (key) => values.delete(String(key)),
     clear: () => values.clear(),
+    dump: () => Object.fromEntries(values),
   };
 };

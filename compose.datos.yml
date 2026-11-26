@@ -63,6 +63,7 @@ services:
       - ./apps/backend/migrations/022_session_activity_audit.sql:/docker-entrypoint-initdb.d/022-sessions.sql:ro
       - ./apps/backend/migrations/023_admin_mfa.sql:/docker-entrypoint-initdb.d/023-mfa.sql:ro
       - ./apps/backend/migrations/024_admin_hierarchy.sql:/docker-entrypoint-initdb.d/024-admin.sql:ro
+      - ./apps/backend/migrations/025_federated_identities.sql:/docker-entrypoint-initdb.d/025-federated.sql:ro
     networks: [shared]
     healthcheck:
       test: [CMD-SHELL, 'MYSQL_PWD="$MYSQL_PASSWORD" mysql -u greenalert greenalert -e "SELECT 1 FROM integration_outbox LIMIT 1" >/dev/null 2>&1']

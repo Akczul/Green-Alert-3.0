@@ -1,0 +1,9 @@
+#!/bin/sh
+# Elige la plantilla según exista el certificado. El entrypoint de nginx hace `source` de *.envsh.
+if [ -f /etc/nginx/tls/tls.crt ] && [ -f /etc/nginx/tls/tls.key ]; then
+  export NGINX_ENVSUBST_TEMPLATE_DIR=/etc/nginx/templates-tls
+else
+  export NGINX_ENVSUBST_TEMPLATE_DIR=/etc/nginx/templates-http
+  echo "greenalert: sin certificado TLS; se sirve HTTP en 8080" >&2
+fi
+export FRONTEND_TLS_PORT="${FRONTEND_TLS_PORT:-8443}"

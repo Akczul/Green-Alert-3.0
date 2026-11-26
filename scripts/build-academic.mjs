@@ -28,7 +28,7 @@ chapters.push(section(1,'Planteamiento',
     ['O3 Recuperación','Caché prescindible; hechos pendientes durables y reintentos idempotentes'],
     ['O4 Entrega','Código empaquetado, instalación reproducible, evidencia y artefactos móviles reales']])+
   para('Alcance: Express, FastAPI, Spring Boot, React y React Native; MySQL, MongoDB, Cassandra, Redis y Druid. No se añade ML. La regresión experimental heredada es opcional y no participa en la demostración integrada de riesgo.')+
-  para('La solución conserva límites explícitos: la jerarquía administrativa general, segundo OIDC, HTTPS/cookies y aceptación de proveedores siguen pendientes. '+summary)));
+  para('La solución conserva límites explícitos: la aceptación con cuentas reales de Google y Microsoft y la instalación física de la APK se comprueban en la sustentación. '+summary)));
 chapters.push(section(2,'Requisitos y casos de uso',
   table(['ID','Requisito','Aceptación'],[
     ['RF01','Registrar, autenticar y revocar sesiones','Registro público ciudadano; logout invalida JWT y refresh'],
@@ -115,28 +115,30 @@ chapters.push(section(7,'Seguridad y calidad',
     ['Sesiones','JWT breve, refresh rotatorio, sid/ver, revocación, 30 min inactividad/7 días absolutos'],
     ['Autorización','Rol y propiedad/entidad antes de salir a servicios; permisos insuficientes no equivalen a una sesión caducada'],
     ['Auditoría','Actor y operación durable antes de confirmar respuesta; ventana de crash respecto a la mutación documentada'],
-    ['Web y red','No se declara HTTPS/cookies/CSRF resuelto. Tokens internos solo backend; publicar la red de laboratorio requiere configuración explícita']])+
-  para('Pendientes de seguridad obligatorios: jerarquía administrativa general, segundo proveedor OIDC comprobado, challenge MFA federado, cookies seguras/HTTPS y evaluación integral de accesibilidad/pentest. La matriz conserva estas ausencias.')));
+    ['Web y red','HTTPS (TLS 1.2+, HSTS) en Nginx; tokens web en cookies __Host- HttpOnly/Secure/SameSite=Strict; CSRF de doble envío en escrituras. Certificado autofirmado solo de laboratorio'],
+    ['Jerarquía','Superadministrador (admin global) y administrador de ámbito con permisos por objeto; último superadministrador protegido con bloqueo; auditoría de solo anexado por triggers']])+
+  para('Pendientes declarados: aceptación con cuentas reales de los proveedores OIDC, certificado TLS de confianza para producción y evaluación integral de accesibilidad/pentest. La matriz completa está en docs/cumplimiento-docente.md.')));
 chapters.push(section(8,'Operación y uso',
-  '<h2>Inicio limpio</h2>'+code('npm.cmd run install:apps\nnpm.cmd run setup:integracion\nnpm.cmd run infra:final:config\nnpm.cmd run infra:final:up\n# Abrir http://localhost:8080')+
+  '<h2>Inicio limpio</h2>'+code('npm.cmd run install:apps\nnpm.cmd run setup:integracion\nnpm.cmd run infra:final:config\nnpm.cmd run infra:final:up\n# Abrir https://localhost:8443 (certificado de laboratorio)\nnpm.cmd run infra:final:superadmin -- correo@dominio')+
   para('Node 24, Git y Docker Compose con contenedores Linux. Reservar unos 8 GB para Docker y memoria adicional para el host. La primera construcción y el arranque de Cassandra/Druid pueden tardar varios minutos. setup genera secretos locales y conserva valores anteriores; nunca imprime credenciales.')+
   '<h2>Recorrido por rol</h2>'+para('Ciudadano: registrar cuenta, acceder, crear reporte, consultar propios y cerrar sesión. Moderador: validar un reporte y calcular riesgo desde dashboard. Entidad: revisar asignaciones y actualizar su ciclo de atención. Administrador: enrolar MFA mediante operador, iniciar con TOTP, consultar indicadores y ejecutar reconciliación según permisos.')+
   '<h2>Demostración reproducible</h2>'+code('npm.cmd run test:integracion\n# Runner con proyecto, red, credenciales y datos sintéticos propios\nnpm.cmd run infra:final:down\n# Se conservan los volúmenes\nnpm.cmd run infra:final:up')+
   para('Para datos existentes: respaldar y aplicar únicamente las migraciones faltantes 021/022/023, con privilegios apropiados. No ejecutar el bootstrap completo ni la cadena histórica sobre datos existentes. No usar down --volumes para detener una instalación que debe conservarse.')+
-  '<h2>Android</h2>'+code('cd apps/mobile\nnpm.cmd ci\n$env:EXPO_PUBLIC_API_URL="https://SERVIDOR/api"\nnpm.cmd run apk')+
-  para(apk?.exists?'APK observada: '+apk.path+'. SHA-256: '+apk.sha256+'. No acredita instalación física.':
+  '<h2>Android</h2>'+code('$env:EXPO_PUBLIC_API_URL="http://IP_LAN:8080/api"\n$env:EXPO_PUBLIC_ALLOW_HTTP="true"\nnpm.cmd run apk:docker\nadb install -r .local/apk/greenalert.apk')+
+  para(apk?.exists?'APK compilada en Linux (Docker): '+apk.path+'. SHA-256: '+apk.sha256+'. Firma debug de evaluación verificada con apksigner. No acredita instalación física.':
     'APK no generada. '+(apk?.blocker || 'Consultar el estado exacto en el manifiesto final.'))+
-  para('Para emulador local: 10.0.2.2 y HTTP habilitado explícitamente; para teléfono: IP LAN o dominio alcanzable y nueva compilación. No usar localhost. Manual detallado y enrolamiento: docs/integracion-final.md.')));
+  para('La pantalla de acceso permite cambiar la URL del servidor (validada y guardada en SecureStore), por lo que no hace falta recompilar al cambiar de red. Emulador: 10.0.2.2; teléfono: IP LAN alcanzable. No usar localhost. Manual detallado: docs/integracion-final.md y docs/compilacion-android-local.md.')));
 chapters.push(section(9,'Identidad y autorización',
   table(['Actor actual','Puede','Restricción'],[
     ['ciudadano','Crear reportes y consultar su historial','No administra ni consulta historial privado ajeno'],
     ['entidad','Consultar y atender reportes asignados','No accede a otro ámbito institucional'],
     ['moderador','Validar reportes, analizar riesgo e indicadores','No ejecuta operaciones de operador exclusivas admin'],
-    ['admin','Gestión actual y operaciones de integración; MFA obligatoria en Compose final','Aún no se distingue superadministrador de administrador general por ámbito']])+
+    ['admin global (superadministrador)','Administradores, niveles y ámbitos; categorías (parámetros); eventos y caché; auditoría. MFA obligatoria','No borra auditoría; no cambia su propio rol; no deja el sistema sin superadministrador'],
+    ['admin de ámbito (segundo nivel)','Usuarios comunes de su comunidad u organización. MFA obligatoria','No se eleva ni eleva a otros; no ve ni modifica otro ámbito (403/404)']])+
   para('La fuente autoritativa de cada petición valida usuario activo, auth_version, sid, rol y entidad. Logout revoca la familia; cambiar privilegios invalida accesos antiguos según el contrato de seguridad. Los tokens internos no representan al usuario: Express debe autorizar antes de llamar al servicio.')+
   para('La MFA usa un secreto por administrador cifrado con una clave separada del JWT. Un contador aceptado no puede reutilizarse; la actualización condicional MySQL cierra la carrera entre dos logins. El enrolamiento no se publica en la API y no reemplaza factores existentes. La custodia del material privado corresponde al operador y al titular del factor.')+
-  para('Google dispone de integración heredada con verificación de identidad y state; no se completó un login real en esta entrega. Facebook OAuth no se presenta como segundo OIDC. La MFA administrativa federada exige un challenge adicional aún pendiente; en la configuración obligatoria no se permite emitir sesión admin sin factor.')+
-  para('El cumplimiento de la jerarquía docente y del segundo OIDC permanece parcial. No se alteraron los cuatro roles existentes de forma incompatible para aparentar ese cumplimiento.')));
+  para('Proveedores OIDC: Google (id_token verificado) y Microsoft Entra ID (Authorization Code + PKCE S256, state y nonce de un solo uso, firma RS256 con JWKS, iss, aud y exp). El rol se asigna en GreenAlert; un correo existente solo se vincula con email_verified. Una cuenta federada administradora completa el TOTP antes de recibir sesión. Facebook OAuth no se presenta como OIDC. El login con cuentas reales requiere registrar las aplicaciones en cada proveedor.')+
+  para('El primer superadministrador se crea por inicialización controlada (scripts/crear-superadmin.mjs), nunca por registro público. Los cuatro roles existentes se conservan: la jerarquía se expresa como nivel del rol admin para no romper contratos web ni móviles.')));
 chapters.push(section(10,'Integridad y rendimiento',
   para('MySQL conserva relaciones y unicidad; la inscripción simultánea devuelve una creación y un conflicto 409. La fila de reporte y su hecho outbox se confirman juntos mediante trigger. El worker no borra entregas fallidas y serializa workers por esquema, con cuatro peticiones de salida en paralelo.')+
   para('Cassandra decide la identidad global mediante IF NOT EXISTS. Un reintento con mismo ID/contenido no agrega un hecho; el contenido diferente entra en conflicto. La proyección Druid reemplaza el intervalo diario en lugar de sumar un replay, y se consulta después de la disponibilidad del segmento.')+

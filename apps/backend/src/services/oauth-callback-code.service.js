@@ -45,6 +45,21 @@ export const consumeOAuthCallbackCode = (code) => {
   return entry.payload;
 };
 
+// MFA en inicio federado: el código queda pendiente hasta validar el TOTP (máximo de intentos).
+const MAX_MFA_ATTEMPTS = 5;
+export const peekOAuthCallbackCode = (code) => {
+  if (typeof code !== 'string' || !code) return null;
+  const entry = callbackCodes.get(code);
+  if (!entry || entry.expiresAt <= Date.now()) { callbackCodes.delete(code); return null; }
+  return entry.payload;
+};
+export const recordOAuthCallbackFailure = (code) => {
+  const entry = callbackCodes.get(code);
+  if (!entry) return;
+  entry.failures = (entry.failures ?? 0) + 1;
+  if (entry.failures >= MAX_MFA_ATTEMPTS) callbackCodes.delete(code);
+};
+
 export const clearOAuthCallbackCodes = () => {
   callbackCodes.clear();
 };

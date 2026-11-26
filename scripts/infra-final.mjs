@@ -26,6 +26,9 @@ if (command === 'up') {
   if (network.status !== 0) run(['network', 'create', vars.GREENALERT_NETWORK]);
   // --remove-orphans retira solo contenedores de aplicaciones creados por el esquema anterior de un
   // único proyecto (mismo nombre); nunca elimina volúmenes.
+  // Los cuatro nodos Druid comparten una imagen local: se construye una vez para evitar la carrera
+  // "image already exists" al construirla en paralelo desde cada servicio.
+  run([...datos, 'build', 'coordinator'], { env });
   run([...datos, 'up', '-d', '--wait', '--wait-timeout', '600', '--remove-orphans'], { env });
   run([...apps, 'up', '--build', '-d', '--wait', '--wait-timeout', '600'], { env });
 } else if (command === 'down') {
