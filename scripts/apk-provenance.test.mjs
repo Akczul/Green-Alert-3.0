@@ -58,5 +58,9 @@ test('Entrega rechaza APK alterada, fuentes distintas, cambios locales y procede
     write('.local/apk/greenalert.apk.sha256', `${sha256}  greenalert.apk\n`);
     write('.local/apk/greenalert.apk', 'alterada');
     assert.throws(() => validateApk(root, current), /cambió/);
-  } finally { rmSync(root, { recursive: true, force: true }); }
+  } finally {
+    assert.equal(path.dirname(path.resolve(root)), path.resolve(tmpdir()));
+    assert.ok(path.basename(root).startsWith('ga-apk-'));
+    rmSync(root, { recursive: true, force: true });
+  }
 });
