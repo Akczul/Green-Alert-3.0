@@ -3,7 +3,7 @@ import { mkdir,readFile,writeFile,copyFile,stat,readdir,unlink } from 'node:fs/p
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { validateApk } from './apk-provenance.mjs';
+import { readApkManifest, validateApk } from './apk-provenance.mjs';
 const root=fileURLToPath(new URL('../',import.meta.url));
 const output=path.join(root,'.local/entrega');
 const git=args=>execFileSync('git',args,{cwd:root,encoding:'utf8',windowsHide:true}).trim();
@@ -22,14 +22,12 @@ const artifacts=['GreenAlert3.0-codigo.zip','VERSION.txt'];
 for(const file of ['informe-greenalert.html','informe-greenalert.pdf']){
   await copyFile(path.join(root,'docs/entrega',file),path.join(output,file)); artifacts.push(file);
 }
-let apk=null;
-try {
-  apk=JSON.parse(await readFile(path.join(root,'.local/integracion/apk.json'),'utf8'));
-} catch(error) { if(error.code!=='ENOENT') throw error; }
+const apk=readApkManifest(root);
 if(apk?.exists){
   const {source}=validateApk(root,apk);
   await copyFile(source,path.join(output,'greenalert.apk')); artifacts.push('greenalert.apk');
-  for(const file of ['apk.json','firma.txt','contenido.txt','greenalert.apk.sha256']) {
+  await writeFile(path.join(output,'apk.json'),JSON.stringify(apk,null,2)+'\n'); artifacts.push('apk.json');
+  for(const file of ['firma.txt','contenido.txt','greenalert.apk.sha256']) {
     await copyFile(path.join(root,'.local/apk',file),path.join(output,file)); artifacts.push(file);
   }
 }

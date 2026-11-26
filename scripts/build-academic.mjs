@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { validateApk } from './apk-provenance.mjs';
+import { readApkManifest, validateApk } from './apk-provenance.mjs';
 const root=fileURLToPath(new URL('../',import.meta.url));
 const output=path.join(root,'docs/entrega');
 await fs.mkdir(output,{recursive:true});
@@ -9,7 +9,7 @@ const read=p=>fs.readFile(path.join(root,p),'utf8');
 const optional=async p=>{try{return JSON.parse(await read(p));}catch{return null;}};
 const result=await optional('.local/integracion/resultado.json');
 const measurement=await optional('.local/integracion/medicion.json');
-const apk=await optional('.local/integracion/apk.json');
+const apk=readApkManifest(root);
 if(apk?.exists) validateApk(root,apk);
 const browser=await optional('.local/integracion/browser/resultado.json');
 const compliance=await optional('docs/evidencias-integracion/cumplimiento.json');

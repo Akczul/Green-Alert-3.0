@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { mobileTree, validateApk } from './apk-provenance.mjs';
+import { mobileTree, readApkManifest, validateApk } from './apk-provenance.mjs';
 
 test('Entrega rechaza APK alterada, fuentes distintas, cambios locales y procedencia heredada', () => {
   const root = mkdtempSync(path.join(tmpdir(), 'ga-apk-'));
@@ -26,6 +26,14 @@ test('Entrega rechaza APK alterada, fuentes distintas, cambios locales y procede
     write('.local/apk/contenido.txt', "package: name='co.greenalert.mobile'\nassets/index.android.bundle\n");
     const manifest = { exists: true, path: '.local/apk/greenalert.apk', sha256,
       commit: git('rev-parse', 'HEAD'), mobileSourcesDirty: false, mobileSourceTree: mobileTree(root) };
+    assert.equal(readApkManifest(root), null);
+    write('.local/apk/apk.json', JSON.stringify(manifest));
+    assert.deepEqual(readApkManifest(root), manifest);
+    mkdirSync(path.join(root, '.local/integracion'), { recursive: true });
+    write('.local/integracion/apk.json', JSON.stringify({ exists: false }));
+    assert.throws(() => readApkManifest(root), /contradicen/);
+    write('.local/integracion/apk.json', JSON.stringify(manifest));
+    assert.deepEqual(readApkManifest(root), manifest);
     assert.equal(validateApk(root, manifest).sha256, sha256);
     write('continuidad.md', 'Commit exclusivamente documental'); commit();
     assert.equal(validateApk(root, manifest).sha256, sha256);

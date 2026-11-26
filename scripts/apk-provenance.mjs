@@ -8,6 +8,17 @@ export const gitAt = (root, args) => execFileSync('git', args, {
   cwd: root, encoding: 'utf8', windowsHide: true,
 }).trim();
 
+export function readApkManifest(root) {
+  const manifests = ['.local/integracion/apk.json', '.local/apk/apk.json'].map(file => {
+    try { return JSON.parse(readFileSync(path.join(root, file), 'utf8')); }
+    catch (error) { if (error.code === 'ENOENT') return null; throw error; }
+  }).filter(Boolean);
+  if (manifests.length === 2 && ['exists', 'path', 'sha256', 'commit', 'mobileSourceTree']
+    .some(key => manifests[0][key] !== manifests[1][key]))
+    throw new Error('Los manifiestos locales de APK se contradicen.');
+  return manifests[0] ?? null;
+}
+
 export function mobileTree(root, ref = 'HEAD') {
   return gitAt(root, ['rev-parse', `${ref}:apps/mobile`]);
 }
