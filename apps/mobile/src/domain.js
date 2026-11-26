@@ -68,7 +68,16 @@ export function validateReport(form, files = []) {
     return "La ubicación no es válida.";
   return null;
 }
-export function reportPayload(form, files, create = () => new FormData()) {
+export function reportPayload(
+  form,
+  files,
+  create = () => new FormData(),
+  filePart = (file, index) => ({
+    uri: file.uri,
+    type: file.mimeType,
+    name: file.fileName || `evidencia-${index}.jpg`,
+  }),
+) {
   const body = create();
   for (const key of [
     "titulo",
@@ -85,11 +94,7 @@ export function reportPayload(form, files, create = () => new FormData()) {
     body.append("longitud", String(form.location.longitude));
   }
   files.forEach((f, index) =>
-    body.append("files", {
-      uri: f.uri,
-      type: f.mimeType,
-      name: f.fileName || `evidencia-${index}.jpg`,
-    }),
+    body.append("files", filePart(f, index)),
   );
   return body;
 }

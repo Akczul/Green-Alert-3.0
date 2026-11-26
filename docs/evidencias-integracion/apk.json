@@ -26,5 +26,7 @@
     "android": "15",
     "apiLevel": 35,
     "status": "passed"
-  }
+  },
+  "correspondsToFinalMobileSources": false,
+  "sourceDifference": "El código final incorpora corrección File/Blob para multipart de Expo 58, con 60 tests aprobados; no se recompiló esta APK por entrega inmediata."
 }

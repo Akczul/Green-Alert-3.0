@@ -273,7 +273,8 @@ export function CreateScreen({ client, onCreated }) {
             try {
               await client.request("/reportes", {
                 method: "POST",
-                body: reportPayload(form, files),
+                // Expo 58 serializa File/Blob; el descriptor URI heredado no es un archivo para expo/fetch.
+                body: reportPayload(form, files, undefined, (file) => new File(file.uri)),
                 multipart: true,
                 timeoutMs: 60000,
               });

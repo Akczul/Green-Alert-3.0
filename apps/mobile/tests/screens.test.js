@@ -23,6 +23,7 @@ jest.mock("expo-image-picker", () => ({
 jest.mock("expo-file-system", () => ({ File: jest.fn() }));
 import * as Location from "expo-location";
 import * as ImagePicker from "expo-image-picker";
+import { File } from "expo-file-system";
 test("login nativo muestra validación y éxito; nunca envía correo inválido", async () => {
   const client = { authenticate: jest.fn(async () => ({ nombre: "Ana" })) };
   const onUser = jest.fn();
@@ -152,6 +153,30 @@ test("cámara denegada no captura ni envía evidencia", async () => {
   await fireEvent.press(screen.getByRole("button", { name: "Tomar foto" }));
   expect(await screen.findByText(/Permiso de cámara denegado/)).toBeTruthy();
   expect(ImagePicker.launchCameraAsync).not.toHaveBeenCalled();
+});
+
+test("galería envía un File serializable por expo/fetch en el campo files", async () => {
+  const uri = "file:///prueba.png";
+  // El FormData de Node usado por Jest exige un File real, igual que el transporte Expo exige bytes/Blob.
+  const file = new globalThis.File([new Uint8Array([1])], "prueba.png", { type: "image/png" });
+  File.mockImplementationOnce(() => file);
+  ImagePicker.launchImageLibraryAsync.mockResolvedValue({ canceled: false, assets: [
+    { uri, mimeType: "image/png", fileSize: 1, fileName: file.name },
+  ] });
+  const client = { request: jest.fn(async (path) => path === "/categorias"
+    ? { categorias: [{ codigo: "agua", nombre: "Agua" }] } : { reporte: { id_reporte: 8 } }) };
+  await render(<CreateScreen client={client} />);
+  await screen.findByRole("button", { name: "Agua" });
+  await fireEvent.changeText(screen.getByLabelText("Título"), "Prueba de imagen");
+  await fireEvent.changeText(screen.getByLabelText("Dirección"), "Laboratorio sintético");
+  await fireEvent.press(screen.getByRole("button", { name: "Agua" }));
+  await fireEvent.press(screen.getByRole("button", { name: "Elegir imagen" }));
+  await screen.findByLabelText("Evidencia 1");
+  await fireEvent.press(screen.getByRole("button", { name: "Enviar reporte" }));
+  await screen.findByText("Reporte enviado");
+  expect(File).toHaveBeenCalledWith(uri);
+  const body = client.request.mock.calls.find(([path]) => path === "/reportes")[1].body;
+  expect(body.getAll("files")[0]).toBe(file);
 });
 
 test("alta válida envía multipart y muestra confirmación del servidor", async () => {

@@ -80,6 +80,17 @@ test("multipart conserva nombres files, latitud y longitud", () => {
     expect.objectContaining({ uri: "file:///foto.jpg", type: "image/jpeg" }),
   );
 });
+test("multipart permite File de Expo sin convertirlo en descriptor URI", () => {
+  const append = jest.fn();
+  const image = { uri: "file:///imagen.png", mimeType: "image/png" };
+  const blob = { name: "imagen.png", type: "image/png", bytes: async () => new Uint8Array([1]) };
+  const filePart = jest.fn(() => blob);
+  reportPayload(report, [image], () => ({ append }), filePart);
+  expect(filePart).toHaveBeenCalledWith(image, 0);
+  expect(append).toHaveBeenCalledWith("files", blob);
+  expect(append.mock.calls.find(([name]) => name === "files")[1]).toBe(blob);
+});
+
 test("doble pulsación comparte una sola operación", async () => {
   const fn = jest.fn(async () => 1);
   const once = singleFlight(fn);

@@ -2,6 +2,16 @@
 
 Fecha: 25 de noviembre de 2026, America/Bogota. Esta misión sustituye las afirmaciones de estado actual de Android de la integración anterior; sus intentos fallidos se conservan como historia.
 
+## Estado de entrega inmediata
+
+Por instrucción del usuario se suspendieron las pruebas adicionales y cualquier nueva compilación para priorizar Moodle. Se conserva la APK release de 31.506.987 bytes, SHA-256 `a22770874f34310912f669c754d8015f774c8289702d4b4a8e6f4b83d1c202e1`, compilada originalmente sobre `75f3bf8`, reexportada en caché y validada sobre `c6d2e3e`. Firma V2 válida; paquete `co.greenalert.mobile`, Android mínimo API 24, ABI arm64-v8a. La instalación real en Samsung SM-A055M con Android 15/API 35 fue correcta.
+
+Se comprobaron físicamente apertura sin Metro, guardado de servidor LAN, registro, listado ambiental, alta sin foto, Mis reportes, cámara y galería, obtención de ubicación y recuperación de sesión después de force-stop. MySQL confirmó el reporte 3, estado pendiente, sin coordenadas personales; se observaron 14 refresh emitidos y 13 revocados. No se completaron login separado, logout, reconexión controlada ni denegación física de permisos. Se restauró el ajuste temporal de pantalla encendida por USB.
+
+El envío de imagen de la APK entregada falló antes de alcanzar el proxy. Se identificó en el código instalado de Expo 58 que su serializador requiere File/Blob, y se corrigió el adaptador de creación para suministrar File sin cambiar el campo multipart `files`. La fuente corregida pasó lint, configuración JS, compatibilidad Expo y **60/60 pruebas**. Esa corrección **no está incluida en la APK entregada**: se detuvo la recompilación por prioridad expresa de entrega. La APK y el código final tienen, por tanto, distinta revisión móvil; los manifiestos lo declaran y no se utiliza el empaquetador estricto para ocultar esa diferencia. Cloudinary tampoco tiene credenciales locales configuradas.
+
+La integración adicional conserva su resultado 15/16 y el fallo de reconexión Spring/Cassandra documentado abajo. Los apartados posteriores son la bitácora previa; para el estado final prevalece este apartado. El informe PDF previo se conserva; el DOCX de origen resultó ilegible como ZIP y se recupera a partir de las páginas del PDF, con limitación de edición del cuerpo. Se excluye el bloqueo temporal de Office del ZIP. La portada no tiene integrantes confirmados: no se inventan nombres ni códigos.
+
 ## Sincronización y preservación
 
 - Se ejecutó `git fetch origin`. Base remota comprobada: `ef06a11a70f2c1cf948d6cc371618f15073bedb3`, merge de `feat/aplication-apk`.
