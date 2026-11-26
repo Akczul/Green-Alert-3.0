@@ -29,6 +29,9 @@ test('Entrega rechaza APK alterada, fuentes distintas, cambios locales y procede
     assert.equal(validateApk(root, manifest).sha256, sha256);
     write('continuidad.md', 'Commit exclusivamente documental'); commit();
     assert.equal(validateApk(root, manifest).sha256, sha256);
+    mkdirSync(path.join(root, 'apps/mobile/docs'), { recursive: true });
+    write('apps/mobile/docs/verificacion.md', 'Evidencia documental posterior a la compilación'); commit();
+    assert.equal(validateApk(root, manifest).sha256, sha256);
     assert.throws(() => validateApk(root, { ...manifest, mobileSourceTree: undefined }), /procedencia/);
     assert.throws(() => validateApk(root, { ...manifest, path: 'C:/otro/antigua.apk' }), /portable/);
     write('apps/mobile/app.js', 'cambio local');
@@ -36,6 +39,15 @@ test('Entrega rechaza APK alterada, fuentes distintas, cambios locales y procede
     commit();
     assert.throws(() => validateApk(root, manifest), /fuentes móviles actuales/);
     const current = { ...manifest, commit: git('rev-parse', 'HEAD'), mobileSourceTree: mobileTree(root) };
+    write('.local/apk/firma.txt', '');
+    assert.throws(() => validateApk(root, current), /Falta evidencia/);
+    write('.local/apk/firma.txt', 'Signer #1 certificate SHA-256 digest: prueba\n');
+    write('.local/apk/contenido.txt', "package: name='co.greenalert.mobile'\n");
+    assert.throws(() => validateApk(root, current), /Falta evidencia/);
+    write('.local/apk/contenido.txt', "package: name='co.greenalert.mobile'\nassets/index.android.bundle\n");
+    write('.local/apk/greenalert.apk.sha256', 'hash incorrecto');
+    assert.throws(() => validateApk(root, current), /cambió/);
+    write('.local/apk/greenalert.apk.sha256', `${sha256}  greenalert.apk\n`);
     write('.local/apk/greenalert.apk', 'alterada');
     assert.throws(() => validateApk(root, current), /cambió/);
   } finally { rmSync(root, { recursive: true, force: true }); }

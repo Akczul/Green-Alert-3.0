@@ -17,11 +17,21 @@ export function assertCleanMobile(root) {
     throw new Error('Confirma las fuentes móviles antes de compilar o empaquetar.');
 }
 
+function sameMobileInputs(root, commit) {
+  try {
+    execFileSync('git', ['diff', '--quiet', commit, 'HEAD', '--', 'apps/mobile', ':(exclude)apps/mobile/docs'],
+      { cwd: root, windowsHide: true, stdio: 'pipe' });
+    return true;
+  } catch { return false; }
+}
+
 export function validateApk(root, manifest) {
   assertCleanMobile(root);
   if (!manifest?.exists || manifest.mobileSourcesDirty !== false || !manifest.mobileSourceTree || !manifest.commit)
     throw new Error('APK sin procedencia limpia acreditada; recompilar con apk:docker.');
-  if (mobileTree(root, manifest.commit) !== manifest.mobileSourceTree || mobileTree(root) !== manifest.mobileSourceTree)
+  // Solo la documentación móvil puede evolucionar sin recompilar; código, pruebas,
+  // assets, lockfile y receta Docker deben conservarse exactamente.
+  if (mobileTree(root, manifest.commit) !== manifest.mobileSourceTree || !sameMobileInputs(root, manifest.commit))
     throw new Error('La APK no corresponde a las fuentes móviles actuales.');
   if (manifest.path !== '.local/apk/greenalert.apk')
     throw new Error('Ruta de APK no portable; se requiere .local/apk/greenalert.apk.');
