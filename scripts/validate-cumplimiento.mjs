@@ -155,7 +155,7 @@ await check('Microsoft OIDC sin credenciales responde 503 controlado', async () 
 });
 
 const result = { generatedAt: new Date().toISOString(), commit: spawnSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).stdout.trim(),
-  dirty: spawnSync('git', ['status', '--porcelain'], { encoding: 'utf8' }).stdout.trim() !== '', projects: [dataProject, appsProject],
+  dirty: spawnSync('git', ['status', '--porcelain', '--', '.', ':!docs/evidencias-integracion/cumplimiento.json'], { encoding: 'utf8' }).stdout.trim() !== '', projects: [dataProject, appsProject],
   passed: checks.filter((c) => c.status === 'passed').length, total: checks.length, checks };
 writeFileSync(new URL('../docs/evidencias-integracion/cumplimiento.json', import.meta.url), JSON.stringify(result, null, 2) + '\n');
 console.log(`Cumplimiento: ${result.passed}/${result.total}`);

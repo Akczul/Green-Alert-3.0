@@ -1,0 +1,68 @@
+{
+  "generatedAt": "2026-11-26T01:47:04.353Z",
+  "commit": "268b639fa27013b0ae3446fe27d6d9fdd9270ba7",
+  "dirty": true,
+  "projects": [
+    "greenalert-final",
+    "greenalert-final-apps"
+  ],
+  "passed": 11,
+  "total": 11,
+  "checks": [
+    {
+      "name": "Dos proyectos Compose independientes (datos y apps) en la misma red externa",
+      "status": "passed",
+      "ms": 464
+    },
+    {
+      "name": "Web por HTTPS con HSTS; HTTP redirige con 308",
+      "status": "passed",
+      "ms": 175
+    },
+    {
+      "name": "Sesión web: tokens solo en cookies __Host- HttpOnly/Secure/SameSite=Strict",
+      "status": "passed",
+      "ms": 391
+    },
+    {
+      "name": "CSRF: escritura con cookie sin token 403; con doble envío 200",
+      "status": "passed",
+      "ms": 74
+    },
+    {
+      "name": "Renovación y cierre web por cookie; tras logout la sesión no sirve",
+      "status": "passed",
+      "ms": 77
+    },
+    {
+      "name": "Cliente móvil (Bearer) conserva tokens en el cuerpo, sin cookies ni CSRF",
+      "status": "passed",
+      "ms": 195
+    },
+    {
+      "name": "Superadministrador por inicialización controlada + MFA obligatoria",
+      "status": "passed",
+      "ms": 4225
+    },
+    {
+      "name": "Superadmin asigna administrador de ámbito; éste no se eleva ni toca otros ámbitos",
+      "status": "passed",
+      "ms": 1476
+    },
+    {
+      "name": "Usuario común no accede al panel ni a la API administrativa (403)",
+      "status": "passed",
+      "ms": 213
+    },
+    {
+      "name": "Auditoría con autor visible para superadmin e inmutable en MySQL",
+      "status": "passed",
+      "ms": 971
+    },
+    {
+      "name": "Microsoft OIDC sin credenciales responde 503 controlado",
+      "status": "passed",
+      "ms": 6
+    }
+  ]
+}

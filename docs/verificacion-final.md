@@ -1,5 +1,22 @@
 # Verificación de la integración final
 
+## Fase de cumplimiento del instructivo (rama feat/cumplimiento-docente, 25 de noviembre de 2026)
+
+Commits locales firmados a74b986 (jerarquía, Compose en dos proyectos, APK en Linux) y 268b639 (HTTPS, cookies y CSRF, OIDC de Microsoft con MFA federada). No se hizo push. Matriz completa: [cumplimiento-docente.md](cumplimiento-docente.md).
+
+| Verificación | Resultado | Evidencia |
+| --- | --- | --- |
+| Backend unitarias (`npm test`) | 375/375 | node:test, incluye administracion, OIDC simulado con RSA real y cookies |
+| Frontend (`npm test`) | 30/30 y lint sin advertencias | Vitest: cookies, CSRF y ausencia de tokens en localStorage |
+| Móvil (`apps/mobile`) | 58/58 | Jest, incluye el selector de servidor |
+| Seguridad con MySQL real (`npm run test:seguridad`) | 27/27 | 5 nuevas: inicialización del superadmin, límites de ámbito, auditoría inmutable, último superadmin con concurrencia |
+| Stack real en dos proyectos (`npm run test:cumplimiento`) | 11/11 | [evidencias-integracion/cumplimiento.json](evidencias-integracion/cumplimiento.json) |
+| APK Android | Compilada en Linux/Docker, firma V2 verificada | [evidencias-integracion/apk.json](evidencias-integracion/apk.json) |
+
+Límites vigentes: el login con cuentas reales de Microsoft y Google requiere registrar las aplicaciones en cada proveedor; la APK falta instalarla en un teléfono físico (no había dispositivo con adb). El certificado TLS es autofirmado para laboratorio. La suite de 16 comprobaciones (`test:integracion`) se adaptó a TLS y al superadministrador, pero no se volvió a ejecutar en esta fase: la sección siguiente conserva su resultado sobre b21e47e.
+
+## Integración original (b21e47e)
+
 Entrega preparada el 25 de noviembre de 2026, America/Bogota, con comprobaciones iniciadas el 24 y sus timestamps originales conservados. Rama local feat/integracion-final; el SHA definitivo se obtiene del VERSION.txt y MANIFIESTO.json del paquete. No se hizo push, force push ni merge sobre main. Se usó un worktree independiente y no se modificaron los cuatro worktrees de origen.
 
 ## Resultado funcional
