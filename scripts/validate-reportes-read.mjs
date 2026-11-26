@@ -1,3 +1,4 @@
+import { seedSessionClaims } from './test-session-fixtures.mjs';
 import assert from 'node:assert/strict';
 import { fork, execFileSync } from 'node:child_process';
 import { once } from 'node:events';
@@ -74,7 +75,10 @@ try {
   ];
   for (const [name,url,subject] of scenarios) {
     await ask('reset');
-    const token = subject==='invalid'?'invalid':subject?jwt.sign({...subjects[subject],exp:Date.parse('2026-11-18T13:00:00Z')/1000},secret,{noTimestamp:true}):null;
+    // Las negativas institucionales siguen siendo usuarios/sesiones reales, sin falsificar ámbito en el JWT.
+    await admin.execute('UPDATE usuarios SET id_entidad=? WHERE id_usuario=4', [name==='list-entity-missing'?null:1]);
+    await admin.execute('UPDATE entidades SET activo=? WHERE id_entidad=1', [name==='list-entity-outside'?0:1]);
+    const token = subject==='invalid'?'invalid':subject?jwt.sign({...await seedSessionClaims(admin,subjects[subject]),exp:Date.parse('2026-11-18T13:00:00Z')/1000},secret,{noTimestamp:true}):null;
     const response=await fetch(`http://127.0.0.1:${ready.port}/api${url}`,{signal:AbortSignal.timeout(15000),headers:{'User-Agent':'greenalert-read-contract',...(token?{Authorization:`Bearer ${token}`}:{})}});
     const entry={name,url,subject:subject??null,status:response.status,body:await response.json(),trace:(await ask('trace')).trace};
     const [[views]]=await admin.query('SELECT vistas FROM reportes WHERE id_reporte=10');entry.persistedViews=views.vistas;

@@ -1,0 +1,211 @@
+{
+  "project": "ga-events-test-6690cdfbd988",
+  "startedUtc": "2026-11-25T03:04:48.631704+00:00",
+  "checks": [
+    {
+      "name": "health y readiness reales",
+      "status": "PASS",
+      "ms": 25.64
+    },
+    {
+      "name": "sin token denegado",
+      "status": "PASS",
+      "ms": 16.8
+    },
+    {
+      "name": "token normal no reconcilia",
+      "status": "PASS",
+      "ms": 12.43
+    },
+    {
+      "name": "token operador no registra",
+      "status": "PASS",
+      "ms": 12.72
+    },
+    {
+      "name": "correlación inválida",
+      "status": "PASS",
+      "ms": 8.28
+    },
+    {
+      "name": "OpenAPI generado",
+      "status": "PASS",
+      "ms": 870.74
+    },
+    {
+      "name": "escritura Cassandra y correlación",
+      "status": "PASS",
+      "ms": 318.41
+    },
+    {
+      "name": "lectura historial reporte",
+      "status": "PASS",
+      "ms": 32.09
+    },
+    {
+      "name": "reintento idempotente",
+      "status": "PASS",
+      "ms": 97.89
+    },
+    {
+      "name": "UUID conflictivo",
+      "status": "PASS",
+      "ms": 67.99
+    },
+    {
+      "name": "UUID no puede moverse de reporte",
+      "status": "PASS",
+      "ms": 56.15
+    },
+    {
+      "name": "reintento repara proyección histórica incompleta",
+      "status": "PASS",
+      "ms": 2200.48
+    },
+    {
+      "name": "propiedades desconocidas rechazadas",
+      "status": "PASS",
+      "ms": 20.35
+    },
+    {
+      "name": "severidad inválida",
+      "status": "PASS",
+      "ms": 99.53
+    },
+    {
+      "name": "rango histórico invertido",
+      "status": "PASS",
+      "ms": 24.26
+    },
+    {
+      "name": "payload acotado",
+      "status": "PASS",
+      "ms": 16.78
+    },
+    {
+      "name": "8 duplicados simultáneos con LWT",
+      "status": "PASS",
+      "ms": 498.35
+    },
+    {
+      "name": "lote concurrente Cassandra",
+      "status": "PASS",
+      "ms": 199.31
+    },
+    {
+      "name": "ingesta real Druid",
+      "status": "PASS",
+      "ms": 13224.22
+    }
+  ],
+  "benchmark": [],
+  "resourceSamples": [
+    {
+      "label": "ready",
+      "containers": [
+        {
+          "BlockIO": "31.1MB / 1.71MB",
+          "CPUPerc": "3.67%",
+          "Container": "7fe4e06798a6c62e1545ae17b2e608d6963d22a4afb22a39a19033114a0d0710",
+          "ID": "7fe4e06798a6",
+          "MemPerc": "55.03%",
+          "MemUsage": "422.7MiB / 768MiB",
+          "Name": "ga-events-test-6690cdfbd988-broker-1",
+          "NetIO": "29.3kB / 21.5kB",
+          "PIDs": "75"
+        },
+        {
+          "BlockIO": "53.7MB / 18.9MB",
+          "CPUPerc": "2.47%",
+          "Container": "17e2467306a2ac3c05acffb6564d6889ce063125c81b126c54621370b5c3f26d",
+          "ID": "17e2467306a2",
+          "MemPerc": "80.43%",
+          "MemUsage": "1.206GiB / 1.5GiB",
+          "Name": "ga-events-test-6690cdfbd988-cassandra-1",
+          "NetIO": "20.7kB / 253kB",
+          "PIDs": "91"
+        },
+        {
+          "BlockIO": "3.1MB / 1.61MB",
+          "CPUPerc": "0.38%",
+          "Container": "b9e475f8171f6b77d47c5736ee2b61d26fad477b4ed2f56701c9aca9b06517bf",
+          "ID": "b9e475f8171f",
+          "MemPerc": "49.58%",
+          "MemUsage": "317.3MiB / 640MiB",
+          "Name": "ga-events-test-6690cdfbd988-coordinator-1",
+          "NetIO": "213kB / 232kB",
+          "PIDs": "97"
+        },
+        {
+          "BlockIO": "4.1kB / 147kB",
+          "CPUPerc": "6.32%",
+          "Container": "abed59edfad42a3203400fe6a939d2f30b174a1fd18abccec9a0cc9a36a2d5a3",
+          "ID": "abed59edfad4",
+          "MemPerc": "52.12%",
+          "MemUsage": "333.6MiB / 640MiB",
+          "Name": "ga-events-test-6690cdfbd988-events-1",
+          "NetIO": "123kB / 8.5kB",
+          "PIDs": "48"
+        },
+        {
+          "BlockIO": "30.1MB / 1.65MB",
+          "CPUPerc": "0.20%",
+          "Container": "f49cacc900a40263b3c3d17d54066380692e5d01a19ffefae30d4922c3b4b1dc",
+          "ID": "f49cacc900a4",
+          "MemPerc": "50.58%",
+          "MemUsage": "388.5MiB / 768MiB",
+          "Name": "ga-events-test-6690cdfbd988-historical-1",
+          "NetIO": "15.1kB / 10.1kB",
+          "PIDs": "54"
+        },
+        {
+          "BlockIO": "66.5MB / 332MB",
+          "CPUPerc": "0.62%",
+          "Container": "1dc5eaa475ce35668266a699fdaf434e54fb2dc8649f86efeae655a5feaae5d1",
+          "ID": "1dc5eaa475ce",
+          "MemPerc": "86.32%",
+          "MemUsage": "442MiB / 512MiB",
+          "Name": "ga-events-test-6690cdfbd988-metadata-1",
+          "NetIO": "200kB / 179kB",
+          "PIDs": "38"
+        },
+        {
+          "BlockIO": "4.14MB / 1.47MB",
+          "CPUPerc": "0.20%",
+          "Container": "80f511ded3af68061b5f77fea37dfd4a60147eb06ba299501e48d8d80e7723d5",
+          "ID": "80f511ded3af",
+          "MemPerc": "19.30%",
+          "MemUsage": "271.8MiB / 1.375GiB",
+          "Name": "ga-events-test-6690cdfbd988-middlemanager-1",
+          "NetIO": "10.2kB / 7.58kB",
+          "PIDs": "49"
+        },
+        {
+          "BlockIO": "30.9MB / 496kB",
+          "CPUPerc": "0.10%",
+          "Container": "6952718330d2a295a6999b89bb79a9173a048569ad6a1d06111ae8920e34927b",
+          "ID": "6952718330d2",
+          "MemPerc": "30.45%",
+          "MemUsage": "77.95MiB / 256MiB",
+          "Name": "ga-events-test-6690cdfbd988-zookeeper-1",
+          "NetIO": "38.8kB / 43kB",
+          "PIDs": "43"
+        }
+      ]
+    }
+  ],
+  "success": false,
+  "docker": "8247705600 bytes; 8 CPUs",
+  "sourceRevision": "9a463dbb046e54c7f87cced82b649a2b58d64d36",
+  "druidTasks": [
+    {
+      "taskId": "index_greenalert_events_v1_ilcggapc_2026-11-25T03:09:22.721Z",
+      "state": "SUCCESS",
+      "sourceEvents": 18,
+      "interval": "2026-01-15/2026-01-16"
+    }
+  ],
+  "error": "Timeout esperando recuperación: ('/api/v1/indicators?from=2026-01-15T00:00:00Z&to=2026-01-16T00:00:00Z', 503, {'status': 'error', 'correlationId': 'test-c-3638', 'message': 'Dependencia no disponible o timeout; resultado parcial posible, reintentar mismos IDs o intervalo'})",
+  "cleanup": "solo proyecto ga-events-test-6690cdfbd988",
+  "finishedUtc": "2026-11-25T03:12:49.347567+00:00"
+}

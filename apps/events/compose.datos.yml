@@ -1,0 +1,156 @@
+# Stack autónomo de desarrollo/demostración; no es el Compose global del producto.
+x-druid: &druid
+  build:
+    context: infra
+    dockerfile: Dockerfile.druid
+  image: greenalert-events-druid:38.0.0-mysql8.2.0
+  environment: &druid-env
+    DRUID_SINGLE_NODE_CONF: micro-quickstart
+    DRUID_XMS: 256m
+    DRUID_XMX: 256m
+    DRUID_MAXNEWSIZE: 128m
+    DRUID_NEWSIZE: 128m
+    DRUID_MAXDIRECTMEMORYSIZE: 256m
+    JAVA_OPTS: -XX:ActiveProcessorCount=2
+    druid_extensions_loadList: '["mysql-metadata-storage"]'
+    druid_startup_logging_logProperties: 'false'
+    druid_zk_service_host: zookeeper:2181
+    druid_metadata_storage_type: mysql
+    druid_metadata_storage_connector_connectURI: jdbc:mysql://metadata:3306/druid_events?useSSL=false&allowPublicKeyRetrieval=true
+    druid_metadata_storage_connector_user: druid_events
+    DRUID_METADATA_PASSWORD: ${DRUID_METADATA_PASSWORD:?Configurar DRUID_METADATA_PASSWORD}
+    druid_metadata_storage_connector_password: '$${env:DRUID_METADATA_PASSWORD}'
+    druid_storage_type: local
+    druid_storage_storageDirectory: /opt/shared/segments
+    druid_indexer_logs_type: file
+    druid_indexer_logs_directory: /opt/shared/indexing-logs
+    druid_processing_numThreads: '1'
+    druid_processing_numMergeBuffers: '2'
+    druid_processing_buffer_sizeBytes: 32MiB
+    druid_server_http_numThreads: '12'
+    druid_indexer_runner_javaOptsArray: '["-server","-Xms256m","-Xmx512m","-XX:MaxDirectMemorySize=256m","-XX:ActiveProcessorCount=2","-Duser.timezone=UTC","-Dfile.encoding=UTF-8","-Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager"]'
+    druid_indexer_fork_property_druid_processing_buffer_sizeBytes: 32MiB
+    druid_indexer_fork_property_druid_processing_numThreads: '1'
+    druid_indexer_fork_property_druid_processing_numMergeBuffers: '2'
+    druid_worker_capacity: '1'
+    druid_segmentCache_locations: '[{"path":"/opt/druid/var/segment-cache","maxSize":1073741824}]'
+    druid_server_maxSize: '1073741824'
+  volumes:
+    - druid-shared:/opt/shared
+  depends_on:
+    metadata:
+      condition: service_healthy
+    zookeeper:
+      condition: service_healthy
+  networks: [events-private]
+  restart: 'no'
+  stop_grace_period: 30s
+
+services:
+  cassandra:
+    image: cassandra:5.0.9@sha256:acd754f07c73f3a166bb477354b56ce9a05690c3e5e2aaacc1aab2afddba6436
+    environment:
+      MAX_HEAP_SIZE: 768M
+      HEAP_NEWSIZE: 192M
+      JVM_EXTRA_OPTS: -XX:ActiveProcessorCount=2
+      CASSANDRA_CLUSTER_NAME: GreenAlertEvents
+      CASSANDRA_NUM_TOKENS: '16'
+    mem_limit: 1536m
+    volumes: [cassandra-data:/var/lib/cassandra]
+    networks: [events-private]
+    healthcheck:
+      test: [CMD-SHELL, "cqlsh -e 'SELECT release_version FROM system.local' >/dev/null 2>&1"]
+      interval: 15s
+      timeout: 10s
+      retries: 30
+      start_period: 60s
+  schema:
+    image: cassandra:5.0.9@sha256:acd754f07c73f3a166bb477354b56ce9a05690c3e5e2aaacc1aab2afddba6436
+    entrypoint: [cqlsh, cassandra, '-f', /schema.cql]
+    volumes: [./infra/schema.cql:/schema.cql:ro]
+    depends_on:
+      cassandra:
+        condition: service_healthy
+    networks: [events-private]
+  metadata:
+    image: mysql:8.4.11
+    command: [--innodb-buffer-pool-size=64M, --max-connections=60, --mysql-native-password=OFF]
+    environment:
+      MYSQL_DATABASE: druid_events
+      MYSQL_USER: druid_events
+      MYSQL_PASSWORD: ${DRUID_METADATA_PASSWORD:?Configurar DRUID_METADATA_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DRUID_METADATA_ROOT_PASSWORD:?Configurar DRUID_METADATA_ROOT_PASSWORD}
+    volumes: [metadata-data:/var/lib/mysql]
+    mem_limit: 512m
+    networks: [events-private]
+    healthcheck:
+      test: [CMD-SHELL, 'MYSQL_PWD="$$MYSQL_PASSWORD" mysql -u druid_events -D druid_events -e "SELECT 1" >/dev/null 2>&1']
+      interval: 5s
+      timeout: 5s
+      retries: 50
+  zookeeper:
+    image: zookeeper:3.9.3
+    environment:
+      ZOO_4LW_COMMANDS_WHITELIST: ruok
+      JVMFLAGS: -Xms64m -Xmx128m -XX:ActiveProcessorCount=2
+    volumes: [zk-data:/data, zk-log:/datalog]
+    mem_limit: 256m
+    networks: [events-private]
+    healthcheck:
+      test: [CMD-SHELL, 'echo ruok | nc -w 2 localhost 2181 | grep imok']
+      interval: 10s
+      timeout: 5s
+      retries: 30
+  coordinator:
+    <<: *druid
+    command: [coordinator]
+    mem_limit: 640m
+    volumes: [druid-shared:/opt/shared, coordinator-data:/opt/druid/var]
+    healthcheck:
+      test: [CMD-SHELL, 'wget -q -O /dev/null http://localhost:8081/status/health']
+      interval: 10s
+      timeout: 5s
+      retries: 40
+  broker:
+    <<: *druid
+    command: [broker]
+    mem_limit: 768m
+    healthcheck:
+      test: [CMD-SHELL, 'wget -q -O /dev/null http://localhost:8082/status/health']
+      interval: 10s
+      timeout: 5s
+      retries: 40
+  historical:
+    <<: *druid
+    command: [historical]
+    mem_limit: 768m
+    volumes: [druid-shared:/opt/shared, historical-data:/opt/druid/var]
+    healthcheck:
+      test: [CMD-SHELL, 'wget -q -O /dev/null http://localhost:8083/status/health']
+      interval: 10s
+      timeout: 5s
+      retries: 40
+  middlemanager:
+    <<: *druid
+    command: [middleManager]
+    mem_limit: 1408m
+    volumes: [druid-shared:/opt/shared, middle-data:/opt/druid/var]
+    healthcheck:
+      test: [CMD-SHELL, 'wget -q -O /dev/null http://localhost:8091/status/health']
+      interval: 10s
+      timeout: 5s
+      retries: 40
+
+volumes:
+  cassandra-data:
+  metadata-data:
+  zk-data:
+  zk-log:
+  druid-shared:
+  coordinator-data:
+  historical-data:
+  middle-data:
+networks:
+  events-private:
+    external: true
+    name: ${EVENTS_NETWORK:?Configurar EVENTS_NETWORK}

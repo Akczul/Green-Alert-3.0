@@ -1,3 +1,7 @@
+import { seguridad, sessionLimits } from '../bootstrap/seguridad.js';
+import { adminMfa } from '../bootstrap/admin-mfa.js';
+import { hashPassword, verifyPassword } from '../modules/identidad/adapters/outbound/passwords.js';
+import { CredencialRechazada, PasswordPolicyError } from '../modules/identidad/domain/seguridad.js';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import {
@@ -21,7 +25,10 @@ import {
 import {
   consumeOAuthCallbackCode,
   createOAuthCallbackCode,
+  peekOAuthCallbackCode,
+  recordOAuthCallbackFailure,
 } from '../services/oauth-callback-code.service.js';
+import { inicioFederado } from '../bootstrap/identidad-federada.js';
 import { consumeOAuthState } from '../services/oauth-state.service.js';
 import { getApiPrefix } from '../config/api-prefix.config.js';
 import { getCloudinaryConfig } from '../config/cloudinary.config.js';
@@ -47,18 +54,18 @@ import { deleteFileByPublicId, uploadFileBuffer } from '../services/cloudinary.s
 import {
   validarNombreUsuario,
   validarTelefono,
-  validarPassword,
 } from '../utils/constantes-validacion.js';
+
+const forwardAuthError = (error, res, next) => {
+  if (error.code === 'ER_DUP_ENTRY') return errorResponse(res, 'El correo ya está registrado.', 409);
+  if (error instanceof PasswordPolicyError) return errorResponse(res, error.message, 400);
+  if (error instanceof CredencialRechazada) return errorResponse(res, error.message, 403);
+  return next(error);
+};
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const DEFAULT_ACCESS_EXPIRES_IN = '15m';
 const DEFAULT_REFRESH_EXPIRES_DAYS = 7;
-
-const hashPassword = (password) => {
-  const salt = crypto.randomBytes(16).toString('hex');
-  const derivedKey = crypto.scryptSync(password, salt, 64).toString('hex');
-  return `${salt}:${derivedKey}`;
-};
 
 const getJwtSecret = () => {
   if (!process.env.JWT_SECRET) {
@@ -88,12 +95,14 @@ const validateGeneratedToken = (token, secret, user) => {
   return decoded;
 };
 
-const buildToken = (user) => {
+const buildToken = (user, session) => {
   const secret = getJwtSecret();
   const expiresIn = process.env.JWT_EXPIRES_IN || DEFAULT_ACCESS_EXPIRES_IN;
 
   const token = jwt.sign(
     {
+      sid: session.sid,
+      ver: session.ver,
       sub: user.id_usuario,
       uuid: user.uuid,
       rol: user.rol,
@@ -132,7 +141,7 @@ const buildRefreshToken = () => {
 const createRefreshTokenForUser = async (user, req) => {
   const { rawToken, tokenHash, expiresAt } = buildRefreshToken();
 
-  await RefreshTokenModel.create({
+  const session = await seguridad.iniciarSesion(user.id_usuario, {
     id_usuario: user.id_usuario,
     token_hash: tokenHash,
     expires_at: expiresAt,
@@ -141,14 +150,17 @@ const createRefreshTokenForUser = async (user, req) => {
   });
 
   return {
+    session,
     refreshToken: rawToken,
     refreshTokenExpiresAt: expiresAt,
   };
 };
 
 const buildAuthPayload = async (user, req) => {
-  const accessToken = buildToken(user);
+  if (adminMfa) await adminMfa.verify(user, req.body?.totp);
   const refresh = await createRefreshTokenForUser(user, req);
+  const currentUser = { ...user, rol: refresh.session.rol, id_entidad: refresh.session.id_entidad };
+  const accessToken = buildToken(currentUser, refresh.session);
 
   return {
     token: accessToken,
@@ -167,6 +179,9 @@ const toPublicUser = (user) => ({
   email: user.email,
   rol: user.rol,
   id_entidad: user.id_entidad ?? null,
+  // Jerarquía administrativa (024): 'global' = superadministrador, 'ambito' = segundo nivel.
+  nivel_admin: user.rol === 'admin' ? (user.nivel_admin ?? null) : null,
+  ambito_entidad: user.rol === 'admin' ? (user.ambito_entidad ?? null) : null,
   activo: user.activo,
   email_verificado: user.email_verificado,
   avatar_url: user.avatar_url,
@@ -198,6 +213,15 @@ const redirectToFrontendAuthCallback = (res, authPayload) => {
   });
 
   return res.redirect(303, buildFrontendAuthCallbackUrl(authPayload));
+};
+
+// Inicio federado (Google/Microsoft): si la cuenta es administradora y la MFA es obligatoria, la sesión
+// no se emite en el callback; el código de un solo uso queda pendiente hasta validar el TOTP.
+const completeFederatedLogin = async (res, user, req) => {
+  if (adminMfa && user.rol === 'admin') {
+    return redirectToFrontendAuthCallback(res, { mfaPendingUserId: user.id_usuario });
+  }
+  return redirectToFrontendAuthCallback(res, await buildAuthPayload(user, req));
 };
 
 const errorResponseWithDevelopmentDetails = (
@@ -240,20 +264,6 @@ export const validateOAuthCallbackState = (state, provider) => {
     valid: false,
     message: getOAuthStateErrorMessage(validation.reason),
   };
-};
-
-const verifyPassword = (password, storedHash) => {
-  if (typeof storedHash !== 'string' || !storedHash.includes(':')) {
-    return false;
-  }
-
-  const [salt, key] = storedHash.split(':');
-  if (!salt || !key) {
-    return false;
-  }
-
-  const derivedKey = crypto.scryptSync(password, salt, 64).toString('hex');
-  return key === derivedKey;
 };
 
 const RESET_TOKEN_MINUTES = 30;
@@ -351,16 +361,14 @@ export const register = async (req, res, next) => {
       return errorResponse(res, 'Correo electronico invalido.', 400);
     }
 
-    if (typeof password !== 'string' || password.length < 8) {
-      return errorResponse(res, 'La contrasena debe tener al menos 8 caracteres.', 400);
-    }
+    await seguridad.validarNuevaPassword(password);
 
     const existingUser = await UsuarioModel.findByEmail(normalizedEmail);
     if (existingUser) {
       return errorResponse(res, 'Ya existe una cuenta registrada con ese correo.', 409);
     }
 
-    const password_hash = hashPassword(password);
+    const password_hash = await hashPassword(password);
 
     const idUsuario = await UsuarioModel.create({
       nombre: normalizedNombre,
@@ -405,7 +413,7 @@ export const register = async (req, res, next) => {
       201
     );
   } catch (error) {
-    return next(error);
+    return forwardAuthError(error, res, next);
   }
 };
 
@@ -444,7 +452,7 @@ export const login = async (req, res, next) => {
       return errorResponse(res, 'No se puede iniciar sesion con contrasena en este momento.', 400);
     }
 
-    if (!verifyPassword(password, user.password_hash)) {
+    if (!await verifyPassword(password, user.password_hash)) {
       return errorResponse(res, 'Credenciales incorrectas.', 401);
     }
 
@@ -454,7 +462,7 @@ export const login = async (req, res, next) => {
 
     return successResponse(res, authPayload, 'Inicio de sesion exitoso.');
   } catch (error) {
-    return next(error);
+    return forwardAuthError(error, res, next);
   }
 };
 
@@ -469,12 +477,17 @@ export const refreshAccessToken = async (req, res, next) => {
     const currentHash = hashToken(refreshToken);
     const current = await RefreshTokenModel.findActiveByHash(currentHash);
 
-    if (!current) {
+    if (!current || !current.session_id || Number(current.session_auth_version) !== Number(current.auth_version)) {
       return errorResponse(res, 'Refresh token invalido o expirado.', 401);
     }
 
+    if (sessionLimits && !await sessionLimits.check(current.session_id, current.id_usuario, false)) {
+      await seguridad.revocarSesion(currentHash);
+      return errorResponse(res, 'Sesion caducada por inactividad o duración máxima.', 401);
+    }
+
     if (!current.activo) {
-      await RefreshTokenModel.revokeByHash(currentHash);
+      await seguridad.revocarSesion(currentHash);
       return errorResponse(res, 'Cuenta desactivada. Contacta al administrador.', 403);
     }
 
@@ -491,7 +504,7 @@ export const refreshAccessToken = async (req, res, next) => {
       return errorResponse(res, 'Refresh token invalido o expirado.', 401);
     }
 
-    const accessToken = buildToken(current);
+    const accessToken = buildToken(current, { sid: rotated.session_id, ver: rotated.auth_version });
 
     return successResponse(
       res,
@@ -505,13 +518,31 @@ export const refreshAccessToken = async (req, res, next) => {
       'Token renovado correctamente.'
     );
   } catch (error) {
-    return next(error);
+    return forwardAuthError(error, res, next);
   }
 };
 
 export const exchangeOAuthCallbackCode = async (req, res, next) => {
   try {
     const { code } = req.body ?? {};
+    const pending = peekOAuthCallbackCode(code);
+
+    if (pending?.mfaPendingUserId) {
+      const user = await UsuarioModel.findById(pending.mfaPendingUserId);
+      if (!user || !user.activo) {
+        consumeOAuthCallbackCode(code);
+        return errorResponse(res, 'Cuenta desactivada. Contacta al administrador.', 403);
+      }
+      let payload;
+      try { payload = await buildAuthPayload(user, req); }
+      catch (error) {
+        if (error.statusCode === 403) recordOAuthCallbackFailure(code);
+        throw error;
+      }
+      consumeOAuthCallbackCode(code);
+      return successResponse(res, payload, 'Autenticacion OAuth completada.', 200);
+    }
+
     const authPayload = consumeOAuthCallbackCode(code);
 
     if (!authPayload) {
@@ -525,7 +556,7 @@ export const exchangeOAuthCallbackCode = async (req, res, next) => {
       200
     );
   } catch (error) {
-    return next(error);
+    return forwardAuthError(error, res, next);
   }
 };
 
@@ -538,7 +569,7 @@ export const logout = async (req, res, next) => {
     }
 
     if (allDevices) {
-      await RefreshTokenModel.revokeAllForUser(req.user.sub);
+      await seguridad.revocarTodas(req.user.sub);
       return successResponse(res, null, 'Sesion cerrada en todos los dispositivos.');
     }
 
@@ -546,10 +577,10 @@ export const logout = async (req, res, next) => {
       return errorResponse(res, 'Refresh token requerido.', 400);
     }
 
-    await RefreshTokenModel.revokeByHash(hashToken(refreshToken));
+    await seguridad.revocarSesion(hashToken(refreshToken));
     return successResponse(res, null, 'Sesion cerrada correctamente.');
   } catch (error) {
-    return next(error);
+    return forwardAuthError(error, res, next);
   }
 };
 
@@ -568,7 +599,7 @@ export const getPerfil = async (req, res, next) => {
 
     return successResponse(res, { user }, 'Perfil obtenido correctamente.', 200);
   } catch (error) {
-    return next(error);
+    return forwardAuthError(error, res, next);
   }
 };
 
@@ -613,7 +644,7 @@ export const updatePerfil = async (req, res, next) => {
 
     return successResponse(res, { user: updatedUser }, 'Perfil actualizado', 200);
   } catch (error) {
-    return next(error);
+    return forwardAuthError(error, res, next);
   }
 };
 
@@ -658,7 +689,7 @@ export const updateAvatar = async (req, res, next) => {
 
     return successResponse(res, { user: updatedUser }, 'Avatar actualizado correctamente.', 200);
   } catch (error) {
-    return next(error);
+    return forwardAuthError(error, res, next);
   }
 };
 
@@ -693,9 +724,7 @@ export const changePassword = async (req, res, next) => {
       return errorResponse(res, 'La nueva contrasena y la confirmacion no coinciden.', 400);
     }
 
-    if (!validarPassword(newPassword)) {
-      return errorResponse(res, 'La nueva contrasena no cumple con los requisitos de seguridad.', 400);
-    }
+    await seguridad.validarNuevaPassword(newPassword);
 
     if (!tokenEmail) {
       return errorResponse(res, 'No autorizado.', 401);
@@ -706,22 +735,22 @@ export const changePassword = async (req, res, next) => {
       return errorResponse(res, 'Usuario no encontrado.', 404);
     }
 
-    if (!verifyPassword(currentPassword, user.password_hash)) {
+    if (!await verifyPassword(currentPassword, user.password_hash)) {
       return errorResponse(res, 'La contrasena actual es incorrecta.', 401);
     }
 
-    const newPasswordHash = hashPassword(newPassword);
+    const newPasswordHash = await hashPassword(newPassword);
     const updatedUser = await UsuarioModel.updatePassword(id_usuario, newPasswordHash);
 
     if (!updatedUser) {
       return errorResponse(res, 'Usuario no encontrado.', 404);
     }
 
-    await RefreshTokenModel.revokeAllForUser(id_usuario);
+    await seguridad.revocarTodas(id_usuario);
 
     return successResponse(res, null, 'Contrasena actualizada. Se cerraron las sesiones activas.', 200);
   } catch (error) {
-    return next(error);
+    return forwardAuthError(error, res, next);
   }
 };
 
@@ -770,7 +799,7 @@ export const forgotPassword = async (req, res, next) => {
       'Si el correo existe, recibiras un enlace de recuperacion.'
     );
   } catch (error) {
-    return next(error);
+    return forwardAuthError(error, res, next);
   }
 };
 
@@ -797,9 +826,7 @@ export const resetPassword = async (req, res, next) => {
       return errorResponse(res, 'La nueva contrasena y la confirmacion no coinciden.', 400);
     }
 
-    if (!validarPassword(newPassword)) {
-      return errorResponse(res, 'La nueva contrasena no cumple con los requisitos de seguridad.', 400);
-    }
+    await seguridad.validarNuevaPassword(newPassword);
 
     const tokenHash = hashToken(token);
     const user = await UsuarioModel.findByResetToken(tokenHash);
@@ -814,7 +841,7 @@ export const resetPassword = async (req, res, next) => {
       return errorResponse(res, 'Token invalido o expirado.', 400);
     }
 
-    const newPasswordHash = hashPassword(newPassword);
+    const newPasswordHash = await hashPassword(newPassword);
     const updatedUser = await UsuarioModel.updatePassword(user.id_usuario, newPasswordHash);
 
     if (!updatedUser) {
@@ -822,11 +849,11 @@ export const resetPassword = async (req, res, next) => {
     }
 
     await UsuarioModel.clearResetToken(user.id_usuario);
-    await RefreshTokenModel.revokeAllForUser(user.id_usuario);
+    await seguridad.revocarTodas(user.id_usuario);
 
     return successResponse(res, null, 'Contrasena actualizada correctamente. Se cerraron las sesiones activas.', 200);
   } catch (error) {
-    return next(error);
+    return forwardAuthError(error, res, next);
   }
 };
 
@@ -860,7 +887,7 @@ export const verifyEmail = async (req, res, next) => {
 
     return successResponse(res, null, 'Correo verificado correctamente.', 200);
   } catch (error) {
-    return next(error);
+    return forwardAuthError(error, res, next);
   }
 };
 
@@ -972,7 +999,7 @@ export const sendVerificationOtp = async (req, res, next) => {
       200
     );
   } catch (error) {
-    return next(error);
+    return forwardAuthError(error, res, next);
   }
 };
 
@@ -1042,7 +1069,7 @@ export const verifyEmailOtp = async (req, res, next) => {
       200
     );
   } catch (error) {
-    return next(error);
+    return forwardAuthError(error, res, next);
   }
 };
 
@@ -1108,7 +1135,7 @@ export const updateNotifications = async (req, res, next) => {
       200
     );
   } catch (error) {
-    return next(error);
+    return forwardAuthError(error, res, next);
   }
 };
 
@@ -1217,7 +1244,7 @@ export const googleLogin = async (req, res, next) => {
       200
     );
   } catch (error) {
-    return next(error);
+    return forwardAuthError(error, res, next);
   }
 };
 
@@ -1262,7 +1289,7 @@ export const googleAccessTokenLogin = async (req, res, next) => {
       200
     );
   } catch (error) {
-    return next(error);
+    return forwardAuthError(error, res, next);
   }
 };
 
@@ -1337,12 +1364,10 @@ export const googleCallback = async (req, res, next) => {
       return errorResponse(res, 'No fue posible crear la cuenta con este correo.', 400);
     }
 
-    // Generar JWT
-    const authPayload = await buildAuthPayload(user, req);
-
-    return redirectToFrontendAuthCallback(res, authPayload);
+    // Generar sesión (con paso MFA si es administrador)
+    return await completeFederatedLogin(res, user, req);
   } catch (error) {
-    return next(error);
+    return forwardAuthError(error, res, next);
   }
 };
 
@@ -1364,7 +1389,7 @@ export const getGoogleAuthUrl = async (req, res, next) => {
       200
     );
   } catch (error) {
-    return next(error);
+    return forwardAuthError(error, res, next);
   }
 };
 
@@ -1435,7 +1460,7 @@ export const getFacebookAuthUrl = async (req, res, next) => {
       200
     );
   } catch (error) {
-    return next(error);
+    return forwardAuthError(error, res, next);
   }
 };
 
@@ -1488,7 +1513,7 @@ export const facebookLogin = async (req, res, next) => {
     const authPayload = await buildAuthPayload(user, req);
     return successResponse(res, authPayload, 'Inicio de sesion con Facebook exitoso.', 200);
   } catch (error) {
-    return next(error);
+    return forwardAuthError(error, res, next);
   }
 };
 
@@ -1566,6 +1591,30 @@ export const facebookCallback = async (req, res, next) => {
       user: publicUser,
     });
   } catch (error) {
+    return forwardAuthError(error, res, next);
+  }
+};
+
+// ── OpenID Connect: Microsoft Entra ID (segundo proveedor externo) ─────────────────────────
+// El usuario autoriza en Microsoft; GreenAlert verifica el id_token (firma JWKS, iss, aud, nonce)
+// y asigna el rol internamente (nuevas cuentas: ciudadano).
+export const getMicrosoftAuthUrl = async (req, res, next) => {
+  try {
+    const { url } = await inicioFederado.iniciar('microsoft');
+    return successResponse(res, { url }, 'URL de autenticacion de Microsoft generada.', 200);
+  } catch (error) {
+    if (error.statusCode) return errorResponse(res, error.message, error.statusCode);
     return next(error);
+  }
+};
+
+export const microsoftCallback = async (req, res, next) => {
+  try {
+    if (req.query?.error) return errorResponse(res, 'Microsoft canceló o rechazó la autorización.', 400);
+    const user = await inicioFederado.completar('microsoft', { code: req.query?.code, state: req.query?.state });
+    return await completeFederatedLogin(res, user, req);
+  } catch (error) {
+    if (error.statusCode) return errorResponse(res, error.message, error.statusCode);
+    return forwardAuthError(error, res, next);
   }
 };

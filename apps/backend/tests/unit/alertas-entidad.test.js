@@ -1,3 +1,4 @@
+import { mockAuthContract } from '../helpers/auth-contract.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import express from 'express';
@@ -76,6 +77,8 @@ const mockEntidadActiva = (t, idEntidad = 1) => {
     activo: 1,
   }));
 };
+
+test.beforeEach(mockAuthContract);
 
 test('crea una alerta cuando se asigna un reporte critico a una entidad', async (t) => {
   let payload;

@@ -44,8 +44,11 @@ export const UsuarioModel = {
     const googleId = await UsuarioModel._optionalColumnSelect('google_id');
     const facebookId = await UsuarioModel._optionalColumnSelect('facebook_id');
     const idEntidad = await UsuarioModel._optionalColumnSelect('id_entidad');
+    // Jerarquía administrativa (migración 024). Sin ella, un admin conserva el control global previo.
+    const nivelAdmin = await UsuarioModel._optionalColumnSelect('nivel_admin', "IF(rol = 'admin', 'global', NULL)");
+    const ambitoEntidad = await UsuarioModel._optionalColumnSelect('ambito_entidad');
 
-    return `${UsuarioModel._publicUserFields}, ${idEntidad}, ${notificationPreferences}, ${googleId}, ${facebookId}`;
+    return `${UsuarioModel._publicUserFields}, ${idEntidad}, ${notificationPreferences}, ${googleId}, ${facebookId}, ${nivelAdmin}, ${ambitoEntidad}`;
   },
   
     // Busca un usuario por su email 
@@ -245,7 +248,7 @@ export const UsuarioModel = {
   updatePassword: async (id_usuario, newPasswordHash) => {
     const [result] = await pool.execute(
       `UPDATE usuarios
-       SET password_hash = ?, updated_at = NOW()
+       SET password_hash = ?, auth_version = auth_version + 1, updated_at = NOW()
        WHERE id_usuario = ? AND deleted_at IS NULL`,
       [newPasswordHash, id_usuario]
     );
@@ -386,15 +389,15 @@ export const UsuarioModel = {
     const [result] = hasEntidad
       ? await pool.execute(
         `UPDATE usuarios
-         SET rol = ?, id_entidad = ?, updated_at = NOW()
+         SET auth_version = auth_version + IF(rol <> ? OR NOT (id_entidad <=> ?), 1, 0), rol = ?, id_entidad = ?, updated_at = NOW()
          WHERE id_usuario = ? AND deleted_at IS NULL`,
-        [rol, rol === 'entidad' ? id_entidad : null, id_usuario]
+        [rol, rol === 'entidad' ? id_entidad : null, rol, rol === 'entidad' ? id_entidad : null, id_usuario]
       )
       : await pool.execute(
         `UPDATE usuarios
-         SET rol = ?, updated_at = NOW()
+         SET auth_version = auth_version + IF(rol <> ?, 1, 0), rol = ?, updated_at = NOW()
          WHERE id_usuario = ? AND deleted_at IS NULL`,
-        [rol, id_usuario]
+        [rol, rol, id_usuario]
       );
 
     if (result.affectedRows === 0) {
@@ -427,9 +430,9 @@ export const UsuarioModel = {
   updateActivo: async (id_usuario, activo) => {
     const [result] = await pool.execute(
       `UPDATE usuarios
-       SET activo = ?, updated_at = NOW()
+       SET auth_version = auth_version + IF(activo <> ?, 1, 0), activo = ?, updated_at = NOW()
        WHERE id_usuario = ? AND deleted_at IS NULL`,
-      [activo, id_usuario]
+      [activo, activo, id_usuario]
     );
 
     if (result.affectedRows === 0) {
@@ -469,7 +472,7 @@ export const UsuarioModel = {
     // Elimina un usuario con (Soft Delete)
   remove: async (id_usuario) => {
     const [result] = await pool.execute(
-      `UPDATE usuarios SET deleted_at = NOW() WHERE id_usuario = ? AND deleted_at IS NULL`,
+      `UPDATE usuarios SET deleted_at = NOW(), auth_version = auth_version + 1 WHERE id_usuario = ? AND deleted_at IS NULL`,
       [id_usuario]
     );
     return result.affectedRows > 0;

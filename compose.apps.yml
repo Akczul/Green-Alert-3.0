@@ -1,0 +1,132 @@
+# Proyecto Compose de aplicaciones: 3 backends + web. Se inicia DESPUÉS de compose.datos.yml
+# (ver docs/integracion-final.md, «Orden de inicio»). Se une a los motores solo por la red externa.
+services:
+  events:
+    restart: unless-stopped
+    build: ./apps/events
+    mem_limit: 640m
+    environment:
+      EVENTS_SERVICE_TOKEN: ${EVENTS_SERVICE_TOKEN:?Configurar EVENTS_SERVICE_TOKEN}
+      EVENTS_RECONCILE_TOKEN: ${EVENTS_RECONCILE_TOKEN:?Configurar EVENTS_RECONCILE_TOKEN}
+      CASSANDRA_HOST: cassandra
+      DRUID_QUERY_URL: http://broker:8082
+      DRUID_TASK_URL: http://coordinator:8081
+      EVENTS_WORKERS: ${EVENTS_WORKERS:-4}
+      EVENTS_QUEUE_CAPACITY: ${EVENTS_QUEUE_CAPACITY:-128}
+      DRUID_TASK_TIMEOUT_SECONDS: ${DRUID_TASK_TIMEOUT_SECONDS:-180}
+    # Sin depends_on hacia compose.datos.yml: son proyectos distintos unidos por la red externa.
+    # Si Cassandra/Druid aún no responden, el contenedor reinicia hasta que estén sanos.
+    networks: [shared]
+    stop_grace_period: 40s
+    healthcheck:
+      test: [CMD-SHELL, 'curl -fsS http://localhost:8080/actuator/health/liveness >/dev/null']
+      interval: 10s
+      timeout: 5s
+      retries: 30
+  backend-prod:
+    build:
+      context: ./apps/backend
+    restart: unless-stopped
+    networks: [shared]
+    environment:
+      JWT_SECRET: ${JWT_SECRET:?Ejecutar setup:integracion}
+      SESSION_LIMITS_ENABLED: 'true'
+      SESSION_IDLE_SECONDS: 1800
+      SESSION_MAX_SECONDS: 604800
+      SECURITY_AUDIT_ENABLED: 'true'
+      ADMIN_MFA_REQUIRED: 'true'
+      MFA_ENCRYPTION_KEY: ${MFA_ENCRYPTION_KEY:?Ejecutar setup:integracion}
+      EMAIL_TRANSPORT: json
+      EMAIL_FROM: no-reply@greenalert.test
+      EMAIL_HOST: localhost
+      EMAIL_PORT: 1025
+      EMAIL_USER: laboratorio
+      EMAIL_PASS: sin-proveedor-remoto
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
+      ANALYTICS_URL: http://analytics:8000
+      ANALYTICS_INTERNAL_TOKEN: ${ANALYTICS_INTERNAL_TOKEN}
+      EVENTS_URL: http://events:8080
+      EVENTS_SERVICE_TOKEN: ${EVENTS_SERVICE_TOKEN}
+      EVENTS_RECONCILE_TOKEN: ${EVENTS_RECONCILE_TOKEN}
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: greenalert
+      DB_PASSWORD: ${MYSQL_PASSWORD:?Ejecuta npm run setup}
+      DB_NAME: greenalert
+      DB_SSL: "false"
+      NODE_ENV: production
+      PORT: 3000
+      API_PREFIX: /api
+      # La web se sirve solo por HTTPS; las cookies de sesión son Secure/HttpOnly/SameSite=Strict.
+      FRONTEND_URL: https://localhost:${FRONTEND_TLS_PORT:-8443}
+      CORS_ORIGIN: https://localhost:${FRONTEND_TLS_PORT:-8443},http://localhost:5173
+      API_PUBLIC_URL: https://localhost:${FRONTEND_TLS_PORT:-8443}
+      # OIDC Microsoft Entra ID (opcional; sin estas variables el botón responde 503 y el resto sigue).
+      MICROSOFT_CLIENT_ID: ${MICROSOFT_CLIENT_ID:-}
+      MICROSOFT_CLIENT_SECRET: ${MICROSOFT_CLIENT_SECRET:-}
+      MICROSOFT_TENANT: ${MICROSOFT_TENANT:-common}
+      MICROSOFT_REDIRECT_URI: ${MICROSOFT_REDIRECT_URI:-https://localhost:8443/api/auth/microsoft/callback}
+    volumes:
+      - backend_uploads:/app/uploads
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://localhost:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+  frontend:
+    build:
+      context: ./apps/frontend
+      target: production
+      args:
+        VITE_APP_NAME: GreenAlert
+        VITE_GOOGLE_CLIENT_ID: ${VITE_GOOGLE_CLIENT_ID:-}
+        VITE_FIREBASE_API_KEY: ${VITE_FIREBASE_API_KEY:-}
+        VITE_FIREBASE_AUTH_DOMAIN: ${VITE_FIREBASE_AUTH_DOMAIN:-}
+        VITE_FIREBASE_PROJECT_ID: ${VITE_FIREBASE_PROJECT_ID:-}
+        VITE_FIREBASE_STORAGE_BUCKET: ${VITE_FIREBASE_STORAGE_BUCKET:-}
+        VITE_FIREBASE_MESSAGING_SENDER_ID: ${VITE_FIREBASE_MESSAGING_SENDER_ID:-}
+        VITE_FIREBASE_APP_ID: ${VITE_FIREBASE_APP_ID:-}
+        VITE_FIREBASE_VAPID_KEY: ${VITE_FIREBASE_VAPID_KEY:-}
+    networks: [shared]
+    environment:
+      FRONTEND_TLS_PORT: ${FRONTEND_TLS_PORT:-8443}
+    volumes:
+      # Certificado local generado por setup:integracion (.local/tls, fuera de Git).
+      - ./.local/tls:/etc/nginx/tls:ro
+    ports:
+      - "${WEB_BIND:-127.0.0.1}:${FRONTEND_TLS_PORT:-8443}:8443"
+      # HTTP: redirige la web a HTTPS y expone /api solo para la APK de laboratorio en LAN.
+      - "${WEB_BIND:-127.0.0.1}:${FRONTEND_PORT:-8080}:8080"
+    depends_on:
+      backend-prod:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: [CMD-SHELL, 'wget -q -O /dev/null http://127.0.0.1:8080/healthz || exit 1']
+      interval: 15s
+      timeout: 5s
+      retries: 5
+  analytics:
+    restart: unless-stopped
+    build: ./apps/analytics
+    environment:
+      ANALYTICS_INTERNAL_TOKEN: ${ANALYTICS_INTERNAL_TOKEN}
+      ANALYTICS_MONGO_URI: mongodb://analytics:${MONGO_APP_PASSWORD}@mongo:27017/greenalert_analytics?authSource=greenalert_analytics
+      ANALYTICS_CPU_WORKERS: 2
+      ANALYTICS_MAX_CPU_JOBS: 2
+    init: true
+    mem_limit: 1536m
+    networks: [shared]
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/live', timeout=2)"]
+      interval: 5s
+      timeout: 5s
+      retries: 40
+volumes:
+  backend_uploads:
+    # Nombre fijo: conserva el volumen creado cuando ambos archivos se levantaban como un solo proyecto.
+    name: ${GREENALERT_DATA_PROJECT:-greenalert-final}_backend_uploads
+networks:
+  shared:
+    external: true
+    name: ${GREENALERT_NETWORK:?Ejecutar setup:integracion}

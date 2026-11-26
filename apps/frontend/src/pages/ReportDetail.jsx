@@ -13,6 +13,7 @@ import { helpers } from '../constants/categorias';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import LikeButton from '../components/LikeButton';
+import HistorialAmbiental from '../components/HistorialAmbiental';
 import MediaLightbox from '../components/MediaLightbox';
 import {
   canManageCitizenReport,
@@ -631,6 +632,7 @@ export default function ReportDetail() {
           {iaAnalysis && <IaBadge iaAnalysis={iaAnalysis} report={report} />}
 
           {/* Comentario del moderador */}
+          {user && <HistorialAmbiental id={id} />}
           {report.comentario_moderacion && (
             <div className="flex items-start gap-2.5 px-4 py-3 rounded-xl bg-amber-500/8 border border-amber-500/25">
               <MessageSquare className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />

@@ -29,6 +29,8 @@ import {
 	facebookLogin,
 	facebookCallback,
 	getFacebookAuthUrl,
+	getMicrosoftAuthUrl,
+	microsoftCallback,
 } from '../src/controllers/auth.controller.js';
 
 const authRouter = Router();
@@ -61,5 +63,9 @@ authRouter.get('/google/callback', googleCallback);
 authRouter.get('/facebook/url', getFacebookAuthUrl);
 authRouter.post('/facebook', authRateLimit, facebookLogin);
 authRouter.get('/facebook/callback', facebookCallback);
+
+// OpenID Connect con Microsoft Entra ID (Authorization Code + PKCE)
+authRouter.get('/microsoft/url', authRateLimit, getMicrosoftAuthUrl);
+authRouter.get('/microsoft/callback', authRateLimit, microsoftCallback);
 
 export default authRouter;

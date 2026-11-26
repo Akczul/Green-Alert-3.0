@@ -1,0 +1,36 @@
+import { execFileSync } from 'node:child_process';
+import { mkdir,readFile,writeFile,copyFile,stat } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
+const root=fileURLToPath(new URL('../',import.meta.url));
+const output=path.join(root,'.local/entrega');
+const git=args=>execFileSync('git',args,{cwd:root,encoding:'utf8',windowsHide:true}).trim();
+if(git(['status','--porcelain'])) throw new Error('Confirmar cambios locales antes de empaquetar para conservar correspondencia con SHA.');
+const sha=git(['rev-parse','HEAD']), branch=git(['branch','--show-current']);
+await mkdir(output,{recursive:true});
+const repository='https://github.com/Akczul/Green-Alert-3.0.git';
+await writeFile(path.join(output,'VERSION.txt'),`Repositorio: ${repository}\nRama: ${branch}\nSHA: ${sha}\nEstado: commit local, sin push ni merge sobre main\n`);
+const zip=path.join(output,'GreenAlert3.0-codigo.zip');
+git(['archive','--format=zip','--output',zip,sha]);
+const artifacts=['GreenAlert3.0-codigo.zip','VERSION.txt'];
+for(const file of ['informe-greenalert.html','informe-greenalert.pdf']){
+  await copyFile(path.join(root,'docs/entrega',file),path.join(output,file)); artifacts.push(file);
+}
+let apk=null;
+try {
+  apk=JSON.parse(await readFile(path.join(root,'.local/integracion/apk.json'),'utf8'));
+} catch(error) { if(error.code!=='ENOENT') throw error; }
+if(apk?.exists){
+  const source=await readFile(apk.path);
+  if(createHash('sha256').update(source).digest('hex').toLowerCase()!==apk.sha256.toLowerCase()) throw new Error('La APK cambió después de validarse');
+  await copyFile(apk.path,path.join(output,'GreenAlert-arm64.apk')); artifacts.push('GreenAlert-arm64.apk');
+}
+const records=[];
+for(const name of artifacts){
+  const file=path.join(output,name);
+  records.push({name,bytes:(await stat(file)).size,sha256:createHash('sha256').update(await readFile(file)).digest('hex')});
+}
+await writeFile(path.join(output,'MANIFIESTO.json'),JSON.stringify({repository,branch,sha,createdAt:new Date().toISOString(),
+  artifacts:records,apk:apk??{exists:false,limitation:'Consultar docs/verificacion-final.md'},publication:'No se hizo push ni publicación externa.'},null,2));
+console.log(`Paquete generado: ${output}\nSHA: ${sha}\nArtefactos: ${records.length}`);

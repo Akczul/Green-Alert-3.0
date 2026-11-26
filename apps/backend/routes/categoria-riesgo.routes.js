@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { verifyToken, requireRoles } from '../middlewares/auth.middleware.js';
+import { adminHttp } from '../src/bootstrap/administracion.js';
 import {
   obtenerTodasLasCategorias,
   obtenerCategoriaPorCodigo,
@@ -30,9 +31,9 @@ categoriaRouter.get('/estadisticas/por-severidad', obtenerEstadisticasSeveridad)
 
 // Obtener todas las categorías
 categoriaRouter.get('/', obtenerTodasLasCategorias);
-categoriaRouter.post('/', verifyToken, requireRoles('admin'), crearCategoria);
-categoriaRouter.patch('/:codigo', verifyToken, requireRoles('admin'), actualizarCategoria);
-categoriaRouter.patch('/:codigo/estado', verifyToken, requireRoles('admin'), cambiarEstadoCategoria);
+categoriaRouter.post('/', verifyToken, requireRoles('admin'), adminHttp.requireSuperadmin, crearCategoria);
+categoriaRouter.patch('/:codigo', verifyToken, requireRoles('admin'), adminHttp.requireSuperadmin, actualizarCategoria);
+categoriaRouter.patch('/:codigo/estado', verifyToken, requireRoles('admin'), adminHttp.requireSuperadmin, cambiarEstadoCategoria);
 
 // Obtener reportes de una categoría específica
 categoriaRouter.get('/:codigo/reportes', obtenerReportesPorCategoria);

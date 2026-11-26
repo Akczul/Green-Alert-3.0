@@ -1,0 +1,29 @@
+# Dependencias, caché y artefactos reconstruibles
+node_modules/
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+.kotlin/
+.metro-health-check*
+*.log
+*.tsbuildinfo
+
+# Configuración y firmas locales
+.env*
+!.env.example
+*.jks
+*.keystore
+*.p8
+*.p12
+*.key
+*.pem
+*.mobileprovision
+*.orig.*
+.DS_Store
+
+# Proyecto nativo generado por Expo; nunca versionar firmas de prueba
+/ios
+/android
+*.apk
+*.aab

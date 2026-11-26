@@ -1,0 +1,89 @@
+{
+  "project": "greenalert-final",
+  "checkedAt": "2026-11-25T04:43:41.616Z",
+  "checks": [
+    {
+      "name": "Compose global compilado y todos los servicios saludables",
+      "status": "passed",
+      "ms": 89173.8
+    },
+    {
+      "name": "React compilado y proxy HTTP hacia Express/MySQL",
+      "status": "passed",
+      "ms": 23.34
+    },
+    {
+      "name": "Registro único ante dos altas simultáneas y sesión revocable",
+      "status": "passed",
+      "ms": 457.08
+    },
+    {
+      "name": "Alta real genera hecho y outbox en la misma transacción MySQL",
+      "status": "passed",
+      "ms": 4497.55
+    },
+    {
+      "name": "React/proxy → Express → FastAPI → MongoDB conserva ejecución de snapshot MySQL",
+      "status": "passed",
+      "ms": 3091.46
+    },
+    {
+      "name": "Express → Spring → Cassandra conserva historial e idempotencia outbox",
+      "status": "passed",
+      "ms": 1065.99
+    },
+    {
+      "name": "Spring reconcilia Cassandra → Druid y consulta indicadores ambientales",
+      "status": "passed",
+      "ms": 16816.74
+    },
+    {
+      "name": "Redis cache-aside con acierto y métricas de latencia",
+      "status": "passed",
+      "ms": 116.25
+    },
+    {
+      "name": "Redis caído → MySQL, invalidación durable y recuperación sin datos obsoletos",
+      "status": "passed",
+      "ms": 3234.44
+    },
+    {
+      "name": "Permisos de objeto y credenciales internas inaccesibles al navegador",
+      "status": "passed",
+      "ms": 2485.61
+    },
+    {
+      "name": "Outbox sobrevive caída de Spring y entrega tras recuperación",
+      "status": "passed",
+      "ms": 37703.65
+    },
+    {
+      "name": "MySQL MongoDB Cassandra Redis conservan datos tras reiniciar contenedores",
+      "status": "passed",
+      "ms": 71836.02
+    },
+    {
+      "name": "Concurrencia E/S Express con respuestas consistentes y medición",
+      "status": "passed",
+      "ms": 5069.47
+    },
+    {
+      "name": "Logout revoca inmediatamente JWT y refresh en API final",
+      "status": "passed",
+      "ms": 148.4
+    },
+    {
+      "name": "Auditoría durable identifica al autor de operaciones críticas",
+      "status": "passed",
+      "ms": 2752.41
+    },
+    {
+      "name": "Inactividad y duración máxima sobreviven a la rotación de JWT",
+      "status": "passed",
+      "ms": 3795.14
+    }
+  ],
+  "limitations": [
+    "Sin navegador interactivo, teléfono físico ni proveedores remotos."
+  ]
+}

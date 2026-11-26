@@ -10,6 +10,9 @@ const backendDir = path.resolve(path.dirname(__filename), '../..');
 const resolveFrontendApiPath = async () => path.resolve(backendDir, '../frontend/src/services/api.js');
 
 const expectedFrontendContracts = [
+  { method: 'post', path: '/integracion/analisis/riesgo' },
+  { method: 'get', path: '/integracion/indicadores' },
+  { method: 'get', path: '/integracion/reportes/${id}/historial' },
   { method: 'get', path: '/health' },
   { method: 'post', path: '/auth/login' },
   { method: 'post', path: '/auth/register' },
@@ -17,6 +20,8 @@ const expectedFrontendContracts = [
   { method: 'post', path: '/auth/facebook' },
   { method: 'get', path: '/auth/google/url' },
   { method: 'get', path: '/auth/facebook/url' },
+  { method: 'get', path: '/auth/microsoft/url' },
+  { method: 'post', path: '/auth/oauth/exchange' },
   { method: 'get', path: '/categorias' },
   { method: 'get', path: '/categorias/${codigo}' },
   { method: 'get', path: '/reportes/stats' },
@@ -52,6 +57,7 @@ const expectedFrontendContracts = [
   { method: 'patch', path: '/admin/usuarios/${id}/rol' },
   { method: 'patch', path: '/admin/usuarios/${id}/estado' },
   { method: 'delete', path: '/admin/usuarios/${id}' },
+  { method: 'get', path: '/admin/auditoria' },
   { method: 'post', path: '/chatbot/mensaje' },
   { method: 'get', path: '/chatbot/faqs' },
   { method: 'get', path: '/notificaciones' },
@@ -123,6 +129,7 @@ test('contrato de frontend cubre modulos principales verificados por la suite', 
     'chatbot',
     'entidades',
     'health',
+    'integracion',
     'notificaciones',
     'reportes',
   ]);
@@ -133,6 +140,7 @@ test('cada endpoint literal del cliente real tiene una ruta Express del mismo me
   const modules = {
     health: 'health', auth: 'auth', reportes: 'reporte', categorias: 'categoria-riesgo',
     admin: 'admin', chatbot: 'chatbot', notificaciones: 'notificacion', entidades: 'entidad',
+    integracion: 'integracion',
   };
   const registered = [];
   for (const [prefix, file] of Object.entries(modules)) {

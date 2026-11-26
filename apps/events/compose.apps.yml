@@ -1,0 +1,36 @@
+services:
+  events:
+    build: .
+    mem_limit: 640m
+    environment:
+      EVENTS_SERVICE_TOKEN: ${EVENTS_SERVICE_TOKEN:?Configurar EVENTS_SERVICE_TOKEN}
+      EVENTS_RECONCILE_TOKEN: ${EVENTS_RECONCILE_TOKEN:?Configurar EVENTS_RECONCILE_TOKEN}
+      CASSANDRA_HOST: cassandra
+      DRUID_QUERY_URL: http://broker:8082
+      DRUID_TASK_URL: http://coordinator:8081
+      EVENTS_WORKERS: ${EVENTS_WORKERS:-4}
+      EVENTS_QUEUE_CAPACITY: ${EVENTS_QUEUE_CAPACITY:-128}
+      DRUID_TASK_TIMEOUT_SECONDS: ${DRUID_TASK_TIMEOUT_SECONDS:-180}
+    ports: ["127.0.0.1:${EVENTS_PORT:-18080}:8080"]
+    depends_on:
+      schema:
+        condition: service_completed_successfully
+      broker:
+        condition: service_healthy
+      coordinator:
+        condition: service_healthy
+      historical:
+        condition: service_healthy
+      middlemanager:
+        condition: service_healthy
+    networks: [events-private]
+    stop_grace_period: 40s
+    healthcheck:
+      test: [CMD-SHELL, 'curl -fsS http://localhost:8080/actuator/health/liveness >/dev/null']
+      interval: 10s
+      timeout: 5s
+      retries: 30
+networks:
+  events-private:
+    external: true
+    name: ${EVENTS_NETWORK:?Configurar EVENTS_NETWORK}

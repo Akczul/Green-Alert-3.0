@@ -1,0 +1,45 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.12, pytest-9.2.0, pluggy-1.7.0 -- /usr/local/bin/python
+rootdir: /app
+configfile: pytest.ini
+plugins: anyio-4.16.0, asyncio-1.5.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+collecting ... collected 35 items
+
+tests/test_http.py::test_live_ready_openapi PASSED                       [  2%]
+tests/test_http.py::test_authorization[headers0-/health/ready] PASSED    [  5%]
+tests/test_http.py::test_authorization[headers0-/internal/v1/runs?kind=risk] PASSED [  8%]
+tests/test_http.py::test_authorization[headers1-/health/ready] PASSED    [ 11%]
+tests/test_http.py::test_authorization[headers1-/internal/v1/runs?kind=risk] PASSED [ 14%]
+tests/test_http.py::test_post_without_credentials PASSED                 [ 17%]
+tests/test_http.py::test_risk_persistence_idempotency_scope PASSED       [ 20%]
+tests/test_http.py::test_invalid_risk[<lambda>0] PASSED                  [ 22%]
+tests/test_http.py::test_invalid_risk[<lambda>1] PASSED                  [ 25%]
+tests/test_http.py::test_invalid_risk[<lambda>2] PASSED                  [ 28%]
+tests/test_http.py::test_invalid_risk[<lambda>3] PASSED                  [ 31%]
+tests/test_http.py::test_invalid_risk[<lambda>4] PASSED                  [ 34%]
+tests/test_http.py::test_invalid_risk[<lambda>5] PASSED                  [ 37%]
+tests/test_http.py::test_invalid_risk[<lambda>6] PASSED                  [ 40%]
+tests/test_http.py::test_invalid_training[<lambda>0] PASSED              [ 42%]
+tests/test_http.py::test_invalid_training[<lambda>1] PASSED              [ 45%]
+tests/test_http.py::test_invalid_training[<lambda>2] PASSED              [ 48%]
+tests/test_http.py::test_invalid_training[<lambda>3] PASSED              [ 51%]
+tests/test_http.py::test_training_inference PASSED                       [ 54%]
+tests/test_http.py::test_pagination_and_missing PASSED                   [ 57%]
+tests/test_http.py::test_body_limit PASSED                               [ 60%]
+tests/test_http.py::test_concurrent_replay_single_document PASSED        [ 62%]
+tests/test_http.py::test_real_http_compute_timeout_does_not_persist PASSED [ 65%]
+tests/test_ml.py::test_reproducible_training_and_future_independence PASSED [ 68%]
+tests/test_ml.py::test_unknown_zone_rejected PASSED                      [ 71%]
+tests/test_ml.py::test_holdout_has_no_future_target_in_features PASSED   [ 74%]
+tests/test_risk.py::test_original_contract[vacio] PASSED                 [ 77%]
+tests/test_risk.py::test_original_contract[periodos-y-geografia] PASSED  [ 80%]
+tests/test_risk.py::test_original_contract[categoria-normalizada] PASSED [ 82%]
+tests/test_risk.py::test_original_contract[score-minimo] PASSED          [ 85%]
+tests/test_risk.py::test_original_contract[ventana-corta] PASSED         [ 88%]
+tests/test_risk.py::test_original_contract[coercion-original] PASSED     [ 91%]
+tests/test_risk.py::test_original_contract[solo-anteriores] PASSED       [ 94%]
+tests/test_risk.py::test_original_contract[score-tope] PASSED            [ 97%]
+tests/test_runtime.py::test_timeout_retains_capacity_until_process_finishes PASSED [100%]
+
+============================= 35 passed in 26.06s ==============================

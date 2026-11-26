@@ -4,7 +4,9 @@
   "private": true,
   "type": "module",
   "description": "GreenAlert: frontend React y API Express consolidados",
-  "engines": { "node": ">=22.13.0" },
+  "engines": {
+    "node": ">=22.13.0"
+  },
   "scripts": {
     "setup": "node scripts/setup.mjs",
     "install:apps": "node scripts/run.mjs install",
@@ -23,6 +25,7 @@
     "test:mysql:docker": "node scripts/validate-mysql.mjs --docker",
     "test:stack": "node scripts/validate-stack.mjs",
     "test:reportes:lectura": "node scripts/validate-reportes-read.mjs",
+    "test:seguridad": "node scripts/validate-security.mjs",
     "test:reportes:creacion": "node scripts/validate-reportes-create.mjs",
     "infra:validation:config": "node scripts/validate-mysql.mjs --docker-config",
     "lint": "npm --prefix apps/frontend run lint",
@@ -30,6 +33,16 @@
     "infra:config": "docker compose config --quiet",
     "infra:up": "docker compose up --build -d",
     "infra:db": "docker compose up -d mysql",
-    "infra:down": "docker compose down"
+    "infra:down": "docker compose down",
+    "setup:integracion": "node scripts/setup-integracion.mjs",
+    "infra:final:config": "docker compose -p greenalert-final --env-file .env.integracion -f compose.datos.yml config --quiet && docker compose -p greenalert-final-apps --env-file .env.integracion -f compose.apps.yml config --quiet",
+    "infra:final:up": "node scripts/infra-final.mjs up",
+    "infra:final:down": "node scripts/infra-final.mjs down",
+    "test:integracion": "node scripts/validate-integration.mjs",
+    "infra:final:status": "node scripts/infra-final.mjs status",
+    "infra:final:migrar-024": "node scripts/infra-final.mjs migrar-024",
+    "infra:final:superadmin": "docker compose -p greenalert-final-apps --env-file .env.integracion -f compose.apps.yml exec backend-prod node scripts/crear-superadmin.mjs",
+    "apk:docker": "node scripts/build-apk-docker.mjs",
+    "test:cumplimiento": "node scripts/validate-cumplimiento.mjs"
   }
 }

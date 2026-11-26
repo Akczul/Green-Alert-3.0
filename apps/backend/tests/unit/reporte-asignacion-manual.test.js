@@ -1,3 +1,5 @@
+import { mockAuthContract } from '../helpers/auth-contract.js';
+import jwt from 'jsonwebtoken';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { asignarEntidadReporte } from '../../src/controllers/reporte.controller.js';
@@ -9,6 +11,8 @@ import {
   setSocketServerForTests,
   SOCKET_EVENTS,
 } from '../../src/config/socket.js';
+
+test.beforeEach((t) => { process.env.JWT_SECRET = 'asignacion-sintetica'; mockAuthContract(t); });
 
 const createRes = () => {
   const res = {
@@ -161,13 +165,10 @@ test('asignarEntidadReporte con prioridad critica genera alerta y evento socket'
     return 20;
   });
   setSocketServerForTests({
-    to(room) {
-      return {
-        emit(event, payload) {
-          emissions.push({ room, event, payload });
-        },
-      };
-    },
+    in(room) { return { fetchSockets: async () => [{
+      data: { accessToken: jwt.sign({ sub: 7, rol: 'entidad', id_entidad: Number(room.split(':')[1]) }, process.env.JWT_SECRET) },
+      emit(event, payload) { emissions.push({ room, event, payload }); }, disconnect() {},
+    }] }; },
   });
 
   const req = {
@@ -182,6 +183,7 @@ test('asignarEntidadReporte con prioridad critica genera alerta y evento socket'
 
   try {
     await asignarEntidadReporte(req, res, assert.fail);
+    await new Promise(setImmediate);
   } finally {
     setSocketServerForTests(null);
   }
@@ -204,13 +206,10 @@ test('asignarEntidadReporte con prioridad alta genera alerta persistente sin eve
     return 21;
   });
   setSocketServerForTests({
-    to(room) {
-      return {
-        emit(event, payload) {
-          emissions.push({ room, event, payload });
-        },
-      };
-    },
+    in(room) { return { fetchSockets: async () => [{
+      data: { accessToken: jwt.sign({ sub: 7, rol: 'entidad', id_entidad: Number(room.split(':')[1]) }, process.env.JWT_SECRET) },
+      emit(event, payload) { emissions.push({ room, event, payload }); }, disconnect() {},
+    }] }; },
   });
 
   const req = {
@@ -225,6 +224,7 @@ test('asignarEntidadReporte con prioridad alta genera alerta persistente sin eve
 
   try {
     await asignarEntidadReporte(req, res, assert.fail);
+    await new Promise(setImmediate);
   } finally {
     setSocketServerForTests(null);
   }

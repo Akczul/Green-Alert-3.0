@@ -1,17 +1,38 @@
 # GreenAlert
 
-Monorepositorio de la plataforma ambiental existente. Conserva la SPA **React 18 + Vite 5** y la API **Express 4 + MySQL**. La consulta de zonas de riesgo tiene un [piloto hexagonal implementado](docs/piloto-hexagonal-zonas-riesgo.md), extendido a [cuatro lecturas](docs/hexagonal-reportes-lectura.md) y a [creación de reportes](docs/hexagonal-reportes-creacion.md); los demás módulos y escrituras continúan por capas. No usa NestJS ni microservicios. Las nuevas bases de datos y ML siguen pendientes de decisión.
+GreenAlert integra la web **React**, la API principal **Express/MySQL**, cálculo ambiental **FastAPI/MongoDB**, eventos **Spring/Cassandra/Druid**, caché **Redis** y un cliente **React Native Android**. Se preservan las pantallas y contratos existentes. Los módulos hexagonales cubren zonas, lectura y creación de reportes, identidad e integración; otros flujos permanecen por capas.
+
+## Ejecutar la integración final
+
+```powershell
+npm.cmd run install:apps
+npm.cmd run setup:integracion
+npm.cmd run infra:final:config
+npm.cmd run infra:final:up
+# Abrir http://localhost:8080
+```
+
+Requiere Docker/Compose con contenedores Linux. El script crea la red externa; cada proyecto tiene sus volúmenes. Para detener conservando datos: `npm.cmd run infra:final:down`. No ejecutar el esquema completo sobre una base existente.
+
+Manual, migraciones, MFA administrativa y límites: [integración final](docs/integracion-final.md). Resultados y pendientes: [verificación final](docs/verificacion-final.md), [trazabilidad](docs/trazabilidad-integracion.md). Informe: [editable HTML](docs/entrega/informe-greenalert.html) y [PDF](docs/entrega/informe-greenalert.pdf).
+
+El stack final exige TOTP al rol admin; su enrolamiento es local por operador. Druid se actualiza mediante reconciliación diaria explícita. Jerarquía administrativa completa, segundo OIDC, HTTPS/cookies y aceptación física móvil conservan su estado pendiente en la documentación. El ML experimental heredado es opcional.
 
 ```text
 GreenAlert/                 # carpeta de trabajo actual: GreenAlert3.0
 ├── apps/
 │   ├── backend/            # API, modelos SQL, servicios, migraciones y pruebas originales
-│   └── frontend/           # SPA original, componentes, mapas, paneles y pruebas
+│   ├── frontend/           # SPA conservada y panel de análisis integrado
+│   ├── analytics/          # FastAPI y ejecuciones MongoDB
+│   ├── events/             # Spring, Cassandra y proyección Druid
+│   └── mobile/             # React Native y compilación Android local
 ├── docs/                   # auditoría, contratos, decisiones y migración
 ├── infra/                  # guía de infraestructura
 ├── scripts/                # ejecución, configuración e inventarios compartidos
 ├── .github/workflows/ci.yml # validación; no publica ni despliega
-└── docker-compose.yml      # MySQL local + API + SPA/Nginx
+├── compose.datos.yml        # cinco motores y auxiliares Druid
+├── compose.apps.yml         # tres APIs y SPA/Nginx
+└── docker-compose.yml       # stack anterior MySQL/API/SPA, conservado
 ```
 
 No se creó `packages/` porque todavía no existe código compartido estable que justifique un paquete. Los lockfiles e instalaciones siguen separados para conservar las resoluciones del frontend y evitar cambios de hoisting.
@@ -52,7 +73,7 @@ En PowerShell, usar `npm.cmd` en lugar de `npm` si la política de ejecución bl
 
 No ejecutar `infra:db` si se va a usar un MySQL propio. Configurar `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` y SSL en `apps/backend/.env`, después ejecutar `npm run dev`. No se importaron ni modificaron datos existentes durante esta consolidación.
 
-El esquema completo es para inicializar un volumen vacío. No es un migrador idempotente: contiene semillas, actualizaciones y procedimientos. Se conservan las 18 migraciones históricas y se añade `019`, que incorpora los códigos actuales del catálogo sin renombrar ni eliminar los anteriores. Se ejecutaron las 19 sobre una base sintética; revisar qué versiones ya están aplicadas antes de usar una base existente. No ejecutar la cadena histórica sobre el esquema completo. [Validación real de MySQL](docs/validacion-mysql.md).
+El esquema completo es para inicializar un volumen vacío. No es un migrador idempotente: contiene semillas, actualizaciones y procedimientos. Se conservan las 18 migraciones históricas y se añade `019`, que incorpora los códigos actuales del catálogo sin renombrar ni eliminar los anteriores. Se añade además `020` para sesiones revocables (sid/auth_version), sin borrar hashes ni usuarios. Se ejecutaron las 20 sobre una base sintética; revisar qué versiones ya están aplicadas antes de usar una base existente. No ejecutar la cadena histórica sobre el esquema completo. [Validación real de MySQL](docs/validacion-mysql.md).
 
 ### Servicios opcionales
 
@@ -67,6 +88,7 @@ npm run build
 npm run lint
 npm test
 npm run test:smoke
+npm run test:seguridad
 npm run infra:config
 ```
 
@@ -107,3 +129,9 @@ Las variables Vite se incorporan al construir la imagen. Para Google/Firebase en
 - [Piloto hexagonal de zonas: estructura, puertos, archivos y pruebas](docs/piloto-hexagonal-zonas-riesgo.md).
 
 Zonas, lecturas y [creación hexagonal de reportes](docs/hexagonal-reportes-creacion.md) están verificadas: **347 pruebas**, **33 contratos de lectura**, **38 contratos de creación HTTP/MySQL equivalentes al código anterior**, **57 comprobaciones MySQL Docker** y **8 del stack completo**. Con Docker iniciado, ejecutar `npm run test:reportes:lectura` y `npm run test:reportes:creacion` para comparar con las capturas previas. Se conservan contratos, geografía, caché y compensaciones best effort; no hay atomicidad global con Cloudinary. La entrega se detiene en creación; las otras escrituras y módulos requieren revisar resultados y una nueva tarea.
+
+## Seguridad crítica en feat/security
+
+[Contrato para integrar clientes](docs/contrato-autenticacion-seguridad.md) e [informe de cambios y worktrees](docs/seguridad-critica.md). Nueva contraseña: 15 caracteres y lista local; hashes históricos compatibles. JWT con sid/ver, revocación por sesión y consulta del estado actual de usuario. Requiere migración aditiva 020 antes de desplegar sobre un clon de una base anterior y reautenticación de sesiones legacy. No se aplicó a datos existentes.
+
+Verificado en esta rama: **367 pruebas**, **22 comprobaciones SQL de seguridad**, **58 de regresión MySQL**, **33 equivalencias de lectura**, **37 equivalencias de creación y un rechazo anticipado de seguridad**, **8 del stack**, build/lint/smoke. No se implementan MFA, otro OIDC, nuevos servicios/motores o móvil. Sin merge ni push.

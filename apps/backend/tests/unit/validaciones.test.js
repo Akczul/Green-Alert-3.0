@@ -31,8 +31,10 @@ test('validarTelefono rechaza valores no telefonicos', () => {
   assert.equal(validarTelefono({}), false);
 });
 
-test('validarPassword exige minimo ocho caracteres, letras y numeros', () => {
-  assert.equal(validarPassword('Clave123'), true);
+test('validarPassword exige quince caracteres y admite frases largas sin composición obligatoria', () => {
+  assert.equal(validarPassword('Clave123'), false);
+  assert.equal(validarPassword('Una frase extensa y diferente'), true);
+  assert.equal(validarPassword('Largas frases con palabras independientes y suficientes para superar sesenta y cuatro caracteres'), true);
   assert.equal(validarPassword('12345678'), false);
   assert.equal(validarPassword('abcdefgh'), false);
   assert.equal(validarPassword('abc123'), false);

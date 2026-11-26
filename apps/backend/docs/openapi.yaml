@@ -3,11 +3,15 @@ info:
   title: Green Alert Backend API
   version: 0.1.0
   description: |
-    Especificacion OpenAPI inicial del backend de Green Alert.
+    Especificacion OpenAPI del backend de Green Alert.
+    Seguridad critica: nuevas contrasenas de al menos 15 caracteres y lista local;
+    JWT con sid/ver y validacion de sesion activa en MySQL. JWT legacy requieren login.
+    Tokens/sesiones invalidos devuelven 403; store no disponible, 503.
+    Contrato detallado: docs/contrato-autenticacion-seguridad.md.
 
     Las rutas se montan con `API_PREFIX`. Por defecto `API_PREFIX` esta vacio,
     por lo que las rutas reales son `/auth`, `/reportes`, `/categorias`, etc.
-    En desarrollo el frontend puede usar `/api` si Vite reescribe ese prefijo.
+    En desarrollo el frontend puede usar `/api` si Vite conserva ese prefijo; configurar API_PREFIX=/api.
 servers:
   - url: http://localhost:3000
     description: Backend local sin API_PREFIX
@@ -28,10 +32,19 @@ tags:
   - name: Administracion
 components:
   securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: __Host-ga_at
+      description: >-
+        Cliente web (cabecera X-GreenAlert-Client: web). JWT de acceso en cookie HttpOnly, Secure,
+        SameSite=Strict. Toda escritura exige X-CSRF-Token igual a la cookie __Host-ga_csrf (doble envío);
+        sin él responde 403. La app móvil usa bearerAuth y SecureStore.
     bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
+      description: JWT con sid y ver; firma valida no basta sin sesion/usuario actuales.
   parameters:
     IdParam:
       in: path
@@ -312,7 +325,7 @@ components:
             $ref: "#/components/schemas/ApiError"
           example:
             status: error
-            message: El nivel de severidad debe ser uno de: bajo, medio, alto, critico.
+            message: "El nivel de severidad debe ser uno de: bajo, medio, alto, critico."
     Unauthorized:
       description: Token ausente, invalido o credenciales incorrectas.
       content:
@@ -359,6 +372,172 @@ components:
             status: error
             message: Error interno del servidor.
 paths:
+  /integracion/analisis/riesgo:
+    post:
+      operationId: analizarRiesgoAmbiental
+      summary: 'Snapshot MySQL autorizado a FastAPI y MongoDB; admin/moderador'
+      tags: [Analitica]
+      security: [{bearerAuth: []}]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                dias: {type: integer, minimum: 1, maximum: 180, default: 30}
+      responses:
+        '200':
+          description: Operación completada
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, message, data]
+                properties:
+                  status: {type: string, enum: [success]}
+                  message: {type: string}
+                  data: {}
+        '400': {description: Parámetros inválidos}
+        '401': {description: Falta token}
+        '403': {description: Sesión rechazada o rol no autorizado}
+        '404': {description: Objeto inexistente o fuera de ámbito}
+        '413': {description: Snapshot excede 20000 reportes}
+        '503': {description: Integración sin configurar o dependencia no disponible}
+        '504': {description: Timeout del servicio interno}
+  /integracion/reportes/{id}/historial:
+    get:
+      operationId: historialAmbiental
+      summary: 'Historial Cassandra; propietario, admin/moderador o entidad asignada'
+      tags: [Analitica]
+      security: [{bearerAuth: []}]
+      parameters:
+        - {name: id, in: path, required: true, schema: {type: integer, minimum: 1}}
+        - {name: from, in: query, schema: {type: string, format: date-time}}
+        - {name: to, in: query, schema: {type: string, format: date-time}}
+      responses:
+        '200':
+          description: Operación completada
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, message, data]
+                properties:
+                  status: {type: string, enum: [success]}
+                  message: {type: string}
+                  data: {}
+        '400': {description: Parámetros inválidos}
+        '401': {description: Falta token}
+        '403': {description: Sesión rechazada o rol no autorizado}
+        '404': {description: Objeto inexistente o fuera de ámbito}
+        '413': {description: Snapshot excede 20000 reportes}
+        '503': {description: Integración sin configurar o dependencia no disponible}
+        '504': {description: Timeout del servicio interno}
+  /integracion/indicadores:
+    get:
+      operationId: indicadoresAmbientales
+      summary: 'Indicadores Druid; admin/moderador; horas UTC completas'
+      tags: [Analitica]
+      security: [{bearerAuth: []}]
+      parameters:
+        - {name: from, in: query, schema: {type: string, format: date-time}}
+        - {name: to, in: query, schema: {type: string, format: date-time}}
+      responses:
+        '200':
+          description: Operación completada
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, message, data]
+                properties:
+                  status: {type: string, enum: [success]}
+                  message: {type: string}
+                  data: {}
+        '400': {description: Parámetros inválidos}
+        '401': {description: Falta token}
+        '403': {description: Sesión rechazada o rol no autorizado}
+        '404': {description: Objeto inexistente o fuera de ámbito}
+        '413': {description: Snapshot excede 20000 reportes}
+        '503': {description: Integración sin configurar o dependencia no disponible}
+        '504': {description: Timeout del servicio interno}
+  /integracion/cache/metricas:
+    get:
+      operationId: metricasCache
+      summary: 'Métricas Redis por proceso; admin'
+      tags: [Analitica]
+      security: [{bearerAuth: []}]
+      responses:
+        '200':
+          description: Operación completada
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, message, data]
+                properties:
+                  status: {type: string, enum: [success]}
+                  message: {type: string}
+                  data: {}
+        '400': {description: Parámetros inválidos}
+        '401': {description: Falta token}
+        '403': {description: Sesión rechazada o rol no autorizado}
+        '404': {description: Objeto inexistente o fuera de ámbito}
+        '413': {description: Snapshot excede 20000 reportes}
+        '503': {description: Integración sin configurar o dependencia no disponible}
+        '504': {description: Timeout del servicio interno}
+  /integracion/eventos/reenviar:
+    post:
+      operationId: reenviarOutbox
+      summary: 'Entregar pendientes durables; admin; conserva event_id'
+      tags: [Analitica]
+      security: [{bearerAuth: []}]
+      responses:
+        '200':
+          description: Operación completada
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, message, data]
+                properties:
+                  status: {type: string, enum: [success]}
+                  message: {type: string}
+                  data: {}
+        '400': {description: Parámetros inválidos}
+        '401': {description: Falta token}
+        '403': {description: Sesión rechazada o rol no autorizado}
+        '404': {description: Objeto inexistente o fuera de ámbito}
+        '413': {description: Snapshot excede 20000 reportes}
+        '503': {description: Integración sin configurar o dependencia no disponible}
+        '504': {description: Timeout del servicio interno}
+  /integracion/eventos/reconciliar/{day}:
+    post:
+      operationId: reconciliarEventos
+      summary: 'Reconstruye día UTC Druid desde Cassandra; admin'
+      tags: [Analitica]
+      security: [{bearerAuth: []}]
+      parameters:
+        - {name: day, in: path, required: true, schema: {type: string, format: date}}
+      responses:
+        '200':
+          description: Operación completada
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, message, data]
+                properties:
+                  status: {type: string, enum: [success]}
+                  message: {type: string}
+                  data: {}
+        '400': {description: Parámetros inválidos}
+        '401': {description: Falta token}
+        '403': {description: Sesión rechazada o rol no autorizado}
+        '404': {description: Objeto inexistente o fuera de ámbito}
+        '413': {description: Snapshot excede 20000 reportes}
+        '503': {description: Integración sin configurar o dependencia no disponible}
+        '504': {description: Timeout del servicio interno}
   /health:
     get:
       tags: [Salud]
@@ -393,7 +572,9 @@ paths:
                 password:
                   type: string
                   format: password
-                  example: Password123
+                  minLength: 15
+                  description: Admite frases largas; rechaza contrasenas comunes de la lista local.
+                  example: Una frase de acceso segura 2026
                 telefono:
                   type: string
                   example: "+573001112233"
@@ -422,7 +603,7 @@ paths:
   /auth/login:
     post:
       tags: [Autenticacion]
-      summary: Inicia sesion con email y contrasena.
+      summary: Inicia sesion con email, contrasena y TOTP cuando MFA administrativa es obligatoria.
       requestBody:
         required: true
         content:
@@ -439,6 +620,10 @@ paths:
                   type: string
                   format: password
                   example: Password123
+                totp:
+                  type: string
+                  pattern: '^[0-9]{6}$'
+                  description: Requerido para rol admin cuando ADMIN_MFA_REQUIRED=true; código de autenticador de un solo uso.
       responses:
         "200":
           description: Sesion iniciada.
@@ -448,6 +633,8 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "403":
           $ref: "#/components/responses/Forbidden"
+        "429":
+          description: Límite de intentos de acceso alcanzado.
         "500":
           $ref: "#/components/responses/ServerError"
   /auth/refresh:
@@ -485,9 +672,15 @@ paths:
               properties:
                 code:
                   type: string
+                totp:
+                  type: string
+                  pattern: '^\d{6}$'
+                  description: Obligatorio cuando la cuenta federada es administradora (MFA); máximo 5 intentos por código.
       responses:
         "200":
-          description: Tokens emitidos.
+          description: Tokens emitidos (en cookies si el cliente es web).
+        "403":
+          description: MFA administrativa requerida o código TOTP inválido.
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -496,7 +689,9 @@ paths:
     post:
       tags: [Autenticacion]
       summary: Cierra sesion individual o global.
-      description: Logout global requiere JWT cuando `allDevices` es true.
+      description: |
+        Logout individual revoca la familia del refresh, incluyendo JWT y refresh posteriores de esa sesion.
+        No afecta otras sesiones. Logout global requiere JWT activo cuando `allDevices` es true.
       security:
         - bearerAuth: []
         - {}
@@ -689,6 +884,43 @@ paths:
       responses:
         "302":
           description: Redireccion al frontend con codigo temporal.
+  /auth/microsoft/url:
+    get:
+      tags: [Autenticacion]
+      summary: URL de autorización OpenID Connect de Microsoft Entra ID (Authorization Code + PKCE S256).
+      description: El backend genera state, nonce y code_verifier de un solo uso (10 min). El rol se asigna en GreenAlert.
+      responses:
+        "200":
+          description: URL generada.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { type: string }
+                  message: { type: string }
+                  data:
+                    type: object
+                    properties:
+                      url: { type: string, format: uri }
+        "503":
+          description: Proveedor no configurado (MICROSOFT_CLIENT_ID/SECRET/REDIRECT_URI).
+  /auth/microsoft/callback:
+    get:
+      tags: [Autenticacion]
+      summary: Callback OIDC; verifica id_token (JWKS, iss, aud, exp, nonce) y redirige con código temporal.
+      parameters:
+        - { name: code, in: query, required: true, schema: { type: string } }
+        - { name: state, in: query, required: true, schema: { type: string } }
+      responses:
+        "303":
+          description: Redirección a /auth/callback#oauth_code=...; canjear con POST /auth/oauth/exchange.
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          description: id_token inválido (firma, emisor, audiencia, nonce o expiración).
+        "409":
+          description: Correo ya registrado sin email_verified del proveedor, o identidad vinculada a otra cuenta.
   /auth/facebook/url:
     get:
       tags: [Autenticacion]
@@ -1510,16 +1742,40 @@ paths:
   /admin/usuarios/{id}/rol:
     patch:
       tags: [Administracion]
-      summary: Cambia rol de usuario.
+      summary: Cambia rol de usuario según la jerarquía administrativa.
+      description: >-
+        Superadministrador (admin, nivel_admin=global): cualquier rol, nivel y ámbito. Administrador de ámbito
+        (nivel_admin=ambito): solo usuarios comunes de su ámbito (comunidad: ciudadano/moderador; organización N:
+        usuarios entidad de N), sin elevar a admin ni mover a otro ámbito. Nadie cambia su propio rol. Cada cambio
+        incrementa auth_version (revoca sesiones) y se registra en admin_audit en la misma transacción.
       security:
         - bearerAuth: []
+        - cookieAuth: []
       parameters:
         - $ref: "#/components/parameters/IdParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [rol]
+              properties:
+                rol: { type: string, enum: [ciudadano, moderador, admin, entidad] }
+                id_entidad: { type: integer, description: Obligatorio para rol entidad. }
+                nivel_admin: { type: string, enum: [global, ambito], description: Solo superadministrador. }
+                ambito_entidad: { type: integer, nullable: true, description: Ámbito de un admin de segundo nivel (null = comunidad). }
       responses:
         "200":
           description: Rol actualizado.
         "400":
           $ref: "#/components/responses/BadRequest"
+        "403":
+          description: Fuera del ámbito administrativo o acción reservada al superadministrador.
+        "404":
+          description: Usuario inexistente.
+        "409":
+          description: Debe existir al menos otro superadministrador activo.
   /admin/usuarios/{id}/estado:
     patch:
       tags: [Administracion]
@@ -1533,6 +1789,24 @@ paths:
           description: Estado actualizado.
         "400":
           $ref: "#/components/responses/BadRequest"
+  /admin/auditoria:
+    get:
+      tags: [Administracion]
+      summary: Bitácora de cambios administrativos (solo superadministrador, solo lectura).
+      description: admin_audit es de solo anexado; triggers MySQL rechazan UPDATE y DELETE.
+      security:
+        - bearerAuth: []
+        - cookieAuth: []
+      parameters:
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 50 } }
+        - { name: offset, in: query, schema: { type: integer, minimum: 0, default: 0 } }
+        - { name: actor, in: query, schema: { type: integer } }
+        - { name: usuario, in: query, schema: { type: integer } }
+      responses:
+        "200":
+          description: Entradas con actor, acción, usuario afectado, estado anterior y posterior.
+        "403":
+          description: Acción reservada al superadministrador.
   /chatbot/mensaje:
     post:
       tags: [Chatbot]

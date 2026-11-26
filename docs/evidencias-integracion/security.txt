@@ -1,0 +1,29 @@
+
+> greenalert@1.0.0 test:seguridad
+> node scripts/validate-security.mjs
+
+Iniciando MySQL Docker aislado para validación...
+OK: Migración 020 aditiva e idempotente sobre bootstrap
+OK: Registro rechaza contraseña corta sin insertar usuario
+OK: Lista local rechaza contraseña común que supera 15 caracteres
+OK: Límite exacto: 14 caracteres rechazados y frase de 15 aceptada
+OK: Registro acepta contraseña válida y claims sid/ver
+OK: Frase mayor de 64 caracteres aceptada sin truncamiento
+OK: Dos sesiones legítimas tienen sid diferentes
+OK: Logout individual revoca access JWT y refresh sin afectar otra sesión
+OK: Renovación concurrente: un éxito y un rechazo, sin revocar la ganadora
+OK: Logout con refresh anterior a rotación revoca la familia completa
+OK: Cambio rechaza contraseña común y conserva sesión/datos
+OK: Cambio válido invalida access y refresh previos
+OK: Recuperación aplica política antes de cambiar datos
+OK: Recuperación válida invalida sesiones y token de un solo uso
+OK: Administrador degradado por API pierde privilegios inmediatamente
+OK: Cuenta desactivada por API y reactivada no recupera JWT antiguo
+OK: Guardar rol sin cambios conserva sesión legítima
+OK: Logout global revoca solo las sesiones del titular
+OK: Logout y renovación simultáneos no resucitan sesión ni revocan otra legítima
+OK: JWT legacy sin sid no obtiene acceso aunque su firma sea válida
+OK: Hashes scrypt históricos conservados y login compatible
+OK: Fallo del almacén de sesiones rechaza con 503 sin filtrar SQL
+Seguridad: 22 comprobaciones reales correctas.
+Contenedor de validación propio eliminado; sin volúmenes persistentes.

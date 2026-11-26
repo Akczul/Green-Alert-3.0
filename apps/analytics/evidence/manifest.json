@@ -1,0 +1,22 @@
+{
+  "date": "2026-11-24",
+  "timezone": "America/Bogota",
+  "base": "9a463dbb046e54c7f87cced82b649a2b58d64d36",
+  "branch": "feat/analytics",
+  "python_tests_passed": 35,
+  "node_tests_passed": 3,
+  "real_mongodb": true,
+  "real_fastapi": true,
+  "training_dataset": "synthetic-weekly-v1-seed-20261124",
+  "source_sha256": {
+    "greenalert_analytics/risk.py": "49bffb180ccb18560c28f652edd35aeaeffdadee3a042200bfbc19ed722cfe1a",
+    "greenalert_analytics/ml.py": "5f0a8d9ecd51ed5da1ff48739025600fb63f4edcf77214b383f0b937189d53a6",
+    "greenalert_analytics/main.py": "20e865c6783071463b822929d6feaef08f732301efe0de2a2a3fce08159b0900",
+    "greenalert_analytics/runtime.py": "000d2b8d4a597bdd6b12456b0a0f9d4f3900cc0ffd876f76249f3e15f92810e2",
+    "greenalert_analytics/schemas.py": "8fbe2a620b602871b98ac4575fd506efc97256059b479a7faac56572b444b345",
+    "greenalert_analytics/repository.py": "bd033bdfb1cdffc65ce35854d20432ce2cab0297b0f00fb6e8772b917635c53f",
+    "requirements.lock": "fc2c535c2876b9cb83b86d3e3f53337cfe05539020c0d0f72cfad36de8ae6afb",
+    "Dockerfile": "f4889519957b2249832ebe0d4766199dfacd2cf8e59344bb80b590200472d18f",
+    "compose.yaml": "d99b91bcc19b486cdf932bde396f5fa1524a9b7228b3241f7c50326a46cf5126"
+  }
+}

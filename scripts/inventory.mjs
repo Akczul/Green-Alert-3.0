@@ -7,6 +7,7 @@ const read = (file) => readFile(path.join(root, file), 'utf8');
 const modules = {
   health: 'health', auth: 'auth', reportes: 'reporte', categorias: 'categoria-riesgo',
   admin: 'admin', chatbot: 'chatbot', notificaciones: 'notificacion', entidades: 'entidad',
+  integracion: 'integracion',
 };
 let routes = '# Inventario de endpoints HTTP\n\nGenerado desde `apps/backend/routes/*.routes.js` con `npm run docs:inventory`. Se conserva el orden de registro. En la configuración local, anteponer `/api`; sin `API_PREFIX` el backend monta rutas sin prefijo.\n\n';
 routes += 'Acceso expresa los middlewares declarados. Las comprobaciones de propiedad, estado y entidad también se ejecutan en los controladores; no sustituye su revisión. Respuesta habitual: `{status, message, data}`; errores `{status, message}`. `/health` tiene formato propio y devuelve 503 si MySQL no responde.\n\n';
@@ -14,12 +15,12 @@ let total = 0;
 for (const [prefix, file] of Object.entries(modules)) {
   const source = await read(`apps/backend/routes/${file}.routes.js`);
   routes += `## ${prefix}\n\n| Método | Ruta sin prefijo | Acceso declarado | Controlador |\n| --- | --- | --- | --- |\n`;
-  const pattern = /\w+Router\.(get|post|patch|delete)\(\s*['"]([^'"]+)['"],\s*([\s\S]*?)\);/g;
+  const pattern = /(?:\w+Router|router)\.(get|post|patch|delete)\(\s*['"]([^'"]+)['"],\s*([\s\S]*?)\);/g;
   for (const match of source.matchAll(pattern)) {
     const [, method, route, handlers] = match;
     let access = 'Público';
     if (prefix === 'admin') access = 'JWT; admin';
-    else if (prefix === 'notificaciones') access = 'JWT';
+    else if (prefix === 'notificaciones' || prefix === 'integracion') access = 'JWT';
     else if (handlers.includes('verifyTokenWhenAllDevicesLogout')) access = 'JWT si allDevices=true';
     else if (handlers.includes('verifyToken')) access = 'JWT';
     else if (handlers.includes('optionalAuth')) access = 'JWT opcional';

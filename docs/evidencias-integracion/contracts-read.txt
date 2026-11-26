@@ -1,0 +1,40 @@
+
+> greenalert@1.0.0 test:reportes:lectura
+> node scripts/validate-reportes-read.mjs
+
+Iniciando MySQL Docker aislado para validación...
+OK: list-anonymous
+OK: list-citizen
+OK: list-invalid-jwt
+OK: list-filter
+OK: list-page
+OK: list-empty-page
+OK: list-q-ignored
+OK: list-scientific-limit
+OK: list-zero
+OK: list-entity
+OK: list-entity-filter
+OK: list-entity-missing
+OK: list-entity-outside
+OK: own
+OK: own-filter
+OK: own-no-normalize
+OK: own-offset
+OK: own-anonymous
+OK: own-invalid
+OK: trending-anonymous
+OK: trending-citizen
+OK: trending-entity
+OK: detail-skip
+OK: detail-entity-assigned
+OK: detail-entity-forbidden
+OK: detail-entity-absent
+OK: detail-not-found
+OK: detail-deleted
+OK: detail-invalid-id
+OK: detail-anonymous-first
+OK: detail-anonymous-repeat
+OK: detail-citizen-first
+OK: detail-citizen-repeat
+33 contratos HTTP/MySQL equivalentes al original.
+Contenedor de validación propio eliminado; sin volúmenes persistentes.

@@ -17,6 +17,7 @@ import { generarReportesPDF } from '../utils/reportesPdf';
 import BarChart from '../components/charts/BarChart';
 import LineChart from '../components/charts/LineChart';
 import TendenciasIACard from '../components/dashboard/TendenciasIACard.jsx';
+import IntegracionAmbiental from '../components/dashboard/IntegracionAmbiental.jsx';
 import {
   ESTADO_REPORTE_TEXT_CLASS,
   ESTADO_SEGUIMIENTO_LABEL,
@@ -899,6 +900,7 @@ export default function Dashboard() {
       {/* FE-27 · Tendencias y patrones detectados por la IA (admin/moderador) */}
       {isAdmin && (
         <section className="mb-10">
+          <IntegracionAmbiental />
           <TendenciasIACard />
         </section>
       )}

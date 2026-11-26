@@ -72,7 +72,7 @@ export default function TerminosCondiciones() {
             <ul className="list-disc pl-5 space-y-1.5">
               <li>Eres responsable de mantener la confidencialidad de tus credenciales.</li>
               <li>Debes notificarnos inmediatamente si detectas un uso no autorizado de tu cuenta.</li>
-              <li>Tu contraseña debe cumplir con los requisitos mínimos de seguridad (8 caracteres, mayúscula, minúscula, número y carácter especial).</li>
+              <li>Tu contraseña debe cumplir con los requisitos mínimos de seguridad (al menos 15 caracteres, admitiendo frases largas y rechazando contraseñas comunes).</li>
               <li>GreenAlert no es responsable de pérdidas derivadas del uso no autorizado de tu cuenta.</li>
             </ul>
           </SubSection>

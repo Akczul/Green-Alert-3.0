@@ -1,0 +1,35 @@
+# Plantilla procesada por envsubst del entrypoint de nginx (solo variables definidas: ${FRONTEND_TLS_PORT}).
+# Web: solo HTTPS (TLS 1.2+, HSTS) para que las cookies Secure/HttpOnly/SameSite funcionen.
+server {
+    listen 8443 ssl;
+    http2 on;
+    server_name _;
+    root /usr/share/nginx/html;
+    index index.html;
+    ssl_certificate     /etc/nginx/tls/tls.crt;
+    ssl_certificate_key /etc/nginx/tls/tls.key;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers off;
+    ssl_session_cache shared:ga_tls:5m;
+    # Resolver de Docker: recupera upstreams después de recrear sus contenedores.
+    resolver 127.0.0.11 valid=10s ipv6=off;
+    set $api_upstream http://backend-prod:3000;
+    # Hasta 10 evidencias de 10 MiB, mas la envoltura multipart.
+    client_max_body_size 110m;
+    add_header Strict-Transport-Security "max-age=31536000" always;
+    include /etc/nginx/greenalert-common.conf;
+}
+
+# HTTP: la interfaz web redirige a HTTPS. /api queda disponible solo para la APK de laboratorio en LAN
+# (EXPO_PUBLIC_ALLOW_HTTP=true); en producción el móvil debe usar HTTPS con certificado de confianza.
+server {
+    listen 8080;
+    server_name _;
+    resolver 127.0.0.11 valid=10s ipv6=off;
+    set $api_upstream http://backend-prod:3000;
+    client_max_body_size 110m;
+    add_header X-Content-Type-Options "nosniff" always;
+    location = /healthz { access_log off; default_type text/plain; return 200 "ok"; }
+    include /etc/nginx/greenalert-api.conf;
+    location / { return 308 https://$host:${FRONTEND_TLS_PORT}$request_uri; }
+}

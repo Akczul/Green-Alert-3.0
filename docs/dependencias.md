@@ -18,6 +18,7 @@ Declaraciones y resoluciones de los lockfiles. No se actualizaron los rangos de 
 | `multer` | `^2.1.1` | 2.5.0 | dependencies |
 | `mysql2` | `^3.9.8` | 3.24.6 | dependencies |
 | `nodemailer` | `^8.0.5` | 8.0.11 | dependencies |
+| `redis` | `^5.12.4` | 5.12.4 | dependencies |
 | `socket.io` | `^4.8.3` | 4.8.4 | dependencies |
 | `nodemon` | `^3.1.3` | 3.1.14 | devDependencies |
 

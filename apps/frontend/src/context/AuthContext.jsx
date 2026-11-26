@@ -1,5 +1,8 @@
-import { createContext, useContext, useState, useEffect } from 'react';
-import { loginUser, registerUser, getPerfil, oauthGoogle, oauthFacebook } from '../services/api';
+import { createContext, useContext, useState, useEffect, useRef } from 'react';
+import {
+  loginUser, registerUser, getPerfil, oauthGoogle, oauthFacebook, logoutUser, exchangeOAuthCode,
+  rememberSession, hasSessionHint, forgetSession,
+} from '../services/api';
 import { useToast } from './ToastContext';
 
 const AuthContext = createContext(null);
@@ -8,22 +11,18 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const { showToast } = useToast();
+  const logoutPending = useRef(null);
 
-  // Valida el token contra el backend al montar
+  // Valida la sesión (cookies HttpOnly) contra el backend al montar. Solo hay pista si hubo login.
   useEffect(() => {
-    const token = localStorage.getItem('ga_token');
-    if (!token) { setLoading(false); return; }
+    if (!hasSessionHint()) { forgetSession(); setLoading(false); return; }
 
     getPerfil()
       .then(({ data }) => {
         setUser(data.data.user);
-        localStorage.setItem('ga_user', JSON.stringify(data.data.user));
+        rememberSession(data.data.user);
       })
-      .catch(() => {
-        localStorage.removeItem('ga_token');
-        localStorage.removeItem('ga_refresh_token');
-        localStorage.removeItem('ga_user');
-      })
+      .catch(() => forgetSession())
       .finally(() => setLoading(false));
   }, []);
 
@@ -42,64 +41,53 @@ export function AuthProvider({ children }) {
     return () => window.removeEventListener('ga:session-expired', handleExpired);
   }, [showToast]);
 
-  const login = async (email, password) => {
-    const res = await loginUser(email, password);
-    const { token, refreshToken, user: userData } = res.data.data;
-    localStorage.setItem('ga_token', token);
-    if (refreshToken) localStorage.setItem('ga_refresh_token', refreshToken);
-    localStorage.setItem('ga_user', JSON.stringify(userData));
-    setUser(userData);
-    return userData;
+  // El backend entrega los tokens en cookies; el cuerpo solo trae el usuario y la expiración.
+  const _saveSession = (payload) => {
+    rememberSession(payload.user, payload.accessTokenExpiresAt);
+    setUser(payload.user);
+    return payload.user;
   };
 
-  const register = async (nombre, apellido, email, password, telefono) => {
-    const res = await registerUser(nombre, apellido, email, password, telefono);
-    const { token, refreshToken, user: userData } = res.data.data;
-    localStorage.setItem('ga_token', token);
-    if (refreshToken) localStorage.setItem('ga_refresh_token', refreshToken);
-    localStorage.setItem('ga_user', JSON.stringify(userData));
-    setUser(userData);
-    return userData;
-  };
+  const login = async (email, password, totp) => _saveSession((await loginUser(email, password, totp)).data.data);
+
+  const register = async (nombre, apellido, email, password, telefono) =>
+    _saveSession((await registerUser(nombre, apellido, email, password, telefono)).data.data);
 
   const refreshUser = async () => {
     const res = await getPerfil();
     const userData = res.data.data.user;
-    localStorage.setItem('ga_user', JSON.stringify(userData));
+    rememberSession(userData);
     setUser(userData);
     return userData;
   };
 
-  const _saveSession = (token, userData, refreshToken = null) => {
-    localStorage.setItem('ga_token', token);
-    if (refreshToken) localStorage.setItem('ga_refresh_token', refreshToken);
-    localStorage.setItem('ga_user', JSON.stringify(userData));
-    setUser(userData);
-    return userData;
-  };
+  const loginWithGoogle = async (accessToken) => _saveSession((await oauthGoogle(accessToken)).data.data);
 
-  const loginWithGoogle = async (accessToken) => {
-    const res = await oauthGoogle(accessToken);
-    const { token, refreshToken, user: userData } = res.data.data;
-    return _saveSession(token, userData, refreshToken);
-  };
+  const loginWithFacebook = async (code) => _saveSession((await oauthFacebook(code)).data.data);
 
-  const loginWithFacebook = async (code) => {
-    const res = await oauthFacebook(code);
-    const { token, refreshToken, user: userData } = res.data.data;
-    return _saveSession(token, userData, refreshToken);
-  };
+  // Inicio federado por redirección (Google/Microsoft OIDC): canje del código de un solo uso.
+  const completeOAuthCallback = async (code, totp) => _saveSession((await exchangeOAuthCode(code, totp)).data.data);
 
-  const logout = () => {
-    localStorage.removeItem('ga_token');
-    localStorage.removeItem('ga_refresh_token');
-    localStorage.removeItem('ga_user');
-    setUser(null);
-    showToast('Sesión cerrada', 'info', 3500, { position: 'top-center', subtitle: 'Hasta pronto' });
+  const logout = ({ allDevices = false } = {}) => {
+    if (logoutPending.current) return logoutPending.current;
+    logoutPending.current = (async () => {
+      try {
+        if (!hasSessionHint()) throw new Error('missing_session');
+        await logoutUser({ allDevices });
+        forgetSession();
+        setUser(null);
+        showToast('Sesión cerrada', 'info', 3500, { position: 'top-center', subtitle: 'Hasta pronto' });
+        return true;
+      } catch {
+        showToast('No se pudo invalidar la sesión en el servidor. Intenta cerrar sesión nuevamente.', 'error');
+        return false;
+      }
+    })().finally(() => { logoutPending.current = null; });
+    return logoutPending.current;
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, refreshUser, loginWithGoogle, loginWithFacebook }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, refreshUser, loginWithGoogle, loginWithFacebook, completeOAuthCallback }}>
       {children}
     </AuthContext.Provider>
   );

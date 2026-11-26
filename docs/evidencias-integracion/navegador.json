@@ -1,0 +1,9 @@
+{
+  "checks": [
+    "React ejecuta FastAPI y persiste ejecución MongoDB a través de Express",
+    "React consulta Spring y Druid a través de Express",
+    "React consulta historial MySQL autorizado → Spring → Cassandra"
+  ],
+  "passed": true,
+  "scope": "Navegador Edge headless aislado contra React/Nginx/Express y motores reales; sin teléfono físico"
+}

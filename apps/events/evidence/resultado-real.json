@@ -1,0 +1,1392 @@
+{
+  "project": "ga-events-test-96c0ac7fdf4f",
+  "startedUtc": "2026-11-25T03:24:47.023386+00:00",
+  "checks": [
+    {
+      "name": "health y readiness reales",
+      "status": "PASS",
+      "ms": 17.24
+    },
+    {
+      "name": "sin token denegado",
+      "status": "PASS",
+      "ms": 12.1
+    },
+    {
+      "name": "token normal no reconcilia",
+      "status": "PASS",
+      "ms": 11.18
+    },
+    {
+      "name": "token operador no registra",
+      "status": "PASS",
+      "ms": 15.79
+    },
+    {
+      "name": "correlación inválida",
+      "status": "PASS",
+      "ms": 6.57
+    },
+    {
+      "name": "OpenAPI generado",
+      "status": "PASS",
+      "ms": 1517.33
+    },
+    {
+      "name": "escritura Cassandra y correlación",
+      "status": "PASS",
+      "ms": 453.16
+    },
+    {
+      "name": "lectura historial reporte",
+      "status": "PASS",
+      "ms": 42.02
+    },
+    {
+      "name": "reintento idempotente",
+      "status": "PASS",
+      "ms": 97.74
+    },
+    {
+      "name": "UUID conflictivo",
+      "status": "PASS",
+      "ms": 53.63
+    },
+    {
+      "name": "UUID no puede moverse de reporte",
+      "status": "PASS",
+      "ms": 62.17
+    },
+    {
+      "name": "reintento repara proyección histórica incompleta",
+      "status": "PASS",
+      "ms": 1572.67
+    },
+    {
+      "name": "propiedades desconocidas rechazadas",
+      "status": "PASS",
+      "ms": 31.57
+    },
+    {
+      "name": "severidad inválida",
+      "status": "PASS",
+      "ms": 69.31
+    },
+    {
+      "name": "revisión fraccionaria no se trunca",
+      "status": "PASS",
+      "ms": 18.86
+    },
+    {
+      "name": "severidad string no se convierte",
+      "status": "PASS",
+      "ms": 12.02
+    },
+    {
+      "name": "rango histórico invertido",
+      "status": "PASS",
+      "ms": 25.63
+    },
+    {
+      "name": "payload acotado",
+      "status": "PASS",
+      "ms": 40.55
+    },
+    {
+      "name": "8 duplicados simultáneos con LWT",
+      "status": "PASS",
+      "ms": 282.83
+    },
+    {
+      "name": "lote concurrente Cassandra",
+      "status": "PASS",
+      "ms": 264.2
+    },
+    {
+      "name": "ingesta real Druid",
+      "status": "PASS",
+      "ms": 9084.03
+    },
+    {
+      "name": "agregados exactos contra fuente",
+      "status": "PASS",
+      "ms": 3816.12
+    },
+    {
+      "name": "indicadores rechazan límites inferiores a una hora",
+      "status": "PASS",
+      "ms": 7.02
+    },
+    {
+      "name": "filtro de período excluye horas ajenas",
+      "status": "PASS",
+      "ms": 80.92
+    },
+    {
+      "name": "filtros período categoría severidad zona",
+      "status": "PASS",
+      "ms": 388.19
+    },
+    {
+      "name": "reingesta reemplaza intervalo",
+      "status": "PASS",
+      "ms": 5721.53
+    },
+    {
+      "name": "replay no duplica métricas",
+      "status": "PASS",
+      "ms": 109.15
+    },
+    {
+      "name": "reconciliación exclusiva y backpressure 429",
+      "status": "PASS",
+      "ms": 5249.56
+    },
+    {
+      "name": "caída Cassandra y recuperación sin reiniciar API",
+      "status": "PASS",
+      "ms": 32225.79
+    },
+    {
+      "name": "caída Druid conserva historial y replay recupera",
+      "status": "PASS",
+      "ms": 32833.9
+    },
+    {
+      "name": "concurrencia real 512 escrituras y resultados equivalentes",
+      "status": "PASS",
+      "ms": 22367.87
+    },
+    {
+      "name": "persistencia Cassandra y Druid tras reiniciar todo el stack",
+      "status": "PASS",
+      "ms": 51199.75
+    },
+    {
+      "name": "rotación de credencial invalida token anterior",
+      "status": "PASS",
+      "ms": 9961.19
+    }
+  ],
+  "benchmark": [
+    {
+      "mode": "sequential",
+      "sample": 0,
+      "events": 64,
+      "ms": 743.01,
+      "warmup": true
+    },
+    {
+      "mode": "concurrent",
+      "sample": 0,
+      "events": 64,
+      "ms": 439.93,
+      "warmup": true
+    },
+    {
+      "mode": "concurrent",
+      "sample": 1,
+      "events": 64,
+      "ms": 470.07,
+      "warmup": false
+    },
+    {
+      "mode": "sequential",
+      "sample": 1,
+      "events": 64,
+      "ms": 576.47,
+      "warmup": false
+    },
+    {
+      "mode": "sequential",
+      "sample": 2,
+      "events": 64,
+      "ms": 523.46,
+      "warmup": false
+    },
+    {
+      "mode": "concurrent",
+      "sample": 2,
+      "events": 64,
+      "ms": 182.12,
+      "warmup": false
+    },
+    {
+      "mode": "concurrent",
+      "sample": 3,
+      "events": 64,
+      "ms": 238.59,
+      "warmup": false
+    },
+    {
+      "mode": "sequential",
+      "sample": 3,
+      "events": 64,
+      "ms": 652.86,
+      "warmup": false
+    }
+  ],
+  "resourceSamples": [
+    {
+      "label": "ready",
+      "containers": [
+        {
+          "BlockIO": "0B / 1.11MB",
+          "CPUPerc": "5.15%",
+          "Container": "aca5254edd9b171907da8c62798edab2d275a62ab50d60337623d28968f1a5a5",
+          "ID": "aca5254edd9b",
+          "MemPerc": "53.69%",
+          "MemUsage": "412.3MiB / 768MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-broker-1",
+          "NetIO": "31.4kB / 23.5kB",
+          "PIDs": "75"
+        },
+        {
+          "BlockIO": "127kB / 18.6MB",
+          "CPUPerc": "4.18%",
+          "Container": "3f5015a3609aee868f7f408697cbf585402982019668c4646d67b1ffab75d67f",
+          "ID": "3f5015a3609a",
+          "MemPerc": "80.55%",
+          "MemUsage": "1.208GiB / 1.5GiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-cassandra-1",
+          "NetIO": "19.8kB / 249kB",
+          "PIDs": "92"
+        },
+        {
+          "BlockIO": "0B / 967kB",
+          "CPUPerc": "2.43%",
+          "Container": "dd6d515a36c0c80815c2c901b5d4ab36ebe598bab07ef56834f2c093e349e650",
+          "ID": "dd6d515a36c0",
+          "MemPerc": "49.64%",
+          "MemUsage": "317.7MiB / 640MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-coordinator-1",
+          "NetIO": "259kB / 271kB",
+          "PIDs": "97"
+        },
+        {
+          "BlockIO": "0B / 94.2kB",
+          "CPUPerc": "8.01%",
+          "Container": "5359fcb4ef21294e390336b661e9d7061b960a310726c0e7aec31426ef4140db",
+          "ID": "5359fcb4ef21",
+          "MemPerc": "46.29%",
+          "MemUsage": "296.3MiB / 640MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-events-1",
+          "NetIO": "123kB / 8.28kB",
+          "PIDs": "48"
+        },
+        {
+          "BlockIO": "0B / 1.09MB",
+          "CPUPerc": "0.23%",
+          "Container": "7e9b9207a6aebc1c0436bc27e74779368e836ebdb46b6fb2c99cd682a1cbdce5",
+          "ID": "7e9b9207a6ae",
+          "MemPerc": "48.86%",
+          "MemUsage": "375.3MiB / 768MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-historical-1",
+          "NetIO": "14.1kB / 9.56kB",
+          "PIDs": "54"
+        },
+        {
+          "BlockIO": "66.6MB / 330MB",
+          "CPUPerc": "1.71%",
+          "Container": "270403b77b6666a6958d1a43f051495e42f76f4990666f4ed93af3aec02a8624",
+          "ID": "270403b77b66",
+          "MemPerc": "86.64%",
+          "MemUsage": "443.6MiB / 512MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-metadata-1",
+          "NetIO": "238kB / 224kB",
+          "PIDs": "38"
+        },
+        {
+          "BlockIO": "0B / 934kB",
+          "CPUPerc": "0.25%",
+          "Container": "853702d242e4547bad672131a3569910afab122719af1d028ef19fe24f3f8e80",
+          "ID": "853702d242e4",
+          "MemPerc": "18.37%",
+          "MemUsage": "258.6MiB / 1.375GiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-middlemanager-1",
+          "NetIO": "9.81kB / 6.79kB",
+          "PIDs": "49"
+        },
+        {
+          "BlockIO": "0B / 188kB",
+          "CPUPerc": "6.49%",
+          "Container": "537114a479e5a8bf872db680416420fa31619a11dae01aa2a7028d9c6f2731fe",
+          "ID": "537114a479e5",
+          "MemPerc": "24.88%",
+          "MemUsage": "63.7MiB / 256MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-zookeeper-1",
+          "NetIO": "37.6kB / 42.2kB",
+          "PIDs": "43"
+        }
+      ]
+    },
+    {
+      "label": "sequential-0",
+      "containers": [
+        {
+          "BlockIO": "0B / 262kB",
+          "CPUPerc": "0.74%",
+          "Container": "aca5254edd9b171907da8c62798edab2d275a62ab50d60337623d28968f1a5a5",
+          "ID": "aca5254edd9b",
+          "MemPerc": "54.60%",
+          "MemUsage": "419.3MiB / 768MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-broker-1",
+          "NetIO": "35.8kB / 26.4kB",
+          "PIDs": "76"
+        },
+        {
+          "BlockIO": "0B / 16MB",
+          "CPUPerc": "122.68%",
+          "Container": "3f5015a3609aee868f7f408697cbf585402982019668c4646d67b1ffab75d67f",
+          "ID": "3f5015a3609a",
+          "MemPerc": "79.95%",
+          "MemUsage": "1.199GiB / 1.5GiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-cassandra-1",
+          "NetIO": "94.2kB / 154kB",
+          "PIDs": "91"
+        },
+        {
+          "BlockIO": "0B / 258kB",
+          "CPUPerc": "0.39%",
+          "Container": "dd6d515a36c0c80815c2c901b5d4ab36ebe598bab07ef56834f2c093e349e650",
+          "ID": "dd6d515a36c0",
+          "MemPerc": "51.95%",
+          "MemUsage": "332.5MiB / 640MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-coordinator-1",
+          "NetIO": "230kB / 236kB",
+          "PIDs": "101"
+        },
+        {
+          "BlockIO": "0B / 176kB",
+          "CPUPerc": "0.38%",
+          "Container": "5359fcb4ef21294e390336b661e9d7061b960a310726c0e7aec31426ef4140db",
+          "ID": "5359fcb4ef21",
+          "MemPerc": "50.00%",
+          "MemUsage": "320MiB / 640MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-events-1",
+          "NetIO": "775kB / 325kB",
+          "PIDs": "54"
+        },
+        {
+          "BlockIO": "0B / 1.24MB",
+          "CPUPerc": "0.19%",
+          "Container": "7e9b9207a6aebc1c0436bc27e74779368e836ebdb46b6fb2c99cd682a1cbdce5",
+          "ID": "7e9b9207a6ae",
+          "MemPerc": "52.31%",
+          "MemUsage": "401.8MiB / 768MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-historical-1",
+          "NetIO": "50.5kB / 35.9kB",
+          "PIDs": "58"
+        },
+        {
+          "BlockIO": "66.6MB / 337MB",
+          "CPUPerc": "5.23%",
+          "Container": "270403b77b6666a6958d1a43f051495e42f76f4990666f4ed93af3aec02a8624",
+          "ID": "270403b77b66",
+          "MemPerc": "87.06%",
+          "MemUsage": "445.7MiB / 512MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-metadata-1",
+          "NetIO": "568kB / 508kB",
+          "PIDs": "38"
+        },
+        {
+          "BlockIO": "0B / 1.59MB",
+          "CPUPerc": "0.20%",
+          "Container": "853702d242e4547bad672131a3569910afab122719af1d028ef19fe24f3f8e80",
+          "ID": "853702d242e4",
+          "MemPerc": "19.62%",
+          "MemUsage": "276.3MiB / 1.375GiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-middlemanager-1",
+          "NetIO": "68.8kB / 134kB",
+          "PIDs": "53"
+        },
+        {
+          "BlockIO": "0B / 365kB",
+          "CPUPerc": "0.08%",
+          "Container": "537114a479e5a8bf872db680416420fa31619a11dae01aa2a7028d9c6f2731fe",
+          "ID": "537114a479e5",
+          "MemPerc": "26.39%",
+          "MemUsage": "67.57MiB / 256MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-zookeeper-1",
+          "NetIO": "85.4kB / 99.3kB",
+          "PIDs": "43"
+        }
+      ]
+    },
+    {
+      "label": "concurrent-0",
+      "containers": [
+        {
+          "BlockIO": "0B / 1.06MB",
+          "CPUPerc": "0.41%",
+          "Container": "aca5254edd9b171907da8c62798edab2d275a62ab50d60337623d28968f1a5a5",
+          "ID": "aca5254edd9b",
+          "MemPerc": "54.54%",
+          "MemUsage": "418.8MiB / 768MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-broker-1",
+          "NetIO": "35.8kB / 26.4kB",
+          "PIDs": "76"
+        },
+        {
+          "BlockIO": "0B / 16.1MB",
+          "CPUPerc": "5.02%",
+          "Container": "3f5015a3609aee868f7f408697cbf585402982019668c4646d67b1ffab75d67f",
+          "ID": "3f5015a3609a",
+          "MemPerc": "80.10%",
+          "MemUsage": "1.202GiB / 1.5GiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-cassandra-1",
+          "NetIO": "169kB / 169kB",
+          "PIDs": "87"
+        },
+        {
+          "BlockIO": "0B / 905kB",
+          "CPUPerc": "0.38%",
+          "Container": "dd6d515a36c0c80815c2c901b5d4ab36ebe598bab07ef56834f2c093e349e650",
+          "ID": "dd6d515a36c0",
+          "MemPerc": "51.92%",
+          "MemUsage": "332.3MiB / 640MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-coordinator-1",
+          "NetIO": "238kB / 242kB",
+          "PIDs": "101"
+        },
+        {
+          "BlockIO": "0B / 217kB",
+          "CPUPerc": "0.22%",
+          "Container": "5359fcb4ef21294e390336b661e9d7061b960a310726c0e7aec31426ef4140db",
+          "ID": "5359fcb4ef21",
+          "MemPerc": "50.13%",
+          "MemUsage": "320.8MiB / 640MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-events-1",
+          "NetIO": "809kB / 405kB",
+          "PIDs": "55"
+        },
+        {
+          "BlockIO": "0B / 1.29MB",
+          "CPUPerc": "0.27%",
+          "Container": "7e9b9207a6aebc1c0436bc27e74779368e836ebdb46b6fb2c99cd682a1cbdce5",
+          "ID": "7e9b9207a6ae",
+          "MemPerc": "52.25%",
+          "MemUsage": "401.3MiB / 768MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-historical-1",
+          "NetIO": "50.6kB / 36.1kB",
+          "PIDs": "58"
+        },
+        {
+          "BlockIO": "66.6MB / 337MB",
+          "CPUPerc": "0.67%",
+          "Container": "270403b77b6666a6958d1a43f051495e42f76f4990666f4ed93af3aec02a8624",
+          "ID": "270403b77b66",
+          "MemPerc": "87.04%",
+          "MemUsage": "445.6MiB / 512MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-metadata-1",
+          "NetIO": "575kB / 516kB",
+          "PIDs": "38"
+        },
+        {
+          "BlockIO": "0B / 1.7MB",
+          "CPUPerc": "0.25%",
+          "Container": "853702d242e4547bad672131a3569910afab122719af1d028ef19fe24f3f8e80",
+          "ID": "853702d242e4",
+          "MemPerc": "19.59%",
+          "MemUsage": "275.8MiB / 1.375GiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-middlemanager-1",
+          "NetIO": "68.9kB / 134kB",
+          "PIDs": "53"
+        },
+        {
+          "BlockIO": "0B / 381kB",
+          "CPUPerc": "0.10%",
+          "Container": "537114a479e5a8bf872db680416420fa31619a11dae01aa2a7028d9c6f2731fe",
+          "ID": "537114a479e5",
+          "MemPerc": "26.39%",
+          "MemUsage": "67.55MiB / 256MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-zookeeper-1",
+          "NetIO": "86kB / 99.7kB",
+          "PIDs": "43"
+        }
+      ]
+    },
+    {
+      "label": "concurrent-1",
+      "containers": [
+        {
+          "BlockIO": "0B / 1.06MB",
+          "CPUPerc": "0.26%",
+          "Container": "aca5254edd9b171907da8c62798edab2d275a62ab50d60337623d28968f1a5a5",
+          "ID": "aca5254edd9b",
+          "MemPerc": "54.48%",
+          "MemUsage": "418.4MiB / 768MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-broker-1",
+          "NetIO": "36.7kB / 26.8kB",
+          "PIDs": "76"
+        },
+        {
+          "BlockIO": "0B / 16.1MB",
+          "CPUPerc": "2.41%",
+          "Container": "3f5015a3609aee868f7f408697cbf585402982019668c4646d67b1ffab75d67f",
+          "ID": "3f5015a3609a",
+          "MemPerc": "80.19%",
+          "MemUsage": "1.203GiB / 1.5GiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-cassandra-1",
+          "NetIO": "244kB / 185kB",
+          "PIDs": "87"
+        },
+        {
+          "BlockIO": "0B / 905kB",
+          "CPUPerc": "0.24%",
+          "Container": "dd6d515a36c0c80815c2c901b5d4ab36ebe598bab07ef56834f2c093e349e650",
+          "ID": "dd6d515a36c0",
+          "MemPerc": "51.88%",
+          "MemUsage": "332MiB / 640MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-coordinator-1",
+          "NetIO": "239kB / 243kB",
+          "PIDs": "101"
+        },
+        {
+          "BlockIO": "0B / 217kB",
+          "CPUPerc": "0.15%",
+          "Container": "5359fcb4ef21294e390336b661e9d7061b960a310726c0e7aec31426ef4140db",
+          "ID": "5359fcb4ef21",
+          "MemPerc": "50.41%",
+          "MemUsage": "322.6MiB / 640MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-events-1",
+          "NetIO": "843kB / 485kB",
+          "PIDs": "54"
+        },
+        {
+          "BlockIO": "0B / 1.29MB",
+          "CPUPerc": "0.15%",
+          "Container": "7e9b9207a6aebc1c0436bc27e74779368e836ebdb46b6fb2c99cd682a1cbdce5",
+          "ID": "7e9b9207a6ae",
+          "MemPerc": "52.25%",
+          "MemUsage": "401.3MiB / 768MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-historical-1",
+          "NetIO": "50.6kB / 36.1kB",
+          "PIDs": "58"
+        },
+        {
+          "BlockIO": "66.6MB / 337MB",
+          "CPUPerc": "5.33%",
+          "Container": "270403b77b6666a6958d1a43f051495e42f76f4990666f4ed93af3aec02a8624",
+          "ID": "270403b77b66",
+          "MemPerc": "87.19%",
+          "MemUsage": "446.4MiB / 512MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-metadata-1",
+          "NetIO": "575kB / 516kB",
+          "PIDs": "38"
+        },
+        {
+          "BlockIO": "0B / 1.7MB",
+          "CPUPerc": "0.17%",
+          "Container": "853702d242e4547bad672131a3569910afab122719af1d028ef19fe24f3f8e80",
+          "ID": "853702d242e4",
+          "MemPerc": "19.59%",
+          "MemUsage": "275.8MiB / 1.375GiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-middlemanager-1",
+          "NetIO": "68.9kB / 134kB",
+          "PIDs": "53"
+        },
+        {
+          "BlockIO": "0B / 381kB",
+          "CPUPerc": "0.08%",
+          "Container": "537114a479e5a8bf872db680416420fa31619a11dae01aa2a7028d9c6f2731fe",
+          "ID": "537114a479e5",
+          "MemPerc": "26.30%",
+          "MemUsage": "67.32MiB / 256MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-zookeeper-1",
+          "NetIO": "86kB / 99.7kB",
+          "PIDs": "43"
+        }
+      ]
+    },
+    {
+      "label": "sequential-1",
+      "containers": [
+        {
+          "BlockIO": "0B / 1.06MB",
+          "CPUPerc": "6.59%",
+          "Container": "aca5254edd9b171907da8c62798edab2d275a62ab50d60337623d28968f1a5a5",
+          "ID": "aca5254edd9b",
+          "MemPerc": "54.53%",
+          "MemUsage": "418.8MiB / 768MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-broker-1",
+          "NetIO": "37.6kB / 27.3kB",
+          "PIDs": "76"
+        },
+        {
+          "BlockIO": "0B / 16.1MB",
+          "CPUPerc": "2.89%",
+          "Container": "3f5015a3609aee868f7f408697cbf585402982019668c4646d67b1ffab75d67f",
+          "ID": "3f5015a3609a",
+          "MemPerc": "80.50%",
+          "MemUsage": "1.207GiB / 1.5GiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-cassandra-1",
+          "NetIO": "320kB / 201kB",
+          "PIDs": "87"
+        },
+        {
+          "BlockIO": "0B / 905kB",
+          "CPUPerc": "0.83%",
+          "Container": "dd6d515a36c0c80815c2c901b5d4ab36ebe598bab07ef56834f2c093e349e650",
+          "ID": "dd6d515a36c0",
+          "MemPerc": "51.96%",
+          "MemUsage": "332.5MiB / 640MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-coordinator-1",
+          "NetIO": "247kB / 250kB",
+          "PIDs": "101"
+        },
+        {
+          "BlockIO": "0B / 217kB",
+          "CPUPerc": "0.17%",
+          "Container": "5359fcb4ef21294e390336b661e9d7061b960a310726c0e7aec31426ef4140db",
+          "ID": "5359fcb4ef21",
+          "MemPerc": "50.41%",
+          "MemUsage": "322.6MiB / 640MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-events-1",
+          "NetIO": "877kB / 566kB",
+          "PIDs": "54"
+        },
+        {
+          "BlockIO": "0B / 1.29MB",
+          "CPUPerc": "0.17%",
+          "Container": "7e9b9207a6aebc1c0436bc27e74779368e836ebdb46b6fb2c99cd682a1cbdce5",
+          "ID": "7e9b9207a6ae",
+          "MemPerc": "52.25%",
+          "MemUsage": "401.3MiB / 768MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-historical-1",
+          "NetIO": "50.6kB / 36.1kB",
+          "PIDs": "58"
+        },
+        {
+          "BlockIO": "66.6MB / 337MB",
+          "CPUPerc": "0.74%",
+          "Container": "270403b77b6666a6958d1a43f051495e42f76f4990666f4ed93af3aec02a8624",
+          "ID": "270403b77b66",
+          "MemPerc": "87.24%",
+          "MemUsage": "446.7MiB / 512MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-metadata-1",
+          "NetIO": "581kB / 524kB",
+          "PIDs": "38"
+        },
+        {
+          "BlockIO": "0B / 1.7MB",
+          "CPUPerc": "0.20%",
+          "Container": "853702d242e4547bad672131a3569910afab122719af1d028ef19fe24f3f8e80",
+          "ID": "853702d242e4",
+          "MemPerc": "19.59%",
+          "MemUsage": "275.8MiB / 1.375GiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-middlemanager-1",
+          "NetIO": "68.9kB / 134kB",
+          "PIDs": "53"
+        },
+        {
+          "BlockIO": "0B / 381kB",
+          "CPUPerc": "0.19%",
+          "Container": "537114a479e5a8bf872db680416420fa31619a11dae01aa2a7028d9c6f2731fe",
+          "ID": "537114a479e5",
+          "MemPerc": "26.21%",
+          "MemUsage": "67.09MiB / 256MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-zookeeper-1",
+          "NetIO": "86kB / 99.7kB",
+          "PIDs": "43"
+        }
+      ]
+    },
+    {
+      "label": "sequential-2",
+      "containers": [
+        {
+          "BlockIO": "0B / 1.06MB",
+          "CPUPerc": "0.53%",
+          "Container": "aca5254edd9b171907da8c62798edab2d275a62ab50d60337623d28968f1a5a5",
+          "ID": "aca5254edd9b",
+          "MemPerc": "54.48%",
+          "MemUsage": "418.4MiB / 768MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-broker-1",
+          "NetIO": "37.6kB / 27.4kB",
+          "PIDs": "76"
+        },
+        {
+          "BlockIO": "0B / 16.8MB",
+          "CPUPerc": "2.19%",
+          "Container": "3f5015a3609aee868f7f408697cbf585402982019668c4646d67b1ffab75d67f",
+          "ID": "3f5015a3609a",
+          "MemPerc": "80.85%",
+          "MemUsage": "1.213GiB / 1.5GiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-cassandra-1",
+          "NetIO": "396kB / 216kB",
+          "PIDs": "85"
+        },
+        {
+          "BlockIO": "0B / 905kB",
+          "CPUPerc": "5.53%",
+          "Container": "dd6d515a36c0c80815c2c901b5d4ab36ebe598bab07ef56834f2c093e349e650",
+          "ID": "dd6d515a36c0",
+          "MemPerc": "52.04%",
+          "MemUsage": "333.1MiB / 640MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-coordinator-1",
+          "NetIO": "248kB / 251kB",
+          "PIDs": "101"
+        },
+        {
+          "BlockIO": "0B / 217kB",
+          "CPUPerc": "0.14%",
+          "Container": "5359fcb4ef21294e390336b661e9d7061b960a310726c0e7aec31426ef4140db",
+          "ID": "5359fcb4ef21",
+          "MemPerc": "50.44%",
+          "MemUsage": "322.8MiB / 640MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-events-1",
+          "NetIO": "910kB / 647kB",
+          "PIDs": "54"
+        },
+        {
+          "BlockIO": "0B / 1.29MB",
+          "CPUPerc": "0.14%",
+          "Container": "7e9b9207a6aebc1c0436bc27e74779368e836ebdb46b6fb2c99cd682a1cbdce5",
+          "ID": "7e9b9207a6ae",
+          "MemPerc": "52.23%",
+          "MemUsage": "401.1MiB / 768MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-historical-1",
+          "NetIO": "50.6kB / 36.1kB",
+          "PIDs": "58"
+        },
+        {
+          "BlockIO": "66.7MB / 337MB",
+          "CPUPerc": "1.10%",
+          "Container": "270403b77b6666a6958d1a43f051495e42f76f4990666f4ed93af3aec02a8624",
+          "ID": "270403b77b66",
+          "MemPerc": "87.18%",
+          "MemUsage": "446.3MiB / 512MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-metadata-1",
+          "NetIO": "587kB / 533kB",
+          "PIDs": "38"
+        },
+        {
+          "BlockIO": "0B / 1.7MB",
+          "CPUPerc": "0.21%",
+          "Container": "853702d242e4547bad672131a3569910afab122719af1d028ef19fe24f3f8e80",
+          "ID": "853702d242e4",
+          "MemPerc": "19.59%",
+          "MemUsage": "275.9MiB / 1.375GiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-middlemanager-1",
+          "NetIO": "68.9kB / 134kB",
+          "PIDs": "53"
+        },
+        {
+          "BlockIO": "0B / 381kB",
+          "CPUPerc": "0.34%",
+          "Container": "537114a479e5a8bf872db680416420fa31619a11dae01aa2a7028d9c6f2731fe",
+          "ID": "537114a479e5",
+          "MemPerc": "26.36%",
+          "MemUsage": "67.48MiB / 256MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-zookeeper-1",
+          "NetIO": "86.3kB / 99.9kB",
+          "PIDs": "43"
+        }
+      ]
+    },
+    {
+      "label": "concurrent-2",
+      "containers": [
+        {
+          "BlockIO": "0B / 1.06MB",
+          "CPUPerc": "1.38%",
+          "Container": "aca5254edd9b171907da8c62798edab2d275a62ab50d60337623d28968f1a5a5",
+          "ID": "aca5254edd9b",
+          "MemPerc": "54.55%",
+          "MemUsage": "419MiB / 768MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-broker-1",
+          "NetIO": "39.9kB / 28.3kB",
+          "PIDs": "76"
+        },
+        {
+          "BlockIO": "0B / 16.8MB",
+          "CPUPerc": "2.41%",
+          "Container": "3f5015a3609aee868f7f408697cbf585402982019668c4646d67b1ffab75d67f",
+          "ID": "3f5015a3609a",
+          "MemPerc": "80.82%",
+          "MemUsage": "1.212GiB / 1.5GiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-cassandra-1",
+          "NetIO": "471kB / 232kB",
+          "PIDs": "85"
+        },
+        {
+          "BlockIO": "0B / 905kB",
+          "CPUPerc": "0.95%",
+          "Container": "dd6d515a36c0c80815c2c901b5d4ab36ebe598bab07ef56834f2c093e349e650",
+          "ID": "dd6d515a36c0",
+          "MemPerc": "51.95%",
+          "MemUsage": "332.5MiB / 640MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-coordinator-1",
+          "NetIO": "257kB / 259kB",
+          "PIDs": "101"
+        },
+        {
+          "BlockIO": "0B / 217kB",
+          "CPUPerc": "4.95%",
+          "Container": "5359fcb4ef21294e390336b661e9d7061b960a310726c0e7aec31426ef4140db",
+          "ID": "5359fcb4ef21",
+          "MemPerc": "50.48%",
+          "MemUsage": "323MiB / 640MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-events-1",
+          "NetIO": "944kB / 727kB",
+          "PIDs": "54"
+        },
+        {
+          "BlockIO": "0B / 1.29MB",
+          "CPUPerc": "0.30%",
+          "Container": "7e9b9207a6aebc1c0436bc27e74779368e836ebdb46b6fb2c99cd682a1cbdce5",
+          "ID": "7e9b9207a6ae",
+          "MemPerc": "52.26%",
+          "MemUsage": "401.3MiB / 768MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-historical-1",
+          "NetIO": "50.7kB / 36.2kB",
+          "PIDs": "58"
+        },
+        {
+          "BlockIO": "66.7MB / 337MB",
+          "CPUPerc": "0.62%",
+          "Container": "270403b77b6666a6958d1a43f051495e42f76f4990666f4ed93af3aec02a8624",
+          "ID": "270403b77b66",
+          "MemPerc": "87.05%",
+          "MemUsage": "445.7MiB / 512MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-metadata-1",
+          "NetIO": "587kB / 533kB",
+          "PIDs": "38"
+        },
+        {
+          "BlockIO": "0B / 1.7MB",
+          "CPUPerc": "0.18%",
+          "Container": "853702d242e4547bad672131a3569910afab122719af1d028ef19fe24f3f8e80",
+          "ID": "853702d242e4",
+          "MemPerc": "19.60%",
+          "MemUsage": "275.9MiB / 1.375GiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-middlemanager-1",
+          "NetIO": "69kB / 134kB",
+          "PIDs": "53"
+        },
+        {
+          "BlockIO": "164kB / 381kB",
+          "CPUPerc": "0.09%",
+          "Container": "537114a479e5a8bf872db680416420fa31619a11dae01aa2a7028d9c6f2731fe",
+          "ID": "537114a479e5",
+          "MemPerc": "26.46%",
+          "MemUsage": "67.73MiB / 256MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-zookeeper-1",
+          "NetIO": "86.6kB / 100kB",
+          "PIDs": "43"
+        }
+      ]
+    },
+    {
+      "label": "concurrent-3",
+      "containers": [
+        {
+          "BlockIO": "0B / 1.09MB",
+          "CPUPerc": "0.30%",
+          "Container": "aca5254edd9b171907da8c62798edab2d275a62ab50d60337623d28968f1a5a5",
+          "ID": "aca5254edd9b",
+          "MemPerc": "54.43%",
+          "MemUsage": "418MiB / 768MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-broker-1",
+          "NetIO": "39.9kB / 28.3kB",
+          "PIDs": "76"
+        },
+        {
+          "BlockIO": "500kB / 17.2MB",
+          "CPUPerc": "50.48%",
+          "Container": "3f5015a3609aee868f7f408697cbf585402982019668c4646d67b1ffab75d67f",
+          "ID": "3f5015a3609a",
+          "MemPerc": "82.40%",
+          "MemUsage": "1.236GiB / 1.5GiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-cassandra-1",
+          "NetIO": "547kB / 248kB",
+          "PIDs": "87"
+        },
+        {
+          "BlockIO": "0B / 930kB",
+          "CPUPerc": "0.28%",
+          "Container": "dd6d515a36c0c80815c2c901b5d4ab36ebe598bab07ef56834f2c093e349e650",
+          "ID": "dd6d515a36c0",
+          "MemPerc": "51.84%",
+          "MemUsage": "331.8MiB / 640MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-coordinator-1",
+          "NetIO": "257kB / 259kB",
+          "PIDs": "101"
+        },
+        {
+          "BlockIO": "0B / 238kB",
+          "CPUPerc": "0.30%",
+          "Container": "5359fcb4ef21294e390336b661e9d7061b960a310726c0e7aec31426ef4140db",
+          "ID": "5359fcb4ef21",
+          "MemPerc": "50.42%",
+          "MemUsage": "322.7MiB / 640MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-events-1",
+          "NetIO": "978kB / 807kB",
+          "PIDs": "54"
+        },
+        {
+          "BlockIO": "0B / 1.32MB",
+          "CPUPerc": "0.17%",
+          "Container": "7e9b9207a6aebc1c0436bc27e74779368e836ebdb46b6fb2c99cd682a1cbdce5",
+          "ID": "7e9b9207a6ae",
+          "MemPerc": "52.20%",
+          "MemUsage": "400.9MiB / 768MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-historical-1",
+          "NetIO": "50.7kB / 36.2kB",
+          "PIDs": "58"
+        },
+        {
+          "BlockIO": "67.7MB / 337MB",
+          "CPUPerc": "6.56%",
+          "Container": "270403b77b6666a6958d1a43f051495e42f76f4990666f4ed93af3aec02a8624",
+          "ID": "270403b77b66",
+          "MemPerc": "87.17%",
+          "MemUsage": "446.3MiB / 512MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-metadata-1",
+          "NetIO": "587kB / 533kB",
+          "PIDs": "38"
+        },
+        {
+          "BlockIO": "0B / 1.73MB",
+          "CPUPerc": "0.19%",
+          "Container": "853702d242e4547bad672131a3569910afab122719af1d028ef19fe24f3f8e80",
+          "ID": "853702d242e4",
+          "MemPerc": "19.57%",
+          "MemUsage": "275.5MiB / 1.375GiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-middlemanager-1",
+          "NetIO": "69kB / 134kB",
+          "PIDs": "53"
+        },
+        {
+          "BlockIO": "164kB / 397kB",
+          "CPUPerc": "0.09%",
+          "Container": "537114a479e5a8bf872db680416420fa31619a11dae01aa2a7028d9c6f2731fe",
+          "ID": "537114a479e5",
+          "MemPerc": "26.14%",
+          "MemUsage": "66.91MiB / 256MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-zookeeper-1",
+          "NetIO": "86.6kB / 100kB",
+          "PIDs": "43"
+        }
+      ]
+    },
+    {
+      "label": "sequential-3",
+      "containers": [
+        {
+          "BlockIO": "0B / 1.1MB",
+          "CPUPerc": "0.24%",
+          "Container": "aca5254edd9b171907da8c62798edab2d275a62ab50d60337623d28968f1a5a5",
+          "ID": "aca5254edd9b",
+          "MemPerc": "54.43%",
+          "MemUsage": "418MiB / 768MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-broker-1",
+          "NetIO": "39.9kB / 28.3kB",
+          "PIDs": "76"
+        },
+        {
+          "BlockIO": "655kB / 17.4MB",
+          "CPUPerc": "7.69%",
+          "Container": "3f5015a3609aee868f7f408697cbf585402982019668c4646d67b1ffab75d67f",
+          "ID": "3f5015a3609a",
+          "MemPerc": "80.72%",
+          "MemUsage": "1.211GiB / 1.5GiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-cassandra-1",
+          "NetIO": "622kB / 263kB",
+          "PIDs": "86"
+        },
+        {
+          "BlockIO": "1.77MB / 946kB",
+          "CPUPerc": "2.09%",
+          "Container": "dd6d515a36c0c80815c2c901b5d4ab36ebe598bab07ef56834f2c093e349e650",
+          "ID": "dd6d515a36c0",
+          "MemPerc": "52.34%",
+          "MemUsage": "335MiB / 640MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-coordinator-1",
+          "NetIO": "266kB / 266kB",
+          "PIDs": "101"
+        },
+        {
+          "BlockIO": "0B / 246kB",
+          "CPUPerc": "0.36%",
+          "Container": "5359fcb4ef21294e390336b661e9d7061b960a310726c0e7aec31426ef4140db",
+          "ID": "5359fcb4ef21",
+          "MemPerc": "50.59%",
+          "MemUsage": "323.8MiB / 640MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-events-1",
+          "NetIO": "1.01MB / 888kB",
+          "PIDs": "54"
+        },
+        {
+          "BlockIO": "0B / 1.33MB",
+          "CPUPerc": "7.89%",
+          "Container": "7e9b9207a6aebc1c0436bc27e74779368e836ebdb46b6fb2c99cd682a1cbdce5",
+          "ID": "7e9b9207a6ae",
+          "MemPerc": "52.33%",
+          "MemUsage": "401.9MiB / 768MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-historical-1",
+          "NetIO": "50.7kB / 36.2kB",
+          "PIDs": "58"
+        },
+        {
+          "BlockIO": "67.7MB / 337MB",
+          "CPUPerc": "0.67%",
+          "Container": "270403b77b6666a6958d1a43f051495e42f76f4990666f4ed93af3aec02a8624",
+          "ID": "270403b77b66",
+          "MemPerc": "87.22%",
+          "MemUsage": "446.6MiB / 512MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-metadata-1",
+          "NetIO": "593kB / 541kB",
+          "PIDs": "38"
+        },
+        {
+          "BlockIO": "147kB / 1.74MB",
+          "CPUPerc": "6.43%",
+          "Container": "853702d242e4547bad672131a3569910afab122719af1d028ef19fe24f3f8e80",
+          "ID": "853702d242e4",
+          "MemPerc": "19.64%",
+          "MemUsage": "276.5MiB / 1.375GiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-middlemanager-1",
+          "NetIO": "69kB / 134kB",
+          "PIDs": "53"
+        },
+        {
+          "BlockIO": "1.08MB / 406kB",
+          "CPUPerc": "0.34%",
+          "Container": "537114a479e5a8bf872db680416420fa31619a11dae01aa2a7028d9c6f2731fe",
+          "ID": "537114a479e5",
+          "MemPerc": "26.32%",
+          "MemUsage": "67.38MiB / 256MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-zookeeper-1",
+          "NetIO": "86.6kB / 100kB",
+          "PIDs": "43"
+        }
+      ]
+    },
+    {
+      "label": "final",
+      "containers": [
+        {
+          "BlockIO": "340kB / 1.16MB",
+          "CPUPerc": "0.55%",
+          "Container": "aca5254edd9b171907da8c62798edab2d275a62ab50d60337623d28968f1a5a5",
+          "ID": "aca5254edd9b",
+          "MemPerc": "55.75%",
+          "MemUsage": "428.1MiB / 768MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-broker-1",
+          "NetIO": "34.2kB / 24.6kB",
+          "PIDs": "76"
+        },
+        {
+          "BlockIO": "9.46MB / 16.8MB",
+          "CPUPerc": "4.72%",
+          "Container": "3f5015a3609aee868f7f408697cbf585402982019668c4646d67b1ffab75d67f",
+          "ID": "3f5015a3609a",
+          "MemPerc": "79.98%",
+          "MemUsage": "1.2GiB / 1.5GiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-cassandra-1",
+          "NetIO": "20.2kB / 362kB",
+          "PIDs": "94"
+        },
+        {
+          "BlockIO": "963kB / 995kB",
+          "CPUPerc": "5.30%",
+          "Container": "dd6d515a36c0c80815c2c901b5d4ab36ebe598bab07ef56834f2c093e349e650",
+          "ID": "dd6d515a36c0",
+          "MemPerc": "49.73%",
+          "MemUsage": "318.3MiB / 640MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-coordinator-1",
+          "NetIO": "205kB / 213kB",
+          "PIDs": "96"
+        },
+        {
+          "BlockIO": "0B / 94.2kB",
+          "CPUPerc": "0.41%",
+          "Container": "27a6d1bd1a8d4f69a7ae1b21cf314ac6fd641ed7372e4f959b9d49e238cc0409",
+          "ID": "27a6d1bd1a8d",
+          "MemPerc": "47.07%",
+          "MemUsage": "301.3MiB / 640MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-events-1",
+          "NetIO": "123kB / 8.75kB",
+          "PIDs": "49"
+        },
+        {
+          "BlockIO": "9.03MB / 1.13MB",
+          "CPUPerc": "0.24%",
+          "Container": "7e9b9207a6aebc1c0436bc27e74779368e836ebdb46b6fb2c99cd682a1cbdce5",
+          "ID": "7e9b9207a6ae",
+          "MemPerc": "53.19%",
+          "MemUsage": "408.5MiB / 768MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-historical-1",
+          "NetIO": "17.3kB / 11.4kB",
+          "PIDs": "57"
+        },
+        {
+          "BlockIO": "35.3MB / 17.4MB",
+          "CPUPerc": "5.16%",
+          "Container": "270403b77b6666a6958d1a43f051495e42f76f4990666f4ed93af3aec02a8624",
+          "ID": "270403b77b66",
+          "MemPerc": "84.87%",
+          "MemUsage": "434.5MiB / 512MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-metadata-1",
+          "NetIO": "182kB / 171kB",
+          "PIDs": "39"
+        },
+        {
+          "BlockIO": "344kB / 963kB",
+          "CPUPerc": "0.31%",
+          "Container": "853702d242e4547bad672131a3569910afab122719af1d028ef19fe24f3f8e80",
+          "ID": "853702d242e4",
+          "MemPerc": "18.47%",
+          "MemUsage": "260MiB / 1.375GiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-middlemanager-1",
+          "NetIO": "8.77kB / 5.8kB",
+          "PIDs": "49"
+        },
+        {
+          "BlockIO": "3.67MB / 131kB",
+          "CPUPerc": "0.24%",
+          "Container": "537114a479e5a8bf872db680416420fa31619a11dae01aa2a7028d9c6f2731fe",
+          "ID": "537114a479e5",
+          "MemPerc": "26.46%",
+          "MemUsage": "67.73MiB / 256MiB",
+          "Name": "ga-events-test-96c0ac7fdf4f-zookeeper-1",
+          "NetIO": "31kB / 37.8kB",
+          "PIDs": "43"
+        }
+      ]
+    }
+  ],
+  "success": true,
+  "docker": "8247705600 bytes; 8 CPUs",
+  "sourceRevision": "9a463dbb046e54c7f87cced82b649a2b58d64d36",
+  "sourceFilesSha256": {
+    "compose.apps.yml": "28f0979a00e9dda366605be1fcd0fb3835ebc1453426af1985ba3e701e1469ba",
+    "compose.datos.yml": "185c931e901d04ee1d3e7d4b9e84c433fd59bdb0da30b10557730a641600a505",
+    "Dockerfile": "5912b998fd71de8b6b7065e63e1021a7219258ede0149a9e34d7b428d43267ee",
+    "infra/Dockerfile.druid": "34ef79970b6d152b0674a2550826ed60ac3f6ee30df0369add1ad5c446d9edcb",
+    "infra/schema.cql": "39bb383c6fd4523552de8e3a550efef80c25430dfc3430571731762e51acba36",
+    "pom.xml": "a50153be6b3d548cdab0f4a6baf68bb0b9fa7db5993e6ab7b925bbeebb6a5957",
+    "src/main/java/org/greenalert/events/adapter/CassandraEventStore.java": "8d2028e79448e165966d8bd6544d115256252aa4a35d194ba362e6df651356ee",
+    "src/main/java/org/greenalert/events/adapter/DruidAnalytics.java": "adfeacf7baec9471ff94c5b21c6c2d0de6d3e6a0cac7f87221841b7f8f451cc7",
+    "src/main/java/org/greenalert/events/adapter/DruidTaskException.java": "1bfa88b1ebe469f0f5a5109f74f7082f793208ca1d5f5d9cdf82c8be92f7ca5a",
+    "src/main/java/org/greenalert/events/api/Errors.java": "8db3b6c83ecccdcd9e5ed9196494e9fc659fc07d82cc72754ff562bd9dded2a3",
+    "src/main/java/org/greenalert/events/api/EventController.java": "f4d8179d9f1183cb1a9e94231eec6c78b481316e7b4911222f72effe79efd87b",
+    "src/main/java/org/greenalert/events/api/ServiceSecurity.java": "60fbd00e09be9f8c72b43dd9a67e8c46cab9990083c2c5fd112b144a70a6580d",
+    "src/main/java/org/greenalert/events/application/EventService.java": "8c2cea9dc5be005e5e12fe1b49269a8d82a2fd38289bd1843d3b9279671b14b9",
+    "src/main/java/org/greenalert/events/config/DependencyHealth.java": "b8fe1c069c27ccc5d493a92a03fee12f62a28b53df4fdbbf99dc67053e57f017",
+    "src/main/java/org/greenalert/events/config/Infrastructure.java": "af13049d9ffb7784f12e3126d86968a0e2f3fe62a5cde80f160e15120849aa68",
+    "src/main/java/org/greenalert/events/config/Settings.java": "2b616eef4e2b47e3b55aa2ede693ceb054929cd96232c5a43077dfe59a6268b2",
+    "src/main/java/org/greenalert/events/domain/EnvironmentalEvent.java": "9bf82135b1e9756f1aca5bfd13e4bb15541cad682e1fbb201562a63605607e46",
+    "src/main/java/org/greenalert/events/domain/EventConflict.java": "bbc94e8301ea50d95fb6982bcfbc4b4a014004799788c1febc8fc4b5f50390c8",
+    "src/main/java/org/greenalert/events/domain/EventStore.java": "5d31fb850de881fa47e2611c174b4792f4291119cccbed60d65418aba4355f12",
+    "src/main/java/org/greenalert/events/EventsApplication.java": "7f519dfc04e5ac8752b99c7c63a148adbcd0293b12a2d387e6186e16b0b2f0d4",
+    "src/main/resources/application.yml": "01826c82fc84ae45ed72dbee25a106d6461639b3e7cdc1dd4648f21c422d27b7",
+    "src/test/java/org/greenalert/events/domain/EventValidationTest.java": "9e3c167712999e4a34d8d7667d076d29e5c7819e81f344d939e9f2ab953125e5",
+    "tests/real_stack.py": "a68066827f25dfca34a5840b37d83100b62ed2daea4fe836f4d5b9f5b484c705"
+  },
+  "druidTasks": [
+    {
+      "taskId": "index_greenalert_events_v1_bnehfkpb_2026-11-25T03:27:08.921Z",
+      "state": "SUCCESS",
+      "sourceEvents": 18,
+      "interval": "2026-01-15/2026-01-16"
+    },
+    {
+      "taskId": "index_greenalert_events_v1_bepglnhj_2026-11-25T03:27:21.738Z",
+      "state": "SUCCESS",
+      "sourceEvents": 18,
+      "interval": "2026-01-15/2026-01-16"
+    },
+    {
+      "taskId": "index_greenalert_events_v1_llbpclea_2026-11-25T03:28:31.966Z",
+      "state": "SUCCESS",
+      "sourceEvents": 20,
+      "interval": "2026-01-15/2026-01-16"
+    }
+  ],
+  "aggregate": {
+    "events": 18,
+    "reportsCreated": 10,
+    "rows": [
+      {
+        "hour": "2026-01-15T12:00:00.000Z",
+        "category": "agua",
+        "severity": "0",
+        "zone": "zona-1",
+        "events": 5,
+        "reportsCreated": 5
+      },
+      {
+        "hour": "2026-01-15T12:00:00.000Z",
+        "category": "agua",
+        "severity": "2",
+        "zone": "zona-1",
+        "events": 3,
+        "reportsCreated": 3
+      },
+      {
+        "hour": "2026-01-15T12:00:00.000Z",
+        "category": "agua",
+        "severity": "4",
+        "zone": "zona-1",
+        "events": 2,
+        "reportsCreated": 2
+      },
+      {
+        "hour": "2026-01-15T12:00:00.000Z",
+        "category": "aire",
+        "severity": "1",
+        "zone": "zona-2",
+        "events": 3,
+        "reportsCreated": 0
+      },
+      {
+        "hour": "2026-01-15T12:00:00.000Z",
+        "category": "aire",
+        "severity": "3",
+        "zone": "zona-2",
+        "events": 3,
+        "reportsCreated": 0
+      },
+      {
+        "hour": "2026-01-15T12:00:00.000Z",
+        "category": "aire",
+        "severity": "5",
+        "zone": "zona-2",
+        "events": 2,
+        "reportsCreated": 0
+      }
+    ]
+  },
+  "benchmarkSummary": {
+    "sequential": 576.47,
+    "concurrent": 238.59
+  },
+  "observedPeakConcurrency": 8.0,
+  "cgroupBeforeRestart": [
+    {
+      "containerId": "aca5254edd9b171907da8c62798edab2d275a62ab50d60337623d28968f1a5a5",
+      "memoryPeakBytes": 445169664,
+      "cpuCumulative": {
+        "usage_usec": "17910304",
+        "user_usec": "16295605",
+        "system_usec": "1614698",
+        "nice_usec": "0",
+        "nr_periods": "0",
+        "nr_throttled": "0",
+        "throttled_usec": "0",
+        "nr_bursts": "0",
+        "burst_usec": "0"
+      }
+    },
+    {
+      "containerId": "3f5015a3609aee868f7f408697cbf585402982019668c4646d67b1ffab75d67f",
+      "memoryPeakBytes": 1356591104,
+      "cpuCumulative": {
+        "usage_usec": "36776598",
+        "user_usec": "32291040",
+        "system_usec": "4485558",
+        "nice_usec": "0",
+        "nr_periods": "0",
+        "nr_throttled": "0",
+        "throttled_usec": "0",
+        "nr_bursts": "0",
+        "burst_usec": "0"
+      }
+    },
+    {
+      "containerId": "dd6d515a36c0c80815c2c901b5d4ab36ebe598bab07ef56834f2c093e349e650",
+      "memoryPeakBytes": 360108032,
+      "cpuCumulative": {
+        "usage_usec": "17036702",
+        "user_usec": "15410305",
+        "system_usec": "1626396",
+        "nice_usec": "0",
+        "nr_periods": "0",
+        "nr_throttled": "0",
+        "throttled_usec": "0",
+        "nr_bursts": "0",
+        "burst_usec": "0"
+      }
+    },
+    {
+      "containerId": "5359fcb4ef21294e390336b661e9d7061b960a310726c0e7aec31426ef4140db",
+      "memoryPeakBytes": 350461952,
+      "cpuCumulative": {
+        "usage_usec": "66253733",
+        "user_usec": "61818676",
+        "system_usec": "4435056",
+        "nice_usec": "0",
+        "nr_periods": "0",
+        "nr_throttled": "0",
+        "throttled_usec": "0",
+        "nr_bursts": "0",
+        "burst_usec": "0"
+      }
+    },
+    {
+      "containerId": "7e9b9207a6aebc1c0436bc27e74779368e836ebdb46b6fb2c99cd682a1cbdce5",
+      "memoryPeakBytes": 427393024,
+      "cpuCumulative": {
+        "usage_usec": "33564682",
+        "user_usec": "28754817",
+        "system_usec": "4809865",
+        "nice_usec": "0",
+        "nr_periods": "0",
+        "nr_throttled": "0",
+        "throttled_usec": "0",
+        "nr_bursts": "0",
+        "burst_usec": "0"
+      }
+    },
+    {
+      "containerId": "270403b77b6666a6958d1a43f051495e42f76f4990666f4ed93af3aec02a8624",
+      "memoryPeakBytes": 499249152,
+      "cpuCumulative": {
+        "usage_usec": "22357816",
+        "user_usec": "12097958",
+        "system_usec": "10259858",
+        "nice_usec": "0",
+        "nr_periods": "0",
+        "nr_throttled": "0",
+        "throttled_usec": "0",
+        "nr_bursts": "0",
+        "burst_usec": "0"
+      }
+    },
+    {
+      "containerId": "853702d242e4547bad672131a3569910afab122719af1d028ef19fe24f3f8e80",
+      "memoryPeakBytes": 590143488,
+      "cpuCumulative": {
+        "usage_usec": "73974283",
+        "user_usec": "66300346",
+        "system_usec": "7673936",
+        "nice_usec": "0",
+        "nr_periods": "0",
+        "nr_throttled": "0",
+        "throttled_usec": "0",
+        "nr_bursts": "0",
+        "burst_usec": "0"
+      }
+    },
+    {
+      "containerId": "537114a479e5a8bf872db680416420fa31619a11dae01aa2a7028d9c6f2731fe",
+      "memoryPeakBytes": 79527936,
+      "cpuCumulative": {
+        "usage_usec": "8011015",
+        "user_usec": "5916491",
+        "system_usec": "2094524",
+        "nice_usec": "0",
+        "nr_periods": "0",
+        "nr_throttled": "0",
+        "throttled_usec": "0",
+        "nr_bursts": "0",
+        "burst_usec": "0"
+      }
+    }
+  ],
+  "cleanup": "solo proyecto ga-events-test-96c0ac7fdf4f",
+  "finishedUtc": "2026-11-25T03:30:13.244170+00:00"
+}

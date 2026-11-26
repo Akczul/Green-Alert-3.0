@@ -5,7 +5,7 @@ import {
   Loader2, AlertTriangle, RefreshCw, UserCog,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { getAdminUsuarios, cambiarRolUsuario, cambiarEstadoUsuario, eliminarUsuarioAdmin } from '../services/api';
+import { getAdminUsuarios, cambiarRolUsuario, cambiarEstadoUsuario, eliminarUsuarioAdmin, getAdminAuditoria } from '../services/api';
 import { useToast } from '../context/ToastContext';
 import { useAuth } from '../context/AuthContext';
 
@@ -13,10 +13,25 @@ import { useAuth } from '../context/AuthContext';
 
 const ROLES = ['ciudadano', 'moderador', 'admin'];
 
+// Jerarquía: 'superadmin' es rol admin con nivel global; 'admin' es administrador de ámbito.
+// El backend decide el permiso real por objeto; aquí solo se ofrecen las opciones válidas.
+const OPCIONES_ROL = {
+  ciudadano:  { rol: 'ciudadano' },
+  moderador:  { rol: 'moderador' },
+  admin:      { rol: 'admin', nivel_admin: 'ambito', ambito_entidad: null },
+  superadmin: { rol: 'admin', nivel_admin: 'global' },
+};
+const esSuperadmin = (u) => u?.rol === 'admin' && u?.nivel_admin === 'global';
+const valorRol = (u) => (esSuperadmin(u) ? 'superadmin' : u.rol);
+const opcionesPara = (actor) => (esSuperadmin(actor)
+  ? ['ciudadano', 'moderador', 'admin', 'superadmin']
+  : ['ciudadano', 'moderador']);
+
 const rolBadge = {
   ciudadano: 'bg-green-500/15 text-green-400 border-green-500/30',
   moderador: 'bg-blue-500/15  text-blue-400  border-blue-500/30',
   admin:     'bg-yellow-500/15 text-yellow-400 border-yellow-500/30',
+  superadmin:'bg-orange-500/15 text-orange-300 border-orange-500/30',
   entidad:   'bg-violet-500/15 text-violet-300 border-violet-500/30',
 };
 const rolIcon = {
@@ -25,7 +40,7 @@ const rolIcon = {
   admin:     Shield,
   entidad:   Building2,
 };
-const rolLabel = { ciudadano: 'Ciudadano', moderador: 'Moderador', admin: 'Admin' };
+const rolLabel = { ciudadano: 'Ciudadano', moderador: 'Moderador', admin: 'Admin de ámbito', superadmin: 'Superadmin', entidad: 'Entidad' };
 
 const ROL_ACCENT = {
   ciudadano: '#4ADE80',
@@ -73,7 +88,12 @@ function ConfirmModal({ message, onConfirm, onCancel, confirmLabel = 'Confirmar'
 
 // ── Fila de usuario ───────────────────────────────────────────────────────────
 
-function UsuarioRow({ usuario, onCambiarRol, onToggleEstado, onEliminar, currentUserId, loadingId }) {
+function UsuarioRow({ usuario, onCambiarRol, onToggleEstado, onEliminar, currentUser, loadingId }) {
+  const currentUserId = currentUser?.id_usuario;
+  const valor = valorRol(usuario);
+  const opciones = opcionesPara(currentUser);
+  // Un administrador de ámbito no puede modificar a otros administradores.
+  const bloqueado = !esSuperadmin(currentUser) && usuario.rol === 'admin';
   const _RolIcon = rolIcon[usuario.rol] ?? UserCircle;
   const isMe = usuario.id_usuario === currentUserId;
   const busy = loadingId === usuario.id_usuario;
@@ -113,15 +133,19 @@ function UsuarioRow({ usuario, onCambiarRol, onToggleEstado, onEliminar, current
       {/* Rol */}
       <td className="px-4 py-3">
         <select
-          value={usuario.rol}
-          disabled={isMe || busy}
+          value={valor}
+          aria-label={`Rol de ${usuario.nombre}`}
+          disabled={isMe || busy || bloqueado}
           onChange={(e) => onCambiarRol(usuario, e.target.value)}
-          className={`badge border cursor-pointer bg-transparent text-xs font-medium rounded-full px-2.5 py-1 ${rolBadge[usuario.rol]} disabled:opacity-50 disabled:cursor-not-allowed`}
+          className={`badge border cursor-pointer bg-transparent text-xs font-medium rounded-full px-2.5 py-1 ${rolBadge[valor]} disabled:opacity-50 disabled:cursor-not-allowed`}
         >
-          {ROLES.map((r) => (
-            <option key={r} value={r} className="bg-gray-900 text-gray-200">{rolLabel[r]}</option>
+          {(opciones.includes(valor) ? opciones : [valor, ...opciones]).map((r) => (
+            <option key={r} value={r} disabled={!opciones.includes(r)} className="bg-gray-900 text-gray-200">{rolLabel[r] ?? r}</option>
           ))}
         </select>
+        {usuario.rol === 'admin' && !esSuperadmin(usuario) && usuario.ambito_entidad && (
+          <p className="text-[11px] text-gray-500 mt-1">Ámbito: entidad #{usuario.ambito_entidad}</p>
+        )}
       </td>
 
       {/* Estado */}
@@ -144,7 +168,7 @@ function UsuarioRow({ usuario, onCambiarRol, onToggleEstado, onEliminar, current
           ) : (
             <>
               {/* Activar / Desactivar */}
-              {!isMe && (
+              {!isMe && !bloqueado && (
                 <button
                   onClick={() => onToggleEstado(usuario)}
                   title={usuario.activo ? 'Desactivar' : 'Activar'}
@@ -158,7 +182,7 @@ function UsuarioRow({ usuario, onCambiarRol, onToggleEstado, onEliminar, current
                 </button>
               )}
               {/* Eliminar */}
-              {!isMe && (
+              {!isMe && !bloqueado && (
                 <button
                   onClick={() => onEliminar(usuario)}
                   title="Eliminar usuario"
@@ -172,6 +196,35 @@ function UsuarioRow({ usuario, onCambiarRol, onToggleEstado, onEliminar, current
         </div>
       </td>
     </motion.tr>
+  );
+}
+
+// ── Bitácora (solo superadministrador; de solo lectura en backend y en MySQL) ──
+
+function AuditoriaAdmin() {
+  const [items, setItems] = useState(null);
+  const [error, setError] = useState('');
+  useEffect(() => {
+    getAdminAuditoria({ limit: 20 })
+      .then(({ data }) => setItems(data.data.items ?? []))
+      .catch((err) => setError(err.response?.data?.message ?? 'No se pudo cargar la auditoría.'));
+  }, []);
+  return (
+    <section aria-labelledby="auditoria-titulo" className="bg-gray-900 border border-gray-800 rounded-xl p-4">
+      <h2 id="auditoria-titulo" className="text-sm font-semibold text-gray-200 mb-3">Auditoría administrativa reciente</h2>
+      {error && <p role="alert" className="text-sm text-red-400">{error}</p>}
+      {!error && items === null && <Loader2 className="w-5 h-5 text-gray-500 animate-spin" aria-label="Cargando auditoría" />}
+      {items?.length === 0 && <p className="text-sm text-gray-500">Sin cambios registrados.</p>}
+      {items?.length > 0 && (
+        <ul className="space-y-1 text-xs text-gray-400">
+          {items.map((it) => (
+            <li key={it.id}>
+              {formatDate(it.occurred_at)} · actor #{it.actor_id ?? 'inicialización'} · {it.action} · usuario #{it.target_id}
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   );
 }
 
@@ -235,7 +288,7 @@ export default function AdminUsuarios() {
   // ── Acciones ──
 
   const handleCambiarRol = (usuario, nuevoRol) => {
-    if (usuario.rol === nuevoRol) return;
+    if (valorRol(usuario) === nuevoRol) return;
     setModal({ type: 'rol', usuario, nuevoRol });
   };
 
@@ -255,7 +308,8 @@ export default function AdminUsuarios() {
 
     try {
       if (type === 'rol') {
-        await cambiarRolUsuario(usuario.id_usuario, nuevoRol);
+        const { rol, ...extra } = OPCIONES_ROL[nuevoRol];
+        await cambiarRolUsuario(usuario.id_usuario, rol, extra);
         showToast(`Rol cambiado a ${rolLabel[nuevoRol]}.`, 'success');
         fetchUsuarios();
       } else if (type === 'estado') {
@@ -398,7 +452,7 @@ export default function AdminUsuarios() {
                       onCambiarRol={handleCambiarRol}
                       onToggleEstado={handleToggleEstado}
                       onEliminar={handleEliminar}
-                      currentUserId={currentUser?.id_usuario}
+                      currentUser={currentUser}
                       loadingId={loadingId}
                     />
                   ))}
@@ -433,6 +487,8 @@ export default function AdminUsuarios() {
           </div>
         </div>
       )}
+
+      {esSuperadmin(currentUser) && <AuditoriaAdmin />}
 
       {/* Modal de confirmación */}
       <AnimatePresence>
