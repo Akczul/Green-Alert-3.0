@@ -1,5 +1,7 @@
 # Compilación Android local
 
+Estado vigente y procedencia: [misión 01](cierre-definitivo/01-sincronizacion-android.md) y [manifiesto Android](evidencias-integracion/apk.json). Las instrucciones de Windows siguientes documentan los intentos históricos; para nuevas compilaciones se utiliza exclusivamente la sección Linux/Docker.
+
 Se utiliza Expo SDK 58, React Native y dependencias fijadas en apps/mobile/package-lock.json. No se usa EAS ni se suben fuentes a un proveedor. No es necesario publicar en Play Store.
 
 ## Herramientas observadas
@@ -60,7 +62,7 @@ npm.cmd run apk:docker
 
 apps/mobile/docker/apk.Dockerfile usa node:24.11.1-bookworm y OpenJDK 17, descarga commandlinetools-linux-15859902_latest.zip con SHA-256 4e4c464f145a7512b57d088ac6c278c03c9eea610886b35a5e0804e74eedf583 comprobado, instala platform-tools, platforms;android-37.0, build-tools;37.0.0, ndk;27.1.12297006 y cmake;3.22.1, ejecuta npm ci con el lockfile, expo prebuild y gradlew :app:assembleRelease (arm64-v8a por defecto; GREENALERT_ANDROID_ABIS admite también x86_64 para emulador). La caché de Gradle es un montaje de BuildKit; repetir la compilación reutiliza capas.
 
-Salida en .local/apk (fuera de Git): greenalert.apk, greenalert.apk.sha256, firma.txt (apksigner verify --print-certs) y apk.json con hash, commit, ABI, URL inicial y si las fuentes móviles tenían cambios sin commit. La firma es la debug de la plantilla Expo: válida para instalar en evaluación, nunca para publicar.
+Salida en .local/apk (fuera de Git): greenalert.apk, greenalert.apk.sha256, firma.txt (apksigner verify --print-certs), contenido.txt (paquete, SDK, ABI y bundle) y apk.json con hash, commit de compilación, árbol móvil, ABI y URL inicial. Se rechazan fuentes móviles sin confirmar. El empaquetador resuelve las rutas desde la raíz del repositorio, valida la procedencia y conserva por separado el SHA de entrega; admite commits posteriores exclusivamente documentales, incluidos `apps/mobile/docs`. La firma es la debug de la plantilla Expo: válida para instalar en evaluación, nunca para publicar.
 
 Instalación en el teléfono (depuración USB activada):
 

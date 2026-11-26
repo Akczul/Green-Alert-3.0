@@ -1,0 +1,36 @@
+[
+  {
+    "command": "npm --prefix apps/mobile run lint",
+    "exitCode": 0
+  },
+  {
+    "command": "npm --prefix apps/mobile run typecheck",
+    "exitCode": 0
+  },
+  {
+    "command": "npm --prefix apps/mobile run test",
+    "exitCode": 1
+  },
+  {
+    "command": "npm --prefix apps/mobile run check",
+    "exitCode": 0
+  },
+  {
+    "command": "npm --prefix apps/mobile run bundle:android",
+    "exitCode": 0
+  },
+  {
+    "command": "npm --prefix apps/mobile test (repetición exacta)",
+    "exitCode": 0,
+    "passed": 58,
+    "failed": 0
+  },
+  {
+    "command": "npm --prefix apps/mobile run prebuild:android",
+    "exitCode": 0
+  },
+  {
+    "command": "node --test scripts/apk-provenance.test.mjs",
+    "exitCode": 0
+  }
+]

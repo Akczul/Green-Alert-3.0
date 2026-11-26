@@ -1,5 +1,9 @@
 # Verificación de la integración final
 
+## Cierre Android sobre origin/main
+
+El estado vigente, comandos y límites de la misión 01 están en [cierre-definitivo/01-sincronizacion-android.md](cierre-definitivo/01-sincronizacion-android.md). La evidencia Android vigente es [evidencias-integracion/apk.json](evidencias-integracion/apk.json). El manifiesto negativo anterior se conserva en [apk-windows-historico.json](evidencias-integracion/apk-windows-historico.json). Las secciones siguientes son registros de fases anteriores; sus menciones de ausencia de APK o de falta de publicación no describen esta misión.
+
 ## Fase de cumplimiento del instructivo (rama feat/cumplimiento-docente, 25 de noviembre de 2026)
 
 Commits locales firmados a74b986 (jerarquía, Compose en dos proyectos, APK en Linux) y 268b639 (HTTPS, cookies y CSRF, OIDC de Microsoft con MFA federada). No se hizo push. Matriz completa: [cumplimiento-docente.md](cumplimiento-docente.md).
@@ -85,9 +89,9 @@ Host: Windows/PowerShell, Node 26.13.0. Backend Docker: Node 24.22.3. Docker Eng
 - Se espera la disponibilidad de segmentos/servicios tras reinicios mediante lecturas acotadas; no se repiten ciegamente escrituras de negocio.
 - El cliente móvil reconoce el 403 específico de sesión revocada y conserva una sesión ante un 403 de permisos.
 
-## Android y entrega física
+## Android y entrega física: historia de b21e47e
 
-**APK no generada.** La primera compilación nativa falló con manifest build.ninja still dirty after 100 tries en react-native-screens. Se preparó una copia corta D:\ga-final-build con npm ci, sin enlaces ni .git. Se comprobó igualdad de los 43 archivos fuente frente al proyecto integrado. El segundo intento llegó a compilar módulos nativos y falló en :app:buildCMakeRelWithDebInfo[arm64-v8a]: Ninja rechazó un objeto RNGestureHandlerDetectorShadowNode.cpp.o por superar 260 caracteres. Duración reportada: 10 min 35 s.
+**APK no generada en aquella fase de Windows.** La primera compilación nativa falló con manifest build.ninja still dirty after 100 tries en react-native-screens. Se preparó una copia corta D:\ga-final-build con npm ci, sin enlaces ni .git. Se comprobó igualdad de los 43 archivos fuente frente al proyecto integrado. El segundo intento llegó a compilar módulos nativos y falló en :app:buildCMakeRelWithDebInfo[arm64-v8a]: Ninja rechazó un objeto RNGestureHandlerDetectorShadowNode.cpp.o por superar 260 caracteres. Duración reportada: 10 min 35 s.
 
 El tercer intento probó CMAKE_OBJECT_PATH_MAX=128 mediante un config plugin Expo, sin editar el proyecto generado a mano. Terminó en 2 min 8 s con el mismo límite Win32; el prefijo ya excedía 128 caracteres y CMake no pudo acortarlo. Se retiró ese ajuste experimental del código entregado. Se conservan evidencias saneadas de los errores. No se habilitaron cambios globales del registro, no se publicaron fuentes en EAS y no se afirmó una compilación exitosa.
 
