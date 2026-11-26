@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { validateApk } from './apk-provenance.mjs';
 const root=fileURLToPath(new URL('../',import.meta.url));
 const output=path.join(root,'docs/entrega');
 await fs.mkdir(output,{recursive:true});
@@ -9,6 +10,7 @@ const optional=async p=>{try{return JSON.parse(await read(p));}catch{return null
 const result=await optional('.local/integracion/resultado.json');
 const measurement=await optional('.local/integracion/medicion.json');
 const apk=await optional('.local/integracion/apk.json');
+if(apk?.exists) validateApk(root,apk);
 const browser=await optional('.local/integracion/browser/resultado.json');
 const compliance=await optional('docs/evidencias-integracion/cumplimiento.json');
 const complianceText=compliance?`${compliance.passed}/${compliance.total} comprobaciones de cumplimiento contra el stack real (commit ${compliance.commit.slice(0,7)})`:'Verificación de cumplimiento no registrada';
