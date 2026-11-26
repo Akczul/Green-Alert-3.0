@@ -59,6 +59,9 @@ RUN --mount=type=cache,target=/gradle \
  && mkdir -p /out \
  && cp app/build/outputs/apk/release/app-release.apk /out/greenalert.apk \
  && "$ANDROID_HOME/build-tools/37.0.0/apksigner" verify --print-certs /out/greenalert.apk > /out/firma.txt \
+ && "$ANDROID_HOME/build-tools/37.0.0/aapt" dump badging /out/greenalert.apk > /out/contenido.txt \
+ && unzip -l /out/greenalert.apk >> /out/contenido.txt \
+ && grep -q 'assets/index.android.bundle' /out/contenido.txt \
  && sha256sum /out/greenalert.apk > /out/greenalert.apk.sha256
 
 FROM scratch AS apk

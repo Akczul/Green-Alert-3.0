@@ -1,5 +1,13 @@
 # Verificación móvil
 
+## Cierre Android del 25 de noviembre de 2026
+
+La misión 01 compiló la APK release en Linux/Docker (567 tareas), verificó firma V2, paquete, ABI arm64 y bundle integrado, y la instaló con `adb install -r` en Samsung SM-A055M, Android 15/API 35. Lint, configuración JS, dependencias Expo, bundle, prebuild y 58 pruebas móviles pasaron; se conserva el timeout de la primera ejecución y su repetición exacta correcta. La primera finalización del manifiesto falló por el nuevo texto `V2 Signer` de Build Tools 37; se corrigió el lector y se reexportó usando la caché, sin recompilar fuentes nativas.
+
+Estado, hash, commits de compilación/validación y resultados físicos: [misión 01](../../../docs/cierre-definitivo/01-sincronizacion-android.md) y [manifiesto vigente](../../../docs/evidencias-integracion/apk.json). Los apartados siguientes conservan el historial de `feat/mobile`; su afirmación de ausencia de APK fue sustituida por esta evidencia.
+
+## Registro histórico de feat/mobile
+
 Fecha de trabajo: 24 de noviembre de 2026, America/Bogota. Rama `feat/mobile`, worktree exclusivo `D:\Juan Diego\7. Septimo Semestre\GreenAlert3.0-mobile`. Base inspeccionada: `9a463db`. No se han modificado fuentes backend/frontend ni archivos compartidos.
 
 ## Entorno
@@ -41,3 +49,5 @@ npm informa deprecaciones en herramientas y avisos de scripts opcionales de `@pa
 El intento directo de Gradle no llegó a compilar la aplicación y el runner final se detiene al comprobar la ausencia del SDK. No se inició una build EAS, no hubo login externo, subida de fuentes, push ni publicación. La alternativa EAS y la compilación local están documentadas; ambas necesitan terminar la configuración de su entorno.
 
 No se probaron API desplegada, MySQL real, SMTP, proveedores OIDC/MFA, autorización por objeto en servidor, GPS/cámara de dispositivo, Android Keystore en hardware, render de pantalla Android ni instalación física. Los tests de esos adaptadores utilizan dobles y no sustituyen el recorrido de `aceptacion.md`. El cumplimiento integral del instructivo y la aceptación final quedan pendientes de esa evidencia.
+
+Entrega inmediata: el código corregido pasó 60/60 pruebas y conserva el contrato files; esa corrección aún no está incluida en la APK instalada. El binario previo se conserva por prioridad expresa de Moodle. Véase la misión 01 para los resultados físicos y las diferencias de revisiones.

@@ -1,0 +1,74 @@
+[
+  {
+    "name": "Instalación física",
+    "status": "passed",
+    "detail": "adb install -r: Success; Samsung SM-A055M, Android 15/API 35, arm64-v8a",
+    "checkedAt": "2026-11-26T04:17:03.5712538Z"
+  },
+  {
+    "name": "Apertura sin Metro ni Expo Go",
+    "status": "passed",
+    "detail": "Inicio frío de co.greenalert.mobile/.MainActivity; pantalla nativa de acceso visible, bundle embebido; sin servidor Metro de desarrollo",
+    "checkedAt": "2026-11-26T04:18:33.625788Z"
+  },
+  {
+    "name": "Configurar URL del servidor",
+    "status": "passed",
+    "detail": "Edición y guardado de http://192.168.18.11:8080/api desde pantalla de acceso",
+    "checkedAt": "2026-11-26T04:19:12.1373679Z"
+  },
+  {
+    "name": "Registro de usuario desde Android",
+    "status": "passed",
+    "detail": "Cuenta sintética creada por UI; respuesta real de API LAN y pantalla Hola, Prueba",
+    "checkedAt": "2026-11-26T04:23:44.4692325Z"
+  },
+  {
+    "name": "Consulta de reportes ambientales",
+    "status": "passed",
+    "detail": "Lista real de dos reportes sintéticos consultada desde Android por API LAN",
+    "checkedAt": "2026-11-26T04:24:16.9171926Z"
+  },
+  {
+    "name": "Obtención de ubicación física",
+    "status": "passed",
+    "detail": "Coordenadas obtenidas en el teléfono; valores no registrados y retirados antes del alta",
+    "checkedAt": "2026-11-26T04:26:23.1246141Z"
+  },
+  {
+    "name": "Captura de fotografía con cámara",
+    "status": "passed",
+    "detail": "Recorrido físico asistido: permiso concedido y fotografía devuelta al formulario, Evidencias 1/10",
+    "checkedAt": "2026-11-26T04:27:53.9710793Z"
+  },
+  {
+    "name": "Adjuntar imagen de galería",
+    "status": "passed",
+    "detail": "Selector nativo del sistema, imagen sintética del logotipo comprobada como más reciente y adjunta al formulario",
+    "checkedAt": "2026-11-26T04:29:50.5991524Z"
+  },
+  {
+    "name": "Creación de reporte sin fotografía",
+    "status": "passed",
+    "detail": "Android mostró Reporte enviado; proxy registró POST /api/reportes 201",
+    "checkedAt": "2026-11-26T04:32:02.6235496Z"
+  },
+  {
+    "name": "Envío de evidencia remota",
+    "status": "failed",
+    "detail": "Con imagen adjunta fetch informó fallo de conexión y no se observó POST /api/reportes en proxy; además faltan credenciales Cloudinary. No se acredita subida remota",
+    "checkedAt": "2026-11-26T04:32:02.6657545Z"
+  },
+  {
+    "name": "Consulta de reportes propios",
+    "status": "passed",
+    "detail": "Mis reportes mostró el reporte creado en Android y su ID de servidor 3",
+    "checkedAt": "2026-11-26T04:33:50.7976029Z"
+  },
+  {
+    "name": "Persistencia segura tras reiniciar app",
+    "status": "passed",
+    "detail": "Force-stop e inicio frío recuperaron la ruta autenticada sin volver a introducir credenciales",
+    "checkedAt": "2026-11-26T04:38:07.1852494Z"
+  }
+]

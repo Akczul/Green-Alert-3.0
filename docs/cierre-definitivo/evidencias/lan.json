@@ -1,0 +1,12 @@
+{
+  "url": "http://192.168.18.11:8080/api/health",
+  "statusCode": 200,
+  "body": {
+    "status": "ok",
+    "message": "servidor funcionando correctamente",
+    "database": "conectada",
+    "timestamp": "2026-11-26T03:35:10.652Z"
+  },
+  "checkedAt": "2026-11-26T03:35:10.7194450Z",
+  "scope": "Desde host por IP LAN; no acredita acceso desde teléfono ni reglas del firewall entrante"
+}

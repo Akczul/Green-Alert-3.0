@@ -1,0 +1,8 @@
+{
+  "model": "SM-A055M",
+  "android": "15",
+  "apiLevel": "35",
+  "abis": "arm64-v8a,armeabi-v7a,armeabi",
+  "existingPackage": "",
+  "checkedAt": "2026-11-26T03:53:29.9584105Z"
+}

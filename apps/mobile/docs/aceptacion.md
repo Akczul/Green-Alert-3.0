@@ -1,5 +1,7 @@
 # Aceptación Android y trazabilidad
 
+Actualización de misión 01 (25 de noviembre de 2026): APK release compilada en Docker, firma V2 verificada e instalación comprobada en Samsung SM-A055M, Android 15/API 35. El resultado de cada recorrido físico se conserva en [misión 01](../../../docs/cierre-definitivo/01-sincronizacion-android.md) y sus evidencias; la matriz siguiente es el registro histórico anterior a ese cierre. Una instalación correcta no acredita automáticamente todos los pasos del recorrido.
+
 Fuente: instructivo oficial `Programación_avanzada-Instructivo_proyecto_final_2026-2.pdf`, páginas 1–3 y 5–7, leído del repositorio original en `docs/requisitos`. Ese PDF todavía no figuraba en el checkout inicial de esta rama; no se copió ni modificó documentación compartida. Esta matriz cubre el aporte móvil; no certifica el proyecto completo.
 
 | Requisito | Caso / implementación | Comprobación automatizada | Evidencia pendiente |

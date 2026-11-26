@@ -1,5 +1,7 @@
 # Cumplimiento del instructivo del proyecto final (rama feat/cumplimiento-docente)
 
+Actualización Android: consultar [misión 01](cierre-definitivo/01-sincronizacion-android.md) y [manifiesto vigente](evidencias-integracion/apk.json). Las cifras y verificaciones de otros módulos de esta matriz corresponden a la fase original; esta misión no rehace la auditoría docente. Compilación, firma y pruebas automatizadas se distinguen de instalación y aceptación en hardware.
+
 Matriz de los requisitos del instructivo de Programación Avanzada – Bases de Datos No Relacionales frente al código de esta rama. «Cumple» significa que hay código **y** prueba o evidencia reproducible; lo que depende de terceros o de un dispositivo físico se marca aparte. Base: `feat/integracion-final` (b21e47e).
 
 ## Resumen de brechas cerradas en esta fase

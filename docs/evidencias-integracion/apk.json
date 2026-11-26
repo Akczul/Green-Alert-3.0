@@ -1,8 +1,32 @@
 {
-  "exists": false,
-  "path": null,
-  "blocker": "Ninja/CMake en Windows rechazó un objeto C++ de react-native-gesture-handler por superar 260 caracteres; tres intentos locales fallidos. No hay APK instalable verificada.",
-  "attempts": 3,
-  "device": "adb sin dispositivos conectados",
-  "linuxAlternative": "Documentada, no ejecutada"
+  "exists": true,
+  "path": ".local/apk/greenalert.apk",
+  "sha256": "a22770874f34310912f669c754d8015f774c8289702d4b4a8e6f4b83d1c202e1",
+  "commit": "75f3bf8bfb46239d2c0095d26ed794fffee6e184",
+  "mobileSourcesDirty": false,
+  "mobileSourceTree": "0de8f1328906d4bf03e9bc55844e1fc9b7fa47d1",
+  "bytes": 31506987,
+  "nativeAbis": [
+    "arm64-v8a"
+  ],
+  "certificateSha256": "fac61745dc0903786fb9ede62a962b399f7348f0bb6f899b8332667591033b9c",
+  "abis": "arm64-v8a",
+  "initialApiUrl": "http://192.168.18.11:8080/api",
+  "allowHttp": true,
+  "builtAt": "2026-11-26T04:16:35.659Z",
+  "signing": "debug (evaluación, no publicar)",
+  "builder": "apps/mobile/docker/apk.Dockerfile (Linux)",
+  "originalCompilationCommit": "75f3bf8bfb46239d2c0095d26ed794fffee6e184",
+  "cacheExportCommit": "c6d2e3e1263cb0c99de9da39ddd6262c766b6753",
+  "note": "Primera compilación nativa; reexportación posterior en caché con idéntico árbol móvil, tras corregir lectura de firma V2.",
+  "minSdk": 24,
+  "targetSdk": 36,
+  "installation": {
+    "deviceModel": "SM-A055M",
+    "android": "15",
+    "apiLevel": 35,
+    "status": "passed"
+  },
+  "correspondsToFinalMobileSources": false,
+  "sourceDifference": "El código final incorpora corrección File/Blob para multipart de Expo 58, con 60 tests aprobados; no se recompiló esta APK por entrega inmediata."
 }

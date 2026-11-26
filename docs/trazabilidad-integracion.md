@@ -1,5 +1,7 @@
 # Trazabilidad de la integración final
 
+La matriz siguiente registra la integración histórica. Para sincronización, publicación y Android sobre `ef06a11`, prevalecen [misión 01](cierre-definitivo/01-sincronizacion-android.md) y [apk.json](evidencias-integracion/apk.json). La evidencia negativa de Windows se conserva por separado; no debe confundirse con el estado vigente. No se recalculó la auditoría de 227 criterios.
+
 Esta matriz complementa la auditoría histórica de 227 filas. No recalcula porcentajes ni concede cumplimiento a una fila amplia por implementar una parte. Los resultados actuales se generan en docs/evidencias-integracion; si allí figura un fallo, prevalece sobre una expectativa de este documento.
 
 | Requisito o componente | Código o artefacto | Evidencia y alcance | Límite |
